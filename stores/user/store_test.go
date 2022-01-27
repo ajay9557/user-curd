@@ -46,7 +46,7 @@ func Test_Create(t *testing.T) {
 				t.Errorf("Error Occoured")
 			}
 			if err != nil && !reflect.DeepEqual(testCase.expectedError, err) {
-				fmt.Println("Output: ", err, "Expected: ", testCase.expectedError)
+				t.Errorf("Output: %v, Expected: %v", err, testCase.expectedError)
 			}
 		})
 	}

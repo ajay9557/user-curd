@@ -2,7 +2,6 @@ package user
 
 import (
 	"errors"
-	"fmt"
 	"go_lang/Assignment/user-curd/models"
 	"go_lang/Assignment/user-curd/services"
 	"go_lang/Assignment/user-curd/stores"
@@ -18,7 +17,6 @@ func New(si stores.Crud) Services {
 
 func (userservice *UserService) AddUser(usr models.User) error {
 
-	fmt.Println(services.IsNumberValid(usr.Phone))
 	if !services.IsNumberValid(usr.Phone) {
 		return errors.New("INVALID PHONE NUMBER")
 	}

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 )
@@ -13,7 +12,6 @@ func IsUniqueEmail(email string) bool {
 
 func IsNumberValid(number string) bool {
 	if _, err := strconv.Atoi(number); err != nil {
-		fmt.Println(err)
 		return false
 	}
 	return true
