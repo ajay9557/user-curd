@@ -67,35 +67,6 @@ func (s *store) CreateUser(u entities.User) error {
 	return nil
 }
 
-func formQuery(u entities.User) (string, []interface{}) {
-	// declare a variable to hold fields to be updated
-	var fields string
-	var values []interface{}
-
-	if u.Id == 0 {
-		return "", nil
-	}
-	if u.Name != "" {
-		fields += " name = ?,"
-		values = append(values, u.Name)
-	}
-	if u.Email != "" {
-		fields += " email = ?,"
-		values = append(values, u.Email)
-	}
-	if u.Phone != "" {
-		fields += " phone = ?,"
-		values = append(values, u.Phone)
-	}
-	if u.Age != 0 {
-		fields += " age = ?,"
-		values = append(values, u.Age)
-	}
-	fields = fields[:len(fields)-1]
-	values = append(values, u.Id)
-	return fields, values
-}
-
 // UpdateUser Update the fields based on the input
 func (s *store) UpdateUser(u entities.User) error {
 

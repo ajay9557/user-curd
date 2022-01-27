@@ -119,7 +119,6 @@ func TestGetAllUsers(t *testing.T) {
 				},
 			},
 		},
-
 		// Error case
 		{
 			caseId: 2,

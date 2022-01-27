@@ -2,12 +2,14 @@ package driver
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type MySQLConfig struct {
+	Driver   string
 	Host     string
 	User     string
 	Password string
@@ -21,7 +23,7 @@ func ConnectToMySQL(conf MySQLConfig) (*sql.DB, error) {
 
 	db, err := sql.Open("mysql", connectionString)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("cannot connect to sql server")
 	}
 
 	return db, nil

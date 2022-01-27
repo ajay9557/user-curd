@@ -7,7 +7,7 @@ import (
 	storeUser "user-curd/datastore/users"
 	"user-curd/driver"
 	httpUser "user-curd/http/users"
-	srvcUser "user-curd/service/users"
+	serviceUser "user-curd/service/users"
 
 	"github.com/gorilla/mux"
 )
@@ -36,9 +36,9 @@ func main() {
 	}
 
 	// define each layer handlers
-	str := storeUser.New(db)
-	serv := srvcUser.New(str)
-	usrHandler := httpUser.New(serv)
+	s := storeUser.New(db)
+	sv := serviceUser.New(s)
+	usrHandler := httpUser.New(sv)
 
 	// define mux and routes with their handlers
 	r := mux.NewRouter()

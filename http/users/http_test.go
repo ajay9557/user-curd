@@ -24,8 +24,7 @@ func TestUserApi_GetUserByIdHandler(t *testing.T) {
 	defer ctrl.Finish()
 
 	testCases := []struct {
-		caseId int
-		//mockCall       *gomock.Call
+		caseId         int
 		input          string
 		expectedOut    entities.User
 		expectedErr    error
@@ -35,13 +34,13 @@ func TestUserApi_GetUserByIdHandler(t *testing.T) {
 		{
 			caseId: 1,
 			input:  "1",
-			//expectedOut: entities.User{
-			//	Id:    1,
-			//	Name:  "jojo",
-			//	Email: "jonathan99@bizzar.com",
-			//	Phone: "8967457789",
-			//	Age:   19,
-			//},
+			expectedOut: entities.User{
+				Id:    1,
+				Name:  "jojo",
+				Email: "jonathan99@bizzar.com",
+				Phone: "8967457789",
+				Age:   19,
+			},
 			expectedErr:    nil,
 			expectedStatus: http.StatusOK,
 		},
@@ -158,34 +157,76 @@ func TestUserApi_CreateUserHandler(t *testing.T) {
 	defer ctrl.Finish()
 
 	testCases := []struct {
-		caseId         int
-		input          entities.User
+		caseId int
+		input  struct {
+			Id    interface{}
+			Name  interface{}
+			Email interface{}
+			Phone interface{}
+			Age   interface{}
+		}
+		mockCall       bool
 		expectedErr    error
 		expectedStatus int
 	}{
 		// Success Case
 		{
 			caseId: 1,
-			input: entities.User{
+			input: struct {
+				Id    interface{}
+				Name  interface{}
+				Email interface{}
+				Phone interface{}
+				Age   interface{}
+			}{
 				Id:    3,
 				Name:  "jotaro",
 				Email: "jojo66@example.com",
 				Phone: "7892567212",
 				Age:   21,
 			},
+			mockCall:       true,
 			expectedErr:    nil,
 			expectedStatus: http.StatusCreated,
 		},
-		// Internal server err with invalid phone
+		// Bad request server err with invalid phone
 		{
 			caseId: 2,
-			input: entities.User{
+			input: struct {
+				Id    interface{}
+				Name  interface{}
+				Email interface{}
+				Phone interface{}
+				Age   interface{}
+			}{
 				Id:    1,
 				Name:  "jotaro",
+				Email: "jojo2@bizzare.com",
 				Phone: "",
+				Age:   21,
 			},
+			mockCall:       true,
 			expectedErr:    errors.New("error invalid phone"),
 			expectedStatus: http.StatusBadRequest,
+		},
+		// Internal server error
+		{
+			caseId: 3,
+			input: struct {
+				Id    interface{}
+				Name  interface{}
+				Email interface{}
+				Phone interface{}
+				Age   interface{}
+			}{
+				Id:    1,
+				Name:  "jotaro",
+				Email: "jojo@bizzare.com",
+				Phone: "67567722212",
+				Age:   "21",
+			},
+			mockCall:       false,
+			expectedStatus: http.StatusInternalServerError,
 		},
 	}
 
@@ -199,8 +240,15 @@ func TestUserApi_CreateUserHandler(t *testing.T) {
 			req := httptest.NewRequest("POST", url, buff)
 			wr := httptest.NewRecorder()
 
-			if tc.expectedStatus != http.StatusInternalServerError {
-				mockUserService.EXPECT().CreateUserService(tc.input).
+			if tc.mockCall {
+				in := entities.User{
+					Id:    tc.input.Id.(int),
+					Name:  tc.input.Name.(string),
+					Email: tc.input.Email.(string),
+					Phone: tc.input.Phone.(string),
+					Age:   tc.input.Age.(int),
+				}
+				mockUserService.EXPECT().CreateUserService(in).
 					Return(tc.expectedErr)
 			}
 			userApi.CreateUserHandler(wr, req)
@@ -225,65 +273,88 @@ func TestUserApi_UpdateUserHandler(t *testing.T) {
 		caseId    int
 		inputId   string
 		inputData struct {
-			Name  string
-			Email string
-			Phone string
-			Age   int
+			Name  interface{}
+			Email interface{}
+			Phone interface{}
+			Age   interface{}
 		}
 		expectedErr    error
 		expectedStatus int
+		mockCall       bool
 	}{
 		// Success case
 		{
 			caseId:  1,
 			inputId: "2",
 			inputData: struct {
-				Name  string
-				Email string
-				Phone string
-				Age   int
+				Name  interface{}
+				Email interface{}
+				Phone interface{}
+				Age   interface{}
 			}{
 				Name:  "jonathan",
 				Email: "jon34@example.com",
 				Phone: "7891232167",
 				Age:   32,
 			},
+			mockCall:       true,
 			expectedErr:    nil,
 			expectedStatus: http.StatusOK,
 		},
-		// Error Bad request
+		// Error internal server error
 		{
 			caseId:  2,
-			inputId: "anc",
+			inputId: "1",
 			inputData: struct {
-				Name  string
-				Email string
-				Phone string
-				Age   int
+				Name  interface{}
+				Email interface{}
+				Phone interface{}
+				Age   interface{}
 			}{
 				Name:  "jonathan",
 				Email: "jon34@example.com",
 				Phone: "7891232167",
+				Age:   "32",
+			},
+			mockCall:       false,
+			expectedErr:    nil,
+			expectedStatus: http.StatusInternalServerError,
+		},
+		// Error internal server error
+		{
+			caseId:  3,
+			inputId: "abc",
+			inputData: struct {
+				Name  interface{}
+				Email interface{}
+				Phone interface{}
+				Age   interface{}
+			}{
+				Name:  "json",
+				Email: "json@masrshal.com",
+				Phone: "4567898765",
 				Age:   32,
 			},
+			mockCall:       false,
 			expectedErr:    nil,
 			expectedStatus: http.StatusInternalServerError,
 		},
 		// Error bad request
 		{
-			caseId:  1,
+			caseId:  4,
 			inputId: "4",
 			inputData: struct {
-				Name  string
-				Email string
-				Phone string
-				Age   int
+				Name  interface{}
+				Email interface{}
+				Phone interface{}
+				Age   interface{}
 			}{
 				Name:  "jonathan",
 				Email: "jon34@example.com",
 				Phone: "7891232167",
 				Age:   32,
 			},
+			mockCall:       true,
 			expectedErr:    errors.New("error, no id provided, cannot update"),
 			expectedStatus: http.StatusBadRequest,
 		},
@@ -305,13 +376,14 @@ func TestUserApi_UpdateUserHandler(t *testing.T) {
 			wr := httptest.NewRecorder()
 
 			id, err := strconv.Atoi(tc.inputId)
-			if err == nil {
+
+			if err == nil && tc.mockCall {
 				inp := entities.User{
 					Id:    id,
-					Name:  tc.inputData.Name,
-					Email: tc.inputData.Email,
-					Phone: tc.inputData.Phone,
-					Age:   tc.inputData.Age,
+					Name:  tc.inputData.Name.(string),
+					Email: tc.inputData.Email.(string),
+					Phone: tc.inputData.Phone.(string),
+					Age:   tc.inputData.Age.(int),
 				}
 				mockUserService.EXPECT().UpdateUserService(inp).
 					Return(tc.expectedErr)
