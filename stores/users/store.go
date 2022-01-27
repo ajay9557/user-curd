@@ -1,11 +1,11 @@
 package users
 
 import (
-	"user-curd/models"
-	"user-curd/stores"
 	"database/sql"
 	"errors"
 	"fmt"
+	"user-curd/models"
+	"user-curd/stores"
 )
 
 type UserStorer struct {
