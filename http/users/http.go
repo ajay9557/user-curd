@@ -28,28 +28,12 @@ func (u UserHandler) PostUser(rw http.ResponseWriter, r *http.Request) {
 		_, _ = rw.Write([]byte("invalid body"))
 		return
 	}
-	if user.Id == 0 {
-		rw.WriteHeader(http.StatusBadRequest)
-		_, _ = rw.Write([]byte("Id shouldn't be zero"))
-		return
-	}
-	ok, err := u.serv.EmailValidation(user.Email)
+	err = u.serv.InsertUserDetails(user)
 	if err != nil {
-		rw.WriteHeader(http.StatusInternalServerError)
-		_, _ = rw.Write([]byte("error generated"))
 		return
-	} else if !ok {
-		rw.WriteHeader(http.StatusInternalServerError)
-		_, _ = rw.Write([]byte("email already present - could not create user"))
-		return
-	} else {
-		err = u.serv.InsertUserDetails(user)
-		if err != nil {
-			return
-		}
-		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte("User created"))
 	}
+	rw.WriteHeader(http.StatusOK)
+	rw.Write([]byte("User created"))
 }
 
 func (u UserHandler) GetUsers(rw http.ResponseWriter, r *http.Request) {
@@ -97,33 +81,16 @@ func (u UserHandler) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if user.Id == 0 {
-		_, _ = rw.Write([]byte("Id shouldn't be zero"))
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	ok, err := u.serv.EmailValidation(user.Email)
+	err = u.serv.UpdateUserDetails(user)
 	if err != nil {
 		fmt.Println(err)
-		_, _ = rw.Write([]byte("error generated"))
+		_, _ = rw.Write([]byte("Database error"))
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
-	} else if !ok {
-		_, _ = rw.Write([]byte("email already present - could not create user"))
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
-	} else {
-		err = u.serv.UpdateUserDetails(user)
-		if err != nil {
-			fmt.Println(err)
-			_, _ = rw.Write([]byte("Database error"))
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		fmt.Println(user)
-		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte("User updated"))
 	}
+	fmt.Println(user)
+	rw.WriteHeader(http.StatusOK)
+	rw.Write([]byte("User updated"))
 }
 
 func (u UserHandler) DeleteUser(rw http.ResponseWriter, r *http.Request) {

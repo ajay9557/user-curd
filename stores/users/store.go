@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"user-curd/models"
 	"user-curd/stores"
 )
@@ -68,8 +69,24 @@ func (u UserStorer) FetchUserById(id int) (models.User, error) {
 }
 
 func (u UserStorer) UpdateUser(user models.User) error {
-	updateQ := "Update user set Name=?,Age=?,Email=?,Phone=? where Id=?;"
-	_, err := u.db.Exec(updateQ, user.Name, user.Age, user.Email, user.Phone, user.Id)
+	updateQ := "update user set " //Update query
+	if user.Age > 0 {
+		updateQ += "Age=?,"
+	}
+	if user.Name != "" {
+		updateQ += "Name=?,"
+	}
+	if user.Email != "" {
+		updateQ += "Email=?,"
+	}
+	if user.Phone != "" {
+		updateQ += "Phone=?,"
+	}
+	updateQ = strings.TrimRight(updateQ, ",")
+	if user.Id != 0 {
+		updateQ += " where Id=?;"
+	}
+	_, err := u.db.Exec(updateQ, user.Age, user.Name, user.Email, user.Phone, user.Id)
 	if err != nil {
 		return errors.New("database error")
 	}

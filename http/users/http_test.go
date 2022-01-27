@@ -103,7 +103,6 @@ func TestPostUser(t *testing.T) {
 				"Age":   23
 			}`),
 			mock: []*gomock.Call{
-				mockService.EXPECT().EmailValidation("gopi@gmail.com").Return(true, nil).MaxTimes(5),
 				mockService.EXPECT().InsertUserDetails(models.User{
 					Id:    1,
 					Name:  "gopi",
@@ -128,51 +127,6 @@ func TestPostUser(t *testing.T) {
 			expecCode: http.StatusBadRequest,
 			expecErr:  errors.New("invalid body"),
 			expecRes:  []byte("invalid body"),
-		},
-		{
-			desc:      "Failure case -2",
-			expecCode: http.StatusBadRequest,
-			user: []byte(`{
-				"Id":    0,
-				"Name":  "gopi",
-				"Email": "gopi@gmail.com",
-				"Phone": "1234567899",
-				"Age":   23
-			}`),
-			expecErr: errors.New("Id shouldn't be zero"),
-			expecRes: []byte("Id shouldn't be zero"),
-		},
-		{
-			desc: "Failure case -3",
-			user: []byte(`{
-				"Id":    1,
-				"Name":  "gopi",
-				"Email": "gopi12@gmail.com",
-				"Phone": "1234567899",
-				"Age":   23
-			}`),
-			mock: []*gomock.Call{
-				mockService.EXPECT().EmailValidation("gopi12@gmail.com").Return(false, nil),
-			},
-			expecCode: http.StatusInternalServerError,
-			expecErr:  errors.New("email already present - could not create user"),
-			expecRes:  []byte("email already present - could not create user"),
-		},
-		{
-			desc: "Failure case -4",
-			user: []byte(`{
-				"Id":    1,
-				"Name":  "gopi",
-				"Email": "1",
-				"Phone": "1234567899",
-				"Age":   23
-			}`),
-			mock: []*gomock.Call{
-				mockService.EXPECT().EmailValidation("1").Return(false, errors.New("error generated")),
-			},
-			expecCode: http.StatusInternalServerError,
-			expecErr:  errors.New("error generated"),
-			expecRes:  []byte("error generated"),
 		},
 	}
 	for _, v := range testCases {
@@ -322,7 +276,6 @@ func TestUpdateUser(t *testing.T) {
 				"Age":   23
 			}`),
 			mock: []*gomock.Call{
-				mockService.EXPECT().EmailValidation("gopi@gmail.com").Return(true, nil).MaxTimes(5),
 				mockService.EXPECT().UpdateUserDetails(models.User{
 					Id:    1,
 					Name:  "gopi",
@@ -345,48 +298,6 @@ func TestUpdateUser(t *testing.T) {
 			}`),
 			expecErr: errors.New("invalid body"),
 			expecRes: []byte("invalid body"),
-		},
-		{
-			desc: "Failure case -2",
-			user: []byte(`{
-				"Id":    0,
-				"Name":  "gopi",
-				"Email": "gopi@gmail.com",
-				"Phone": "1234567899",
-				"Age":   23
-			}`),
-			expecErr: errors.New("Id shouldn't be zero"),
-			expecRes: []byte("Id shouldn't be zero"),
-		},
-		{
-			desc: "Failure case -3",
-			user: []byte(`{
-				"Id":    1,
-				"Name":  "gopi",
-				"Email": "gopi12@gmail.com",
-				"Phone": "1234567899",
-				"Age":   23
-			}`),
-			mock: []*gomock.Call{
-				mockService.EXPECT().EmailValidation("gopi12@gmail.com").Return(false, nil),
-			},
-			expecErr: errors.New("email already present - could not create user"),
-			expecRes: []byte("email already present - could not create user"),
-		},
-		{
-			desc: "Failure case -4",
-			user: []byte(`{
-				"Id":    1,
-				"Name":  "gopi",
-				"Email": "1",
-				"Phone": "1234567899",
-				"Age":   23
-			}`),
-			mock: []*gomock.Call{
-				mockService.EXPECT().EmailValidation("1").Return(false, errors.New("error generated")),
-			},
-			expecErr: errors.New("error generated"),
-			expecRes: []byte("error generated"),
 		},
 	}
 	for _, v := range testCases {

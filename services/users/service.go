@@ -1,10 +1,10 @@
 package users
 
 import (
+	"errors"
 	"user-curd/models"
 	"user-curd/services"
 	"user-curd/stores"
-	"errors"
 )
 
 type UserServiceHandler struct {
@@ -15,16 +15,19 @@ func New(store stores.Store) services.Services {
 	return UserServiceHandler{stores: store}
 }
 
-func (u UserServiceHandler) EmailValidation(email string) (bool, error) {
-	ok, err := u.stores.GetEmail(email)
-	if err != nil {
-		return ok, errors.New("error generated")
-	}
-	return ok, nil //true if email not present in db
-}
-
 func (u UserServiceHandler) InsertUserDetails(user models.User) error {
-
+	checkId := idCheck(user.Id)
+	if !checkId {
+		return errors.New("id should not be zero")
+	}
+	ok := emailValidation(user.Email)
+	if !ok {
+		return errors.New("email not valid")
+	}
+	checkEmail, _ := u.stores.GetEmail(user.Email)
+	if !checkEmail {
+		return errors.New("email already present")
+	}
 	err := u.stores.InsertUser(user)
 	if err != nil {
 		return errors.New("error generated")
@@ -42,6 +45,10 @@ func (u UserServiceHandler) FetchAllUserDetails() ([]models.User, error) {
 }
 
 func (u UserServiceHandler) FetchUserDetailsById(id int) (models.User, error) {
+	checkId := idCheck(id)
+	if !checkId {
+		return models.User{}, errors.New("id should not be zero")
+	}
 	user, err := u.stores.FetchUserById(id)
 	if err != nil {
 		return user, errors.New("data fetching error")
@@ -50,6 +57,18 @@ func (u UserServiceHandler) FetchUserDetailsById(id int) (models.User, error) {
 }
 
 func (u UserServiceHandler) UpdateUserDetails(user models.User) error {
+	checkId := idCheck(user.Id)
+	if !checkId {
+		return errors.New("id should not be zero")
+	}
+	ok := emailValidation(user.Email)
+	if !ok {
+		return errors.New("email not valid")
+	}
+	checkEmail, _ := u.stores.GetEmail(user.Email)
+	if !checkEmail {
+		return errors.New("email already present")
+	}
 	err := u.stores.UpdateUser(user)
 	if err != nil {
 		return errors.New("error generated")
@@ -58,6 +77,10 @@ func (u UserServiceHandler) UpdateUserDetails(user models.User) error {
 }
 
 func (u UserServiceHandler) DeleteUserDetailsById(id int) error {
+	checkId := idCheck(id)
+	if !checkId {
+		return errors.New("id should not be zero")
+	}
 	err := u.stores.DeleteUserById(id)
 	if err != nil {
 		return errors.New("error generated")
