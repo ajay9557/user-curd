@@ -66,7 +66,7 @@ func TestGetUserById(t *testing.T) {
 			if !reflect.DeepEqual(resp, tc.expectedOut) {
 				t.Errorf("TestCase[%v] Expected: \t%v\nGot: \t%v\n", tc.caseId, tc.expectedOut, resp)
 			}
-			if err != nil && err.Error() != tc.expectedErr.Error() {
+			if !reflect.DeepEqual(err, tc.expectedErr) {
 				t.Errorf("TestCase[%v] Expected: \t%v\nGot: \t%v\n", tc.caseId, tc.expectedErr, err)
 			}
 		})
@@ -133,11 +133,11 @@ func TestGetAllUsers(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("testing "+strconv.Itoa(tc.caseId), func(t *testing.T) {
 
-			resp, _ := store.GetAllUsers()
+			resp, err := store.GetAllUsers()
 			if !reflect.DeepEqual(resp, tc.expectedOut) {
 				t.Errorf("TestCase[%v] Expected: \t%v\nGot: \t%v\n", tc.caseId, tc.expectedOut, resp)
 			}
-			if err != nil && tc.expectedErr != nil && err.Error() != tc.expectedErr.Error() {
+			if !reflect.DeepEqual(err, tc.expectedErr) {
 				t.Errorf("TestCase[%v] Expected: \t%v\nGot: \t%v\n", tc.caseId, tc.expectedErr, err)
 			}
 		})
@@ -267,6 +267,7 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
+
 	// Create a mock db
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
@@ -274,6 +275,7 @@ func TestDeleteUser(t *testing.T) {
 	}
 	defer db.Close()
 
+	// get store struct
 	store := New(db)
 
 	// define the query

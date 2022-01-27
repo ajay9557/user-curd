@@ -4,23 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/golang/mock/gomock"
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
 	"user-curd/entities"
 	"user-curd/service"
-)
 
-var expectedOutput = entities.User{
-	Id:    1,
-	Name:  "jojo",
-	Email: "jonathan99@bizzar.com",
-	Phone: "8967457789",
-	Age:   19,
-}
+	"github.com/golang/mock/gomock"
+	"github.com/gorilla/mux"
+)
 
 func TestUserApi_GetUserByIdHandler(t *testing.T) {
 
@@ -33,8 +26,8 @@ func TestUserApi_GetUserByIdHandler(t *testing.T) {
 	testCases := []struct {
 		caseId int
 		//mockCall       *gomock.Call
-		input string
-		//expectedOut    entities.User
+		input          string
+		expectedOut    entities.User
 		expectedErr    error
 		expectedStatus int
 	}{
@@ -70,6 +63,8 @@ func TestUserApi_GetUserByIdHandler(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("testing "+strconv.Itoa(tc.caseId), func(t *testing.T) {
+
+			// define url and test request and response
 			url := "/users/" + tc.input
 			req := httptest.NewRequest("GET", url, nil)
 			wr := httptest.NewRecorder()
@@ -80,26 +75,13 @@ func TestUserApi_GetUserByIdHandler(t *testing.T) {
 			id, err := strconv.Atoi(tc.input)
 			if err == nil {
 				mockUserService.EXPECT().GetUserByIdService(id).
-					Return(&expectedOutput, tc.expectedErr)
+					Return(&tc.expectedOut, tc.expectedErr)
 			}
 
 			userApi.GetUserByIdHandler(wr, req)
 			if wr.Code != tc.expectedStatus {
 				t.Errorf("TestCase[%v] Expected: \t%v\nGot: \t%v\n", tc.caseId, tc.expectedStatus, wr.Code)
 			}
-
-			//var out entities.User
-			//body, err := ioutil.ReadAll(wr.Body)
-			//if err != nil {
-			//	t.Errorf("unexpected error %v", err)
-			//}
-			//err = json.Unmarshal(body, &out)
-			//if err != nil {
-			//	t.Errorf("Unexpected error %v", err)
-			//}
-			//if !reflect.DeepEqual(out, tc.expectedOut) {
-			//	t.Errorf("TestCase[%v] Expected: \t%v\nGot: \t%v\n", tc.caseId, tc.expectedOut, out)
-			//}
 		})
 	}
 }
@@ -150,6 +132,8 @@ func TestUserApi_GetAllUserHandler(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("testing "+strconv.Itoa(tc.caseId), func(t *testing.T) {
+
+			// define url and test request and response
 			url := "/users"
 			req := httptest.NewRequest("GET", url, nil)
 			wr := httptest.NewRecorder()
@@ -207,6 +191,8 @@ func TestUserApi_CreateUserHandler(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("testing "+strconv.Itoa(tc.caseId), func(t *testing.T) {
+
+			// define url and test request and response
 			url := "/users"
 			jsnBdy, _ := json.Marshal(tc.input)
 			buff := bytes.NewBuffer(jsnBdy)
@@ -228,6 +214,7 @@ func TestUserApi_CreateUserHandler(t *testing.T) {
 
 func TestUserApi_UpdateUserHandler(t *testing.T) {
 
+	// mock for service layer
 	ctrl := gomock.NewController(t)
 	mockUserService := service.NewMockUserServiceHandler(ctrl)
 	userApi := New(mockUserService)
@@ -305,8 +292,10 @@ func TestUserApi_UpdateUserHandler(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("testing "+strconv.Itoa(tc.caseId), func(t *testing.T) {
 
+			// define url and test request and response
 			url := "/users/" + tc.inputId
 
+			// json input
 			jsnBdy, _ := json.Marshal(tc.inputData)
 			buff := bytes.NewBuffer(jsnBdy)
 			req := httptest.NewRequest("PUT", url, buff)
@@ -338,6 +327,7 @@ func TestUserApi_UpdateUserHandler(t *testing.T) {
 
 func TestUserApi_DeleteUserHandler(t *testing.T) {
 
+	// mock for service layer
 	ctrl := gomock.NewController(t)
 	mockUserService := service.NewMockUserServiceHandler(ctrl)
 	userApi := New(mockUserService)
@@ -375,9 +365,12 @@ func TestUserApi_DeleteUserHandler(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("testing "+strconv.Itoa(tc.caseId), func(t *testing.T) {
-			url := "/users/" + tc.inputId
 
+			// define url and test request and response
+			url := "/users/" + tc.inputId
 			req := httptest.NewRequest("DELETE", url, nil)
+
+			// set url variables
 			req = mux.SetURLVars(req, map[string]string{
 				"id": tc.inputId,
 			})

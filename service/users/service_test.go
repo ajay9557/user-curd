@@ -2,21 +2,22 @@ package users
 
 import (
 	"errors"
-	"fmt"
-	"github.com/golang/mock/gomock"
 	"reflect"
 	"strconv"
 	"testing"
 	"user-curd/datastore"
 	"user-curd/entities"
+
+	"github.com/golang/mock/gomock"
 )
 
 func TestGetUserByIdService(t *testing.T) {
 
-	// create a controller for datastore interface
+	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
 	mockUserStore := datastore.NewMockUserStoresHandler(ctrl)
 	usrServ := New(mockUserStore)
+	defer ctrl.Finish()
 
 	testCases := []struct {
 		caseId      int
@@ -68,7 +69,7 @@ func TestGetUserByIdService(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("testing "+strconv.Itoa(tc.caseId), func(t *testing.T) {
-			//mockUserStore.EXPECT().GetUserById(tc.input).Return(&tc.expectedOut, nil)
+
 			resp, err := usrServ.GetUserByIdService(tc.input)
 			if !reflect.DeepEqual(resp, &tc.expectedOut) {
 				t.Errorf("TestCase[%v] Expected: \t%v\nGot: \t%v\n", tc.caseId, tc.expectedOut, resp)
@@ -83,9 +84,11 @@ func TestGetUserByIdService(t *testing.T) {
 
 func TestGetAllUsersService(t *testing.T) {
 
+	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
 	mockUserStore := datastore.NewMockUserStoresHandler(ctrl)
 	usrService := New(mockUserStore)
+	defer ctrl.Finish()
 
 	testCases := []struct {
 		caseId      int
@@ -136,10 +139,11 @@ func TestGetAllUsersService(t *testing.T) {
 
 func TestCreateUserService(t *testing.T) {
 
+	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
 	mockUserStore := datastore.NewMockUserStoresHandler(ctrl)
 	usrService := New(mockUserStore)
-	fmt.Println(usrService)
+	defer ctrl.Finish()
 
 	testCases := []struct {
 		caseId      int
@@ -245,9 +249,11 @@ func TestCreateUserService(t *testing.T) {
 
 func TestUpdateUserService(t *testing.T) {
 
+	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
 	mockUserStore := datastore.NewMockUserStoresHandler(ctrl)
 	userService := New(mockUserStore)
+	defer ctrl.Finish()
 
 	testCase := []struct {
 		caseId      int
@@ -331,9 +337,11 @@ func TestUpdateUserService(t *testing.T) {
 
 func TestDeleteUserService(t *testing.T) {
 
+	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
 	mockUserStore := datastore.NewMockUserStoresHandler(ctrl)
 	userService := New(mockUserStore)
+	defer ctrl.Finish()
 
 	testCase := []struct {
 		caseId      int

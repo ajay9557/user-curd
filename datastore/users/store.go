@@ -39,7 +39,6 @@ func (s *store) GetAllUsers() ([]*entities.User, error) {
 
 	// define the query
 	query := "select id,name,email,phone,age from user"
-
 	rows, err := s.db.Query(query)
 	if err != nil {
 		return []*entities.User{}, errors.New("error fetching data from database")
@@ -101,16 +100,8 @@ func formQuery(u entities.User) (string, []interface{}) {
 func (s *store) UpdateUser(u entities.User) error {
 
 	fields, values := formQuery(u)
-	//if fields == "" || values == nil {
-	//	return errors.New("error, no id provided, cannot update")
-	//}
-
 	// form the query with the fields
 	query := "update user set" + fields + " where id = ?"
-
-	//query := "update user set name = ? where id = ?"
-
-	// update user set name = ? where id = ?
 	_, err := s.db.Exec(query, values...)
 	if err != nil {
 		return errors.New("error, no id provided, cannot update")

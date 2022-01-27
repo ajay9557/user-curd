@@ -14,6 +14,7 @@ import (
 
 func main() {
 
+	// define the mysql configuration
 	sqlConf := driver.MySQLConfig{
 		Host:     "localhost",
 		User:     "vips",
@@ -22,6 +23,7 @@ func main() {
 		Db:       "users",
 	}
 
+	// handle opening sql connection
 	db, err := driver.ConnectToMySQL(sqlConf)
 	defer func(db *sql.DB) {
 		err := db.Close()
@@ -33,10 +35,12 @@ func main() {
 		log.Printf("error connecting to sql server %v", err)
 	}
 
+	// define each layer handlers
 	str := storeUser.New(db)
 	serv := srvcUser.New(str)
 	usrHandler := httpUser.New(serv)
 
+	// define mux and routes with their handlers
 	r := mux.NewRouter()
 	r.HandleFunc("/user", usrHandler.GetAllUserHandler).Methods(http.MethodGet)
 	r.HandleFunc("/user/{id}", usrHandler.GetUserByIdHandler).Methods(http.MethodGet)
@@ -44,8 +48,10 @@ func main() {
 	r.HandleFunc("/user/{id}", usrHandler.UpdateUserHandler).Methods(http.MethodPut)
 	r.HandleFunc("/user/{id}", usrHandler.DeleteUserHandler).Methods(http.MethodDelete)
 
+	// Run the server
+	log.Printf("Listening on port 8000...")
 	err = http.ListenAndServe(":8000", r)
 	if err != nil {
-		return
+		log.Printf("error creating server: %v", err)
 	}
 }
