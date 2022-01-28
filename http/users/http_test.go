@@ -51,6 +51,9 @@ func TestHandler_Search(t *testing.T) {
 	h := Handler{serv}
 	for _, tc := range tcs {
 		link := "/users/%s"
+		//req, _ := http.NewRequest("GET", fmt.Sprintf(link, tc.Id), nil)
+		//var ww http.ResponseWriter
+		//h.Search(ww, req)
 		r := httptest.NewRequest("GET", fmt.Sprintf(link, tc.Id), nil)
 		w := httptest.NewRecorder()
 		//router := mux.NewRouter()
@@ -163,21 +166,12 @@ func Test_AddUser(t *testing.T) {
 			validity: true,
 			err:      nil,
 		},
-		{
-			desc:     "Failure",
-			usr:      models.User{Id: 3, Name: "Sudheer", Email: "Sudheergmail.com", Phone: "9908577405", Age: 22},
-			output:   models.User{},
-			stcode:   http.StatusBadRequest,
-			validity: false,
-			err:      nil,
-		},
 	}
 	for _, tc := range tests {
 
 		l, _ := json.Marshal(tc.usr)
 		m := bytes.NewBuffer(l)
 		link := "/users"
-		serv.EXPECT().IsEmailValid(tc.usr.Email).Return(tc.validity)
 		r := httptest.NewRequest("POST", link, m)
 		w := httptest.NewRecorder()
 
@@ -213,7 +207,6 @@ func TestUpdateUser(t *testing.T) {
 				"Age":   23
 			}`),
 			mock: []*gomock.Call{
-				serv.EXPECT().IsEmailValid("sudheer@gmail.com").Return(true).MaxTimes(5),
 				serv.EXPECT().UpdateByUserId(models.User{
 					Id:    1,
 					Name:  "sudheer",
@@ -248,21 +241,6 @@ func TestUpdateUser(t *testing.T) {
 			}`),
 			expecErr: errors.New("Id shouldn't be zero"),
 			expecRes: []byte("Id shouldn't be zero"),
-		},
-		{
-			desc: "Failure case -3",
-			user: []byte(`{
-				"Id":    1,
-				"Name":  "sudheer",
-				"Email": "sudheerpup@gmail.com",
-				"Phone": "9908577405",
-				"Age":   23
-			}`),
-			mock: []*gomock.Call{
-				serv.EXPECT().IsEmailValid("sudheerpup@gmail.com").Return(false),
-			},
-			expecErr: errors.New("Email already there,create new email"),
-			expecRes: []byte("Email already there,create new email"),
 		},
 	}
 	for _, v := range testCases {

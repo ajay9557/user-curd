@@ -1,13 +1,13 @@
 package users
 
 import (
+	"user-curd/models"
+	"user-curd/services"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"user-curd/models"
-	"user-curd/services"
 
 	"github.com/gorilla/mux"
 )
@@ -42,12 +42,6 @@ func (serv Handler) Create(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("invalid body"))
 		w.WriteHeader(http.StatusBadRequest)
 		return
-	}
-	addr := serv.Sev.IsEmailValid(users.Email)
-	if !addr {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Enter Valid Email"))
-
 	}
 	usr, err := serv.Sev.InsertUserDetails(users)
 	res, _ := json.Marshal(usr)
@@ -88,18 +82,11 @@ func (serv Handler) UpdateUserDetails(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	ok := serv.Sev.IsEmailValid(user.Email)
-	if !ok {
-		_, _ = rw.Write([]byte("Email already there,create new email"))
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
-	} else {
-		err = serv.Sev.UpdateByUserId(user)
-		fmt.Println(err)
-		fmt.Println(user)
-		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte("user updated"))
-	}
+	err = serv.Sev.UpdateByUserId(user)
+	fmt.Println(err)
+	fmt.Println(user)
+	rw.WriteHeader(http.StatusOK)
+	rw.Write([]byte("user updated"))
 }
 
 // func (serv Handler) UpdateId(w http.ResponseWriter, r *http.Request) {

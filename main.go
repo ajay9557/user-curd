@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"user-curd/middlewares"
 	"user-curd/stores/users"
 
 	slayer "user-curd/services/users"
@@ -27,10 +28,10 @@ func main() {
 
 	fmt.Print("Server Starting....")
 	m := mux.NewRouter().StrictSlash(true)
-	m.HandleFunc("/users", ht.GetAll).Methods("GET")
-	m.HandleFunc("/users/{id}", ht.DeleteId).Methods("DELETE")
-	m.HandleFunc("/update", ht.UpdateUserDetails).Methods("PUT")
-	m.HandleFunc("/users/{id}", ht.Search).Methods("GET")
-	m.HandleFunc("/users", ht.Create).Methods("POST")
-	http.ListenAndServe(":8055", m)
+	m.HandleFunc("/users", middlewares.Logger(ht.GetAll)).Methods("GET")
+	m.HandleFunc("/users/{id}", middlewares.Logger(ht.DeleteId)).Methods("DELETE")
+	m.HandleFunc("/update", middlewares.Logger(ht.UpdateUserDetails)).Methods("PUT")
+	m.HandleFunc("/users/{id}", middlewares.Logger(ht.Search)).Methods("GET")
+	m.HandleFunc("/users", middlewares.Logger(ht.Create)).Methods("POST")
+	http.ListenAndServe(":8040", m)
 }

@@ -5,9 +5,7 @@ import (
 	"user-curd/stores"
 	"errors"
 	"fmt"
-
 	//"fmt"
-	"regexp"
 )
 
 type UserDetails struct {
@@ -44,11 +42,9 @@ func (ud UserDetails) InsertUserDetails(user models.User) (models.User, error) {
 
 func (ud UserDetails) IsEmailValid(e string) bool {
 
-	var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-	if len(e) < 3 || len(e) > 254 {
-		return false
-	}
-	if emailRegex.MatchString(e) {
+	ok := isEmailValid(e)
+
+	if ok {
 		res, err := ud.u.SearchDetails()
 		if err != nil {
 			return false
