@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	hl "user-curd/Http/Users"
+	sl "user-curd/Service/Users"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -21,14 +22,14 @@ func main() {
 	}
 	defer db.Close()
 	st := Users.New(db)
-	s := sl.new(st)
-	ht := hl.Handlers{s}
+	s := sl.New(st)
+	ht := hl.Handler{s}
 
 	fmt.Print("Server Starting....")
 	m := mux.NewRouter().StrictSlash(true)
 	m.HandleFunc("/Users", ht.GetAll).Methods("GET")
 	m.HandleFunc("/Users/{id}", ht.DeleteId).Methods("DELETE")
-	m.HandleFunc("/Update", ht.UpdateUserDetails).Methods("PUT")
+	m.HandleFunc("/Update", ht.UpdateUser).Methods("PUT")
 	m.HandleFunc("/Users/{id}", ht.Search).Methods("GET")
 	m.HandleFunc("/Users", ht.Create).Methods("POST")
 	http.ListenAndServe(":8050", m)
