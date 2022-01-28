@@ -7,7 +7,6 @@ type Store interface {
 	Update(Id int, Phone string) error
 	Delete(id int) error
 	Create(Id int, Name string, Email string, Phone string, Age int) error
-	GetMail(mail string) (bool,error)
+	GetMail(mail string) (bool, error)
+	GetAllUsersStore() ([]models.User,error)
 }
-
-

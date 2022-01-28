@@ -48,6 +48,21 @@ func (mr *MockServicesMockRecorder) DeletebyId(Id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletebyId", reflect.TypeOf((*MockServices)(nil).DeletebyId), Id)
 }
 
+// GetAllUsersService mocks base method.
+func (m *MockServices) GetAllUsersService() ([]models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllUsersService")
+	ret0, _ := ret[0].([]models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllUsersService indicates an expected call of GetAllUsersService.
+func (mr *MockServicesMockRecorder) GetAllUsersService() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllUsersService", reflect.TypeOf((*MockServices)(nil).GetAllUsersService))
+}
+
 // GetUserById mocks base method.
 func (m *MockServices) GetUserById(Id int) (models.User, error) {
 	m.ctrl.T.Helper()
@@ -61,6 +76,20 @@ func (m *MockServices) GetUserById(Id int) (models.User, error) {
 func (mr *MockServicesMockRecorder) GetUserById(Id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserById", reflect.TypeOf((*MockServices)(nil).GetUserById), Id)
+}
+
+// UpdatebyId mocks base method.
+func (m *MockServices) UpdatebyId(Id int, Phone string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatebyId", Id, Phone)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatebyId indicates an expected call of UpdatebyId.
+func (mr *MockServicesMockRecorder) UpdatebyId(Id, Phone interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatebyId", reflect.TypeOf((*MockServices)(nil).UpdatebyId), Id, Phone)
 }
 
 // ValidateEmail mocks base method.

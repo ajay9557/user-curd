@@ -1,33 +1,35 @@
 package http
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
 	"zopsmart/Task/models"
 	"zopsmart/Task/services"
 
-	"fmt"
-	"net/http/httptest"
-	"testing"
-
 	"github.com/golang/mock/gomock"
-
+	"github.com/gorilla/mux"
 )
 
-func TestGetUserById(t *testing.T) {
+func TestApiGetUserById(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockService := services.NewMockServices(ctrl)
+	mockService := service.NewMockServices(ctrl)
 	mock := New(mockService)
+
 	testCases := []struct {
-		id        int
-		mock      []*gomock.Call
-		expecErr  error
-		expecBody []byte
+		id        string
+		mock      *gomock.Call
+		expectErr  error
+		expectOut models.User
+		expectstat int
 	}{
 		{
-			id:       1,
-			expecErr: nil,
-			mock: []*gomock.Call{
+			id: "1",
+			expectErr: nil,
+			mock: 
 				mockService.EXPECT().GetUserById(1).Return(models.User{
 					Id:    1,
 					Name:  "prasath",
@@ -35,130 +37,189 @@ func TestGetUserById(t *testing.T) {
 					Phone: "12345",
 					Age:   20,
 				}, nil),
+			expectOut: models.User{
+				Id:1,
+				Name:"prasath",
+				Email:"prasath@gmail.com",
+				Phone:"12345",
+				Age:20,
 			},
-			expecBody: []byte(`{"Id":1,"Name":"prasath","Email":"prasath@gmail.com","Phone":"12345","Age":20}`),
+			expectstat: http.StatusOK,
 		},
 	}
 
-	for _,tc := range testCases {
-		req := httptest.NewRequest("GET","/user="+tc.id,nil)
-		wr := httptest.NewRecorder()
-		mock.GetUserById(req,wr)
-		if wr.Body.String()!= string(tc.expecBody) {
-			t.Errorf("Expected %v but got %v",string(tc.expecBody),wr.Body.String())
-		}
-	}
+	for _, tc := range testCases {
+		t.Run("sucess test case",func(t *testing.T) {
 
-}
+			url := "/users/" + tc.id
+			req := httptest.NewRequest("GET", url, nil)
+			wr := httptest.NewRecorder()
 
-func TestDeleteUser(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+			req = mux.SetURLVars(req, map[string]string{
+				"id": tc.id,
+			})
 
-	mockService := services.NewMockServices(ctrl)
-	mock := New(mockService)
-
-	testCases := []struct {
-		id        int
-		mock      []*gomock.Call
-		expectedErr  error
-		expectedOut []byte
-	}{
-		{
-			id:       1,
-			expectedErr: nil,
-			mock: []*gomock.Call{
-				mockService.EXPECT().DeleteUser(1).Return(nil),
-			},
-			expectedOut: []byte(`{user deleted}`),
-		},
-	}
-	for _,tc := range testCases {
-		t.Run("",func (t *testing.T)  {
-			req:= httptest.NewRequest("DELETE", "/delete?id="+tc.id, nil)
-			writer := httptest.NewRecorder()
-			mock.DeleteUser(writer, req)
-			fmt.Println(writer.Body.String())
-			if writer.Body.String() != string(tc.expectedOut) {
-				t.Errorf("Expected %v Obtained %v", string(tc.expectedOut), writer.Body.String())
+			mock.GetUserById(wr, req)
+			if wr.Code != tc.expectstat {
+				t.Errorf("Expected: \t%v\nGot: \t%v\n", tc.expectstat, wr.Code)
 			}
-			
 		})
 	}
+	
 }
 
-func TestUpdateUser(t *testing.T) {
+func TestUserApi_GetAllUserHandler(t *testing.T) {
+
 	ctrl := gomock.NewController(t)
+	mockService := service.NewMockServices(ctrl)
+	userApi := New(mockService)
+
 	defer ctrl.Finish()
 
-	mockService := services.NewMockServices(ctrl)
-	mock := New(mockService)
-
 	testCases := []struct {
-		id        int
-		mock      []*gomock.Call
-		expectedErr  error
-		expectedOut []byte
+		expectedOut    []models.User
+		expectedErr    error
+		expectedStatus int
 	}{
 		{
-			id:       1,
-			expectedErr: nil,
-			mock: []*gomock.Call{
-				mockService.EXPECT().DeleteUser(1).Return(nil),
+			expectedOut: []models.User{
+				{
+					Id:    1,
+					Name:  "prasath",
+					Email: "prasath@gmail.com",
+					Phone: "12345",
+					Age:   20,
+				},
+				{
+					Id:    2,
+					Name:  "rishi kumar",
+					Email: "rishi.kumar@example.com",
+					Phone: "9821328772",
+					Age:   25,
+				},
 			},
-			expectedOut: []byte(`{user updated}`),
+			expectedErr:    nil,
+			expectedStatus: http.StatusOK,
 		},
 	}
-	for _,tc := range testCases {
-		t.Run("",func (t *testing.T)  {
-			req:= httptest.NewRequest("UPDATE", "/update?id="+tc.id, nil)
-			writer := httptest.NewRecorder()
-			mock.DeleteUser(writer, req)
-			fmt.Println(writer.Body.String())
-			if writer.Body.String() != string(tc.expectedOut) {
-				t.Errorf("Expected %v Obtained %v", string(tc.expectedOut), writer.Body.String())
+
+	for _, tc := range testCases {
+		t.Run("Success case testing ", func(t *testing.T) {
+
+			// define url and test request and response
+			url := "/users"
+			req := httptest.NewRequest("GET", url, nil)
+			wr := httptest.NewRecorder()
+			mockService.EXPECT().GetAllUsersService().
+				Return(tc.expectedOut, tc.expectedErr)
+
+			userApi.AllUserDetails(wr, req)
+			if wr.Code != tc.expectedStatus {
+				t.Errorf("Expected: \t%v\nGot: \t%v\n", tc.expectedStatus, wr.Code)
 			}
-			
 		})
 	}
 
 }
 
-
-func TestCreateUser(t *testing.T) {
+func TestApiDeleteUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	 mockService := services.NewMockServices(ctrl)
+	mockService := service.NewMockServices(ctrl)
+	mock := New(mockService)
+
+	testCases := []struct {
+		id  int
+		expectErr  error
+		expectstat  int
+	}{
+		{
+			id:       1,
+			expectErr: nil,
+			expectstat : http.StatusOK,
+		},
+	}
+
+	for _,tc := range testCases {
+		t.Run("Success test case",func (t *testing.T)  {
+			url := "/user/"+strconv.Itoa(tc.id)
+			req:= httptest.NewRequest("DELETE", url, nil)
+			writer := httptest.NewRecorder()
+			mock.DeleteUser(writer, req)
+			if writer.Code != tc.expectstat {
+				t.Errorf("Expected: \t%v\nGot: \t%v\n", tc.expectstat, writer.Code)
+			}
+			
+			
+		})
+	}
+}
+
+func TestApiUpdateUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockService := service.NewMockServices(ctrl)
+	mock := New(mockService)
+
+	testCases := []struct {
+		id  int
+		expectErr  error
+		expectstat  int
+	}{
+		{
+			id:       1,
+			expectErr: nil,
+			expectstat : http.StatusOK,
+		},
+	}
+
+	for _,tc := range testCases {
+		t.Run("Success test case",func (t *testing.T)  {
+			url := "/user/"+strconv.Itoa(tc.id)
+			req:= httptest.NewRequest("UPDATE", url, nil)
+			writer := httptest.NewRecorder()
+			mock.UpdateUser(writer, req)
+			if writer.Code != tc.expectstat {
+				t.Errorf("Expected: \t%v\nGot: \t%v\n", tc.expectstat, writer.Code)
+			}
+			
+			
+		})
+	}
+}
+
+
+func TestApiCreateUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	 mockService := service.NewMockServices(ctrl)
 	 mock := New(mockService)
 
 	testCases := []struct {
 		id int
-		mock []*gomock.Call
-		expectedErr error
-		expectedOut []byte
+		expectErr error
+		expectstat int
 
 	}{
 		{
 			id:       1,
-			expectedErr: nil,
-			mock: []*gomock.Call{
-				mockService.EXPECT().DeleteUser(1).Return(nil),
-			},
-			expectedOut: []byte(`{user created}`),
+			expectErr: nil,
+			expectstat: http.StatusOK,
 		},
 	}
 
 	for _,tc := range testCases {
-		t.Run("",func(t *testing.T) {
-			req:= httptest.NewRequest("INSERT", "/insert="+tc.id, nil)
+		t.Run("success test case",func(t *testing.T) {
+			url := "/user"
+			req:= httptest.NewRequest("INSERT", url, nil)
 			writer := httptest.NewRecorder()
-			mock.DeleteUser(writer, req)
-			fmt.Println(writer.Body.String())
-			if writer.Body.String() != string(tc.expectedOut) {
-				t.Errorf("Expected %v Obtained %v", string(tc.expectedOut), writer.Body.String())
+			mock.CreateUser(writer, req)
+			if writer.Code != tc.expectstat {
+				t.Errorf("Expected: \t%v\nGot: \t%v\n", tc.expectstat, writer.Code)
 			}
-
 		})
 	}
 }

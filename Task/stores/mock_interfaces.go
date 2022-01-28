@@ -62,6 +62,21 @@ func (mr *MockStoreMockRecorder) Delete(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockStore)(nil).Delete), id)
 }
 
+// GetAllUsersStore mocks base method.
+func (m *MockStore) GetAllUsersStore() ([]models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllUsersStore")
+	ret0, _ := ret[0].([]models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllUsersStore indicates an expected call of GetAllUsersStore.
+func (mr *MockStoreMockRecorder) GetAllUsersStore() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllUsersStore", reflect.TypeOf((*MockStore)(nil).GetAllUsersStore))
+}
+
 // GetMail mocks base method.
 func (m *MockStore) GetMail(mail string) (bool, error) {
 	m.ctrl.T.Helper()
