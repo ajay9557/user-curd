@@ -200,3 +200,44 @@ func TestUpdateUserById(t *testing.T) {
 		})
 	}
 }
+
+func TestGetEmail(t *testing.T) {
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "email", "phone", "age"}).AddRow(
+		1, "Naruto", "ridhdhish@gmail.com", "9999999999", 21,
+	)
+
+	tests := []struct {
+		desc     string
+		email    string
+		expected bool
+		mockCall *sqlmock.ExpectedQuery
+	}{
+		{
+			desc:     "Case1",
+			email:    "ridhdhish@gmail.com",
+			expected: false,
+			mockCall: mock.ExpectQuery("Select email from HUser where email=?").WithArgs("ridhdhish@gmail.com").WillReturnRows(rows),
+		},
+		{
+			desc:     "Case2",
+			email:    "naruto@gmail.com",
+			expected: true,
+			mockCall: mock.ExpectQuery("Select email from HUser where email=?").WithArgs("naruto@gmail.com").WillReturnError(errors.New("Email is already in use")),
+		},
+	}
+
+	userStore := New(db)
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			isEmailExist, _ := userStore.GetEmail(test.email)
+			if test.expected != isEmailExist {
+				t.Errorf("Expected: %t, Got: %t", test.expected, isEmailExist)
+			}
+		})
+	}
+
+}

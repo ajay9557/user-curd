@@ -44,8 +44,8 @@ func (su *ServUser) GetUsers() ([]TModels.User, error) {
 
 func (su *ServUser) InsertUser(users TModels.User) (int, error) {
 	var iid int
-	isValid, _ := su.isu.GetEmail(users.Email)
-	if isValid {
+	isEmailExist, _ := su.isu.GetEmail(users.Email)
+	if isEmailExist {
 		return iid, errors.New("email id is already in use")
 	}
 	res, err := su.isu.InsertUser(users)
