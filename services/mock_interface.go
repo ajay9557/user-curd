@@ -48,21 +48,6 @@ func (mr *MockServicesMockRecorder) DeleteUserDetailsById(id interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserDetailsById", reflect.TypeOf((*MockServices)(nil).DeleteUserDetailsById), id)
 }
 
-// EmailValidation mocks base method.
-func (m *MockServices) EmailValidation(email string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EmailValidation", email)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// EmailValidation indicates an expected call of EmailValidation.
-func (mr *MockServicesMockRecorder) EmailValidation(email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EmailValidation", reflect.TypeOf((*MockServices)(nil).EmailValidation), email)
-}
-
 // FetchAllUserDetails mocks base method.
 func (m *MockServices) FetchAllUserDetails() ([]models.User, error) {
 	m.ctrl.T.Helper()

@@ -30,6 +30,8 @@ func (u UserHandler) PostUser(rw http.ResponseWriter, r *http.Request) {
 	}
 	err = u.serv.InsertUserDetails(user)
 	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		_, _ = rw.Write([]byte("internal error"))
 		return
 	}
 	rw.WriteHeader(http.StatusOK)
@@ -73,22 +75,20 @@ func (u UserHandler) GetUserById(rw http.ResponseWriter, r *http.Request) {
 
 func (u UserHandler) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 	var user models.User
+	rw.Header().Set("Content-Type", "application/json")
 	resBody, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(resBody, &user)
 	if err != nil {
-		fmt.Println(err)
-		_, _ = rw.Write([]byte("invalid body"))
 		rw.WriteHeader(http.StatusBadRequest)
+		_, _ = rw.Write([]byte("invalid body"))
 		return
 	}
 	err = u.serv.UpdateUserDetails(user)
 	if err != nil {
-		fmt.Println(err)
-		_, _ = rw.Write([]byte("Database error"))
 		rw.WriteHeader(http.StatusInternalServerError)
+		_, _ = rw.Write([]byte("internal error"))
 		return
 	}
-	fmt.Println(user)
 	rw.WriteHeader(http.StatusOK)
 	rw.Write([]byte("User updated"))
 }
@@ -110,11 +110,7 @@ func (u UserHandler) DeleteUser(rw http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		rw.WriteHeader(http.StatusOK)
-		_, err = rw.Write([]byte("User deleted successfully"))
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+		_, _ = rw.Write([]byte("User deleted successfully"))
 	}
 
 }

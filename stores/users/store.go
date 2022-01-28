@@ -19,7 +19,7 @@ func New(db *sql.DB) stores.Store {
 
 func (u UserStorer) InsertUser(user models.User) error {
 
-	insertQ := "INSERT INTO user(Id, Name, Email, Phone, Age) VALUES(?,?,?,?,?)" //Insert query
+	insertQ := "insert into user(Id, Name, Email, Phone, Age) VALUES(?,?,?,?,?)" //Insert query
 	if user.Id == 0 {
 		return errors.New("id can`t be 0")
 	}
@@ -42,10 +42,7 @@ func (u UserStorer) FetchAllUsers() ([]models.User, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
-		if err != nil {
-			return nil, errors.New("database row scan error")
-		}
+		_ = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
 		allUsers = append(allUsers, user)
 	}
 	return allUsers, nil
@@ -60,33 +57,37 @@ func (u UserStorer) FetchUserById(id int) (models.User, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
-		if err != nil {
-			return user, errors.New("database error")
-		}
+		_ = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
 	}
 	return user, nil
 }
 
 func (u UserStorer) UpdateUser(user models.User) error {
+	updateEntities := []interface{}{}
 	updateQ := "update user set " //Update query
 	if user.Age > 0 {
 		updateQ += "Age=?,"
+		updateEntities = append(updateEntities, user.Age)
 	}
 	if user.Name != "" {
 		updateQ += "Name=?,"
+		updateEntities = append(updateEntities, user.Name)
 	}
 	if user.Email != "" {
 		updateQ += "Email=?,"
+		updateEntities = append(updateEntities, user.Email)
 	}
 	if user.Phone != "" {
 		updateQ += "Phone=?,"
+		updateEntities = append(updateEntities, user.Phone)
 	}
 	updateQ = strings.TrimRight(updateQ, ",")
 	if user.Id != 0 {
 		updateQ += " where Id=?;"
+		updateEntities = append(updateEntities, user.Id)
 	}
-	_, err := u.db.Exec(updateQ, user.Age, user.Name, user.Email, user.Phone, user.Id)
+
+	_, err := u.db.Exec(updateQ, updateEntities...)
 	if err != nil {
 		return errors.New("database error")
 	}
@@ -111,10 +112,7 @@ func (u UserStorer) GetEmail(email string) (bool, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err = rows.Scan(&email)
-		if err != nil {
-			return false, errors.New("database error")
-		}
+		_ = rows.Scan(&email)
 		Emails = append(Emails, email)
 	}
 	return len(Emails) == 0, nil

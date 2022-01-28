@@ -128,6 +128,28 @@ func TestPostUser(t *testing.T) {
 			expecErr:  errors.New("invalid body"),
 			expecRes:  []byte("invalid body"),
 		},
+		{
+			desc: "Failure case -2",
+			user: []byte(`{
+				"Id":    0,
+				"Name":  "gopi1",
+				"Email": "gopi@gmail.com",
+				"Phone": "1234567899",
+				"Age":   23
+			}`),
+			mock: []*gomock.Call{
+				mockService.EXPECT().InsertUserDetails(models.User{
+					Id:    0,
+					Name:  "gopi1",
+					Email: "gopi@gmail.com",
+					Phone: "1234567899",
+					Age:   23,
+				}).Return(errors.New("internal error")).MaxTimes(5),
+			},
+			expecCode: http.StatusInternalServerError,
+			expecErr:  errors.New("internal error"),
+			expecRes:  []byte("internal error"),
+		},
 	}
 	for _, v := range testCases {
 		t.Run(v.desc, func(t *testing.T) {
@@ -284,8 +306,8 @@ func TestUpdateUser(t *testing.T) {
 					Age:   23,
 				}).Return(nil).MaxTimes(5),
 			},
-			expecErr: nil,
-			expecRes: []byte("User updated"),
+			expecErr:  nil,
+			expecRes:  []byte("User created"),
 		},
 		{
 			desc: "Failure case -1",
@@ -296,8 +318,29 @@ func TestUpdateUser(t *testing.T) {
 				"Phone": "1234567899",
 				"Age":   23,
 			}`),
-			expecErr: errors.New("invalid body"),
-			expecRes: []byte("invalid body"),
+			expecErr:  errors.New("invalid body"),
+			expecRes:  []byte("invalid body"),
+		},
+		{
+			desc: "Failure case -2",
+			user: []byte(`{
+				"Id":    0,
+				"Name":  "gopi1",
+				"Email": "gopi@gmail.com",
+				"Phone": "1234567899",
+				"Age":   23
+			}`),
+			mock: []*gomock.Call{
+				mockService.EXPECT().UpdateUserDetails(models.User{
+					Id:    0,
+					Name:  "gopi1",
+					Email: "gopi@gmail.com",
+					Phone: "1234567899",
+					Age:   23,
+				}).Return(errors.New("internal error")).MaxTimes(5),
+			},
+			expecErr:  errors.New("internal error"),
+			expecRes:  []byte("internal error"),
 		},
 	}
 	for _, v := range testCases {

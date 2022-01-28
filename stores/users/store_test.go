@@ -1,11 +1,11 @@
 package users
 
 import (
-	"user-curd/models"
 	"errors"
 	"fmt"
 	"reflect"
 	"testing"
+	"user-curd/models"
 
 	"github.com/DATA-DOG/go-sqlmock"
 )
@@ -32,7 +32,7 @@ func TestInsertUser(t *testing.T) {
 				Age:   23,
 			},
 			Mock: []interface{}{
-				mock.ExpectExec("INSERT INTO user").
+				mock.ExpectExec("insert into user").
 					WithArgs(1, "gopi", "gopi@gmail.com", "1234567899", 23).
 					WillReturnResult(sqlmock.NewResult(1, 1)),
 			},
@@ -48,7 +48,7 @@ func TestInsertUser(t *testing.T) {
 				Age:   23,
 			},
 			Mock: []interface{}{
-				mock.ExpectExec("INSERT INTO user").
+				mock.ExpectExec("insert into user").
 					WithArgs(0, "gopi", "gopi@gmail.com", "1234567899", 23).
 					WillReturnError(errors.New("id can`t be 0")),
 			},
@@ -57,15 +57,15 @@ func TestInsertUser(t *testing.T) {
 		{
 			desc: "Failure - DB case",
 			User: models.User{
-				Id:    2,
+				Id:    1,
 				Name:  "chand",
 				Email: "gopi@gmail.com",
 				Phone: "1234567899",
 				Age:   23,
 			},
 			Mock: []interface{}{
-				mock.ExpectExec("INSERT INTO user").
-					WithArgs(2, "chand", "gopi@gmail.com", "1234567899", 23).
+				mock.ExpectExec("insert into user").
+					WithArgs(1, "chand", "gopi@gmail.com", "1234567899", 23).
 					WillReturnError(errors.New("database error")),
 			},
 			expecErr: errors.New("database error"),
@@ -222,8 +222,8 @@ func TestUpdateUser(t *testing.T) {
 				Age:   23,
 			},
 			Mock: []interface{}{
-				mock.ExpectExec("Update user set").
-					WithArgs("gopi", 23, "gopi123@gmail.com", "1234567699", 1).
+				mock.ExpectExec("update user set").
+					WithArgs(23, "gopi", "gopi123@gmail.com", "1234567699", 1).
 					WillReturnResult(sqlmock.NewResult(1, 1)),
 			},
 			expecErr: nil,
@@ -239,7 +239,7 @@ func TestUpdateUser(t *testing.T) {
 			},
 			Mock: []interface{}{
 				mock.ExpectExec("Update user set").
-					WithArgs("gopi", 23, "gopi123@gmail.com", "1234567699", 12).
+					WithArgs(23, "gopi", "gopi123@gmail.com", "1234567699", 2).
 					WillReturnError(errors.New("database error")),
 			},
 			expecErr: errors.New("database error"),

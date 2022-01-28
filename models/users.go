@@ -7,3 +7,8 @@ type User struct {
 	Phone string
 	Age   int
 }
+
+type AuthUser struct {
+	UserName string
+	Password string
+}
