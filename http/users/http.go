@@ -92,7 +92,15 @@ func (ua *userApi) CreateUserHandler(wr http.ResponseWriter, req *http.Request) 
 		wr.Write(res)
 		return
 	}
+
 	wr.WriteHeader(http.StatusCreated)
+	response := entities.HttpResponse{
+		Data:       userData,
+		Message:    "User created",
+		StatusCode: http.StatusOK,
+	}
+	resp, _ := json.Marshal(response)
+	wr.Write(resp)
 }
 
 func (ua *userApi) UpdateUserHandler(wr http.ResponseWriter, req *http.Request) {
@@ -144,6 +152,13 @@ func (ua *userApi) UpdateUserHandler(wr http.ResponseWriter, req *http.Request) 
 
 	// give status OK (200) if everything goes OK
 	wr.WriteHeader(http.StatusOK)
+	response := entities.HttpResponse{
+		Data:       inp,
+		Message:    "Data updated",
+		StatusCode: http.StatusOK,
+	}
+	resp, _ := json.Marshal(response)
+	wr.Write(resp)
 }
 
 func (ua *userApi) DeleteUserHandler(wr http.ResponseWriter, req *http.Request) {
@@ -171,4 +186,11 @@ func (ua *userApi) DeleteUserHandler(wr http.ResponseWriter, req *http.Request) 
 
 	// give status OK (200) if everything goes OK
 	wr.WriteHeader(http.StatusOK)
+	response := entities.HttpResponse{
+		Data:       id,
+		Message:    "User deleted",
+		StatusCode: http.StatusOK,
+	}
+	resp, _ := json.Marshal(response)
+	wr.Write(resp)
 }
