@@ -54,7 +54,7 @@ func TestUserById(t *testing.T) {
 			id:       "100000000",
 			expecErr: nil,
 			mock: []*gomock.Call{
-				mockService.EXPECT().GetUserById(2).Return(models.User{
+				mockService.EXPECT().GetUserById(100000000).Return(models.User{
 					Id:    0,
 					Name:  "",
 					Email: "",
