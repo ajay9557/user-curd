@@ -7,6 +7,7 @@ import (
 	storeUser "user-curd/datastore/users"
 	"user-curd/driver"
 	httpUser "user-curd/http/users"
+	"user-curd/middleware"
 	serviceUser "user-curd/service/users"
 
 	"github.com/gorilla/mux"
@@ -43,11 +44,11 @@ func main() {
 
 	// define mux and routes with their handlers
 	r := mux.NewRouter()
-	r.HandleFunc("/user", usrHandler.GetAllUserHandler).Methods(http.MethodGet)
-	r.HandleFunc("/user/{id}", usrHandler.GetUserByIdHandler).Methods(http.MethodGet)
-	r.HandleFunc("/user", usrHandler.CreateUserHandler).Methods(http.MethodPost)
-	r.HandleFunc("/user/{id}", usrHandler.UpdateUserHandler).Methods(http.MethodPut)
-	r.HandleFunc("/user/{id}", usrHandler.DeleteUserHandler).Methods(http.MethodDelete)
+	r.Handle("/user", middleware.Authentication(http.HandlerFunc(usrHandler.GetAllUserHandler))).Methods(http.MethodGet)
+	r.Handle("/user/{id}", middleware.Authentication(http.HandlerFunc(usrHandler.GetUserByIdHandler))).Methods(http.MethodGet)
+	r.Handle("/user", middleware.Authentication(http.HandlerFunc(usrHandler.CreateUserHandler))).Methods(http.MethodPost)
+	r.Handle("/user/{id}", middleware.Authentication(http.HandlerFunc(usrHandler.UpdateUserHandler))).Methods(http.MethodPut)
+	r.Handle("/user/{id}", middleware.Authentication(http.HandlerFunc(usrHandler.DeleteUserHandler))).Methods(http.MethodDelete)
 
 	// Run the server
 	log.Printf("Listening on port 8000...")
