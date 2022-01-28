@@ -8,7 +8,7 @@ import (
 func Test_validateId(t *testing.T) {
 	testCases := []struct {
 		caseId      int
-		input       interface{}
+		input       int
 		expectedOut bool
 	}{
 		// Success case
@@ -20,11 +20,6 @@ func Test_validateId(t *testing.T) {
 		// Error cases
 		{
 			caseId:      2,
-			input:       "1",
-			expectedOut: false,
-		},
-		{
-			caseId:      3,
 			input:       -1,
 			expectedOut: false,
 		},

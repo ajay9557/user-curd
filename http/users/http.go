@@ -11,10 +11,10 @@ import (
 )
 
 type userApi struct {
-	userService service.UserServiceHandler
+	userService service.UserService
 }
 
-func New(userService service.UserServiceHandler) *userApi {
+func New(userService service.UserService) *userApi {
 	return &userApi{userService: userService}
 }
 

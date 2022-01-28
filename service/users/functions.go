@@ -3,14 +3,10 @@ package users
 import "regexp"
 
 // validateId utility to validate the id
-func validateId(id interface{}) bool {
+func validateId(id int) bool {
 
 	// check if id is of type int and is a positive number
-	idInt, ok := id.(int)
-	if !ok {
-		return false
-	}
-	if idInt < 0 {
+	if id < 0 {
 		return false
 	}
 	return true

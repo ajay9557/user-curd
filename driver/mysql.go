@@ -21,7 +21,7 @@ type MySQLConfig struct {
 func ConnectToMySQL(conf MySQLConfig) (*sql.DB, error) {
 	connectionString := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", conf.User, conf.Password, conf.Host, conf.Port, conf.Db)
 
-	db, err := sql.Open("mysql", connectionString)
+	db, err := sql.Open(conf.Driver, connectionString)
 	if err != nil {
 		return nil, errors.New("cannot connect to sql server")
 	}

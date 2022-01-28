@@ -16,6 +16,7 @@ func main() {
 
 	// define the mysql configuration
 	sqlConf := driver.MySQLConfig{
+		Driver:   "mysql",
 		Host:     "localhost",
 		User:     "vips",
 		Password: "1234",

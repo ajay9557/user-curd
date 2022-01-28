@@ -15,13 +15,13 @@ func TestGetUserByIdService(t *testing.T) {
 
 	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
-	mockUserStore := datastore.NewMockUserStoresHandler(ctrl)
+	mockUserStore := datastore.NewMockUserStore(ctrl)
 	usrServ := New(mockUserStore)
 	defer ctrl.Finish()
 
 	testCases := []struct {
 		caseId      int
-		input       interface{}
+		input       int
 		mockCall    *gomock.Call
 		expectedErr error
 		expectedOut entities.User
@@ -52,6 +52,7 @@ func TestGetUserByIdService(t *testing.T) {
 		// Error validating id
 		{
 			caseId:      2,
+			input:       -1,
 			expectedErr: errors.New("error invalid id type"),
 		},
 		// Error from datastore
@@ -86,7 +87,7 @@ func TestGetAllUsersService(t *testing.T) {
 
 	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
-	mockUserStore := datastore.NewMockUserStoresHandler(ctrl)
+	mockUserStore := datastore.NewMockUserStore(ctrl)
 	usrService := New(mockUserStore)
 	defer ctrl.Finish()
 
@@ -141,7 +142,7 @@ func TestCreateUserService(t *testing.T) {
 
 	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
-	mockUserStore := datastore.NewMockUserStoresHandler(ctrl)
+	mockUserStore := datastore.NewMockUserStore(ctrl)
 	usrService := New(mockUserStore)
 	defer ctrl.Finish()
 
@@ -251,7 +252,7 @@ func TestUpdateUserService(t *testing.T) {
 
 	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
-	mockUserStore := datastore.NewMockUserStoresHandler(ctrl)
+	mockUserStore := datastore.NewMockUserStore(ctrl)
 	userService := New(mockUserStore)
 	defer ctrl.Finish()
 
@@ -339,13 +340,13 @@ func TestDeleteUserService(t *testing.T) {
 
 	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
-	mockUserStore := datastore.NewMockUserStoresHandler(ctrl)
+	mockUserStore := datastore.NewMockUserStore(ctrl)
 	userService := New(mockUserStore)
 	defer ctrl.Finish()
 
 	testCase := []struct {
 		caseId      int
-		input       interface{}
+		input       int
 		mockCall    *gomock.Call
 		expectedErr error
 	}{
@@ -361,7 +362,7 @@ func TestDeleteUserService(t *testing.T) {
 		// Error case invalid id
 		{
 			caseId:      2,
-			input:       'x',
+			input:       -2,
 			mockCall:    nil,
 			expectedErr: errors.New("error invalid id"),
 		},

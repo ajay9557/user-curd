@@ -18,7 +18,7 @@ func New(db *sql.DB) *store {
 }
 
 // GetUserById Retrieve a single user from database
-func (s *store) GetUserById(id interface{}) (*entities.User, error) {
+func (s *store) GetUserById(id int) (*entities.User, error) {
 
 	var user entities.User
 
@@ -81,7 +81,7 @@ func (s *store) UpdateUser(u entities.User) error {
 }
 
 // DeleteUser Delete record from database based on input id
-func (s *store) DeleteUser(id interface{}) error {
+func (s *store) DeleteUser(id int) error {
 
 	// define the delete query
 	query := "delete from user where id = ?"

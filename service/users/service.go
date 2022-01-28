@@ -16,7 +16,7 @@ func New(store datastore.UserStore) *UserService {
 	}
 }
 
-func (us *UserService) GetUserByIdService(id interface{}) (*entities.User, error) {
+func (us *UserService) GetUserByIdService(id int) (*entities.User, error) {
 
 	// check if id is valid
 	if validateId(id) {
@@ -64,7 +64,7 @@ func (us *UserService) UpdateUserService(user entities.User) error {
 	return us.usrStoreHandler.UpdateUser(user)
 }
 
-func (us *UserService) DeleteUserService(id interface{}) error {
+func (us *UserService) DeleteUserService(id int) error {
 
 	// validation of id
 	if !validateId(id) {
