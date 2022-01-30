@@ -44,7 +44,12 @@ func (ua *userApi) GetUserByIdHandler(wr http.ResponseWriter, req *http.Request)
 	}
 
 	// convert user data to json object and write on the response
-	resp, _ := json.Marshal(usrData)
+	outData := entities.HttpResponse{
+		Data:       usrData,
+		Message:    "Retrieved",
+		StatusCode: http.StatusOK,
+	}
+	resp, _ := json.Marshal(outData)
 	_, _ = wr.Write(resp)
 	wr.WriteHeader(http.StatusOK)
 }
@@ -65,7 +70,12 @@ func (ua *userApi) GetAllUserHandler(wr http.ResponseWriter, req *http.Request) 
 	}
 
 	// convert user data to json object and write on the response
-	resp, _ := json.Marshal(data)
+	outData := entities.HttpResponse{
+		Data:       data,
+		Message:    "Retrieved",
+		StatusCode: http.StatusOK,
+	}
+	resp, _ := json.Marshal(outData)
 	_, _ = wr.Write(resp)
 }
 
