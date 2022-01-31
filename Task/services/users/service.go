@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"strconv"
 	"zopsmart/Task/models"
 	service "zopsmart/Task/services"
 	store "zopsmart/Task/stores"
@@ -20,8 +19,11 @@ func (u UserServiceHandler) GetAllUsersService() ([]models.User,error){
 	return u.stores.GetAllUsersStore()
 }
 
-func (u UserServiceHandler) GetUserById(Id int) (models.User, error) {
-
+func (u UserServiceHandler) GetUserByIdService(Id int) (models.User, error) {
+	ok := validateId(Id)
+	if !ok{
+		return models.User{},errors.New("invalid Id")
+	}
 	res, err := u.stores.GetUserById(Id)
 	if err != nil {
 		return res, errors.New("error occured while getting the data")
@@ -30,7 +32,11 @@ func (u UserServiceHandler) GetUserById(Id int) (models.User, error) {
 	return res, nil
 }
 
-func (u UserServiceHandler) DeletebyId(Id int) error {
+func (u UserServiceHandler) DeletebyIdService(Id int) error {
+	ok := validateId(Id)
+	if !ok {
+		return errors.New("invalid Id")
+	}
 	err := u.stores.Delete(Id)
 	if err != nil {
 		return errors.New("error occured while deleting data")
@@ -39,32 +45,43 @@ func (u UserServiceHandler) DeletebyId(Id int) error {
 	return nil
 }
 
-func (u UserServiceHandler) UpdatebyId(Id int, Phone string) error {
-	err := u.stores.Update(Id, Phone)
+func (u UserServiceHandler) UpdatebyIdService(us models.User) error {
+	okid := validateId(us.Id)
+	if !okid {
+		return errors.New("invalid Id")
+	}
+	okmail := validateEmail(us.Email)
+	if !okmail {
+		return errors.New("invalid Email")
+	}
+	okphone := validatePhone(us.Phone)
+	if !okphone {
+		return errors.New("invalid Phone")
+	}
+	err := u.stores.Update(us)
 
 	if err != nil {
 		return errors.New("Error")
 	}
 
-	return err
+	return nil
 }
-
-func (u UserServiceHandler) ValidateEmail(mail string) (bool, error) {
-	ok, err := u.stores.GetMail(mail)
-	if err != nil {
-		return ok, errors.New("Error")
+func (u UserServiceHandler) CreateUserService(us models.User) error{
+	okid := validateId(us.Id)
+	if !okid {
+		return errors.New("invalid Id")
 	}
-	return ok, nil
-}
-
-func (u UserServiceHandler) ValidateId(Id int) (bool, error) {
-	if Id < 1 {
-		return false, errors.New("id cannot be less than zero")
+	okmail := validateEmail(us.Email)
+	if !okmail {
+		return errors.New("invalid Email")
 	}
-	id := strconv.Itoa(Id)
-
-	if id == "" {
-		return false, errors.New("id cannot be empty")
+	okphone := validatePhone(us.Phone)
+	if !okphone {
+		return errors.New("invalid Phone")
 	}
-	return true, nil
+	err := u.stores.Create(us.Id,us.Name,us.Phone,us.Email,us.Age)
+	if err!=nil {
+		return errors.New("Error")
+	}
+	return nil
 }

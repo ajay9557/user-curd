@@ -34,18 +34,32 @@ func (m *MockServices) EXPECT() *MockServicesMockRecorder {
 	return m.recorder
 }
 
-// DeletebyId mocks base method.
-func (m *MockServices) DeletebyId(Id int) error {
+// CreateUserService mocks base method.
+func (m *MockServices) CreateUserService(us models.User) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeletebyId", Id)
+	ret := m.ctrl.Call(m, "CreateUserService", us)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeletebyId indicates an expected call of DeletebyId.
-func (mr *MockServicesMockRecorder) DeletebyId(Id interface{}) *gomock.Call {
+// CreateUserService indicates an expected call of CreateUserService.
+func (mr *MockServicesMockRecorder) CreateUserService(us interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletebyId", reflect.TypeOf((*MockServices)(nil).DeletebyId), Id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserService", reflect.TypeOf((*MockServices)(nil).CreateUserService), us)
+}
+
+// DeletebyIdService mocks base method.
+func (m *MockServices) DeletebyIdService(Id int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeletebyIdService", Id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeletebyIdService indicates an expected call of DeletebyIdService.
+func (mr *MockServicesMockRecorder) DeletebyIdService(Id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletebyIdService", reflect.TypeOf((*MockServices)(nil).DeletebyIdService), Id)
 }
 
 // GetAllUsersService mocks base method.
@@ -63,61 +77,31 @@ func (mr *MockServicesMockRecorder) GetAllUsersService() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllUsersService", reflect.TypeOf((*MockServices)(nil).GetAllUsersService))
 }
 
-// GetUserById mocks base method.
-func (m *MockServices) GetUserById(Id int) (models.User, error) {
+// GetUserByIdService mocks base method.
+func (m *MockServices) GetUserByIdService(Id int) (models.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserById", Id)
+	ret := m.ctrl.Call(m, "GetUserByIdService", Id)
 	ret0, _ := ret[0].(models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetUserById indicates an expected call of GetUserById.
-func (mr *MockServicesMockRecorder) GetUserById(Id interface{}) *gomock.Call {
+// GetUserByIdService indicates an expected call of GetUserByIdService.
+func (mr *MockServicesMockRecorder) GetUserByIdService(Id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserById", reflect.TypeOf((*MockServices)(nil).GetUserById), Id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByIdService", reflect.TypeOf((*MockServices)(nil).GetUserByIdService), Id)
 }
 
-// UpdatebyId mocks base method.
-func (m *MockServices) UpdatebyId(Id int, Phone string) error {
+// UpdatebyIdService mocks base method.
+func (m *MockServices) UpdatebyIdService(arg0 models.User) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdatebyId", Id, Phone)
+	ret := m.ctrl.Call(m, "UpdatebyIdService", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// UpdatebyId indicates an expected call of UpdatebyId.
-func (mr *MockServicesMockRecorder) UpdatebyId(Id, Phone interface{}) *gomock.Call {
+// UpdatebyIdService indicates an expected call of UpdatebyIdService.
+func (mr *MockServicesMockRecorder) UpdatebyIdService(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatebyId", reflect.TypeOf((*MockServices)(nil).UpdatebyId), Id, Phone)
-}
-
-// ValidateEmail mocks base method.
-func (m *MockServices) ValidateEmail(email string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ValidateEmail", email)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ValidateEmail indicates an expected call of ValidateEmail.
-func (mr *MockServicesMockRecorder) ValidateEmail(email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateEmail", reflect.TypeOf((*MockServices)(nil).ValidateEmail), email)
-}
-
-// ValidateId mocks base method.
-func (m *MockServices) ValidateId(Id int) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ValidateId", Id)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ValidateId indicates an expected call of ValidateId.
-func (mr *MockServicesMockRecorder) ValidateId(Id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateId", reflect.TypeOf((*MockServices)(nil).ValidateId), Id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatebyIdService", reflect.TypeOf((*MockServices)(nil).UpdatebyIdService), arg0)
 }

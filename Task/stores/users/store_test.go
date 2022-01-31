@@ -2,12 +2,14 @@ package store
 
 import (
 	"database/sql"
+//	"errors"
 	"fmt"
 	reflect "reflect"
 	"testing"
 	"zopsmart/Task/models"
 
 	"github.com/DATA-DOG/go-sqlmock"
+//	"github.com/golang/mock/gomock"
 )
 
 func NewMock() (*sql.DB, sqlmock.Sqlmock) {
@@ -96,40 +98,48 @@ func TestGetUserById(t *testing.T) {
 	}
 }
 
+
+
+
 func TestUpdate(t *testing.T) {
 
-	db, mock := NewMock()
+	db, mock,_ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	s := DbStore{db: db}
-	query := "update Phone from user where id = ?"
 	tests := []struct {
 		testCase    int
-		Id          int
-		Name        string
-		Email       string
-		Phone       string
-		Age         int
+		input models.User
 		expectedErr error
-		expectedOut int
-		mock        []interface{}
+
 	}{
 		{
 			testCase:    1,
-			Name:        "prasath",
-			Id:          1,
-			Email:       "prasath@gmail.com",
-			Phone:       "12345",
-			Age:         20,
-			expectedOut: 1,
+			input : models.User{
+				Id : 1,
+				Name : "jhon",
+				Phone : "84732",
+				Email: "jhon@gmail.com",
+				Age: 21,
+			},
 			expectedErr: nil,
-			mock:        []interface{}{mock.ExpectExec(query).WithArgs("12345", 1).WillReturnResult(sqlmock.NewResult(1, 1))},
+		
 		},
 	}
+	
 
+	
 	for _, tc := range tests {
-		err := s.Update(tc.Id, tc.Phone)
-		if err != nil && err != tc.expectedErr {
-			t.Errorf("TestCase[%v] Expected: \t%v\nGot: \t%v\n", tc.testCase, tc.expectedErr, err)
-		}
+		t.Run("Success case testing ", func(t *testing.T) {
+			query := "update user set"
+			fields, values := find(tc.input)
+			query += fields + " where id = ?"
+			mock.ExpectExec(query).WithArgs(values[0], values[1], values[2], values[3], values[4]).WillReturnResult(sqlmock.NewResult(1, 1))
+		
+		//	fmt.Println(query)
+			err := s.Update(tc.input)
+			if err != tc.expectedErr {
+				t.Errorf("Expected: \t%v\nGot: \t%v\n", tc.expectedErr, err)
+			}
+		})
 	}
 }
 

@@ -57,40 +57,7 @@ func TestGetAllUsersService(t*testing.T) {
 		})
 	}
 }
-func TestValidateEmail(t *testing.T) {
-	ctrl := gomock.NewController(t)
 
-	defer ctrl.Finish()
-	mockStore := store.NewMockStore(ctrl)
-	mock := New(mockStore)
-
-	testCases := []struct {
-		Email     string
-		mockCall  *gomock.Call
-		expectRes bool
-		expectErr error
-	}{
-		{
-			Email:     "prasath@gmail.com",
-			mockCall:  mockStore.EXPECT().GetMail("prasath@gmail.com").Return(true, nil),
-			expectRes: true,
-			expectErr: nil,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run("Sucess test case ", func(t *testing.T) {
-			res, err := mock.ValidateEmail(tc.Email)
-			if err != nil && err != tc.expectErr {
-				t.Errorf("Expected: %v but got %v", tc.expectErr, err)
-			}
-			if !reflect.DeepEqual(res, tc.expectRes) {
-				t.Errorf("Expected: %v but got %v", tc.expectRes, res)
-			}
-		})
-	}
-
-}
 
 func TestDeletebyId(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -113,7 +80,7 @@ func TestDeletebyId(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("Sucess test case ", func(t *testing.T) {
-			err := mock.DeletebyId(tc.Id)
+			err := mock.DeletebyIdService(tc.Id)
 			if err != nil && err != tc.expectErr {
 				t.Errorf("Expected: %v but got %v", tc.expectErr, err)
 			}
@@ -131,21 +98,35 @@ func TestUpdatebyId(t *testing.T) {
 
 	testCases := []struct {
 		Id        int
-		Phone     string
+		Input    models.User
 		mock      *gomock.Call
 		expectErr error
 	}{
 		{
 			Id:        1,
-			Phone:     "12345",
-			mock:      mockStore.EXPECT().Update(1, "12345").Return(nil),
+			Input:     models.User{
+				Id : 1,
+				Name : "andrew",
+				Phone : "36785",
+				Email : "andrew@gmail.com",
+				Age : 21,
+
+			},
+			mock:      mockStore.EXPECT().Update(models.User{
+				Id : 1,
+				Name : "andrew",
+				Phone : "36785",
+				Email : "andrew@gmail.com",
+				Age : 21,
+
+			}).Return(nil),
 			expectErr: nil,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run("Sucess test case ", func(t *testing.T) {
-			err := mock.UpdatebyId(tc.Id, tc.Phone)
+			err := mock.UpdatebyIdService(tc.Input)
 			if err != nil && (err != tc.expectErr) {
 				t.Error("Expected: ", tc.expectErr, "but Got: ", err)
 			}
@@ -188,7 +169,7 @@ func TestGetUserById(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("Sucess test case ", func(t *testing.T) {
-			res, err := mock.GetUserById(tc.Id)
+			res, err := mock.GetUserByIdService(tc.Id)
 			if err != nil && (err != tc.expectErr) {
 				t.Errorf("Expected %v: But got %v", tc.expectErr, err)
 			}
@@ -201,36 +182,3 @@ func TestGetUserById(t *testing.T) {
 
 }
 
-func TestValidateId(t *testing.T) {
-	ctrl := gomock.NewController(t)
-
-	defer ctrl.Finish()
-	mockStore := store.NewMockStore(ctrl)
-	mock := New(mockStore)
-
-	testCases := []struct {
-		Id        int
-		expectOut bool
-		expectErr error
-	}{
-		{
-			Id:        1,
-			expectOut: true,
-			expectErr: nil,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run("Sucess test case ", func(t *testing.T) {
-			res, err := mock.ValidateId(tc.Id)
-			if err != nil && (err != tc.expectErr) {
-				t.Error("Expected: ", tc.expectErr, "but Got: ", err)
-			}
-
-			if !reflect.DeepEqual(res, tc.expectOut) {
-				t.Error("Expected :", tc.expectOut, "But Got:", res)
-			}
-		})
-	}
-
-}

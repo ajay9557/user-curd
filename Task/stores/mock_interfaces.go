@@ -77,21 +77,6 @@ func (mr *MockStoreMockRecorder) GetAllUsersStore() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllUsersStore", reflect.TypeOf((*MockStore)(nil).GetAllUsersStore))
 }
 
-// GetMail mocks base method.
-func (m *MockStore) GetMail(mail string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMail", mail)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetMail indicates an expected call of GetMail.
-func (mr *MockStoreMockRecorder) GetMail(mail interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMail", reflect.TypeOf((*MockStore)(nil).GetMail), mail)
-}
-
 // GetUserById mocks base method.
 func (m *MockStore) GetUserById(id int) (models.User, error) {
 	m.ctrl.T.Helper()
@@ -108,15 +93,15 @@ func (mr *MockStoreMockRecorder) GetUserById(id interface{}) *gomock.Call {
 }
 
 // Update mocks base method.
-func (m *MockStore) Update(Id int, Phone string) error {
+func (m *MockStore) Update(user models.User) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", Id, Phone)
+	ret := m.ctrl.Call(m, "Update", user)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockStoreMockRecorder) Update(Id, Phone interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) Update(user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockStore)(nil).Update), Id, Phone)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockStore)(nil).Update), user)
 }

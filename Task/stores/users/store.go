@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+//	"fmt"
 
 	"zopsmart/Task/models"
 
@@ -69,14 +70,24 @@ func (s *DbStore) Create(Id int, Name string, Email string, Phone string, Age in
 	return nil
 }
 
-func (s *DbStore) Update(Id int, Phone string) error {
-	query := "update Phone from user where id = ?"
-	_, err := s.db.ExecContext(context.TODO(), query, Phone, Id)
+
+
+func (u *DbStore) Update(user models.User) error {
+
+	
+	query := "update user set"
+	fields, values := find(user)
+	query += fields + " where id = ?"
+
+	_, err := u.db.Exec(query, values...)
+
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
+
 
 func (s *DbStore) Delete(id int) error {
 
@@ -90,22 +101,22 @@ func (s *DbStore) Delete(id int) error {
 	return nil
 }
 
-func (s *DbStore) GetMail(mail string) (bool, error) {
-	Email := []string{}
-	query := "select Email from user where Email=?;"
+// func (s *DbStore) GetMail(mail string) (bool, error) {
+// 	Email := []string{}
+// 	query := "select Email from user where Email=?;"
 
-	res, err := s.db.Query(query, mail)
-	if err != nil {
-		return false, errors.New("error")
-	}
-	defer res.Close()
-	for res.Next() {
-		err = res.Scan(&mail)
-		if err != nil {
-			return false, errors.New("error")
-		}
-		Email = append(Email, mail)
-	}
+// 	res, err := s.db.Query(query, mail)
+// 	if err != nil {
+// 		return false, errors.New("error")
+// 	}
+// 	defer res.Close()
+// 	for res.Next() {
+// 		err = res.Scan(&mail)
+// 		if err != nil {
+// 			return false, errors.New("error")
+// 		}
+// 		Email = append(Email, mail)
+// 	}
 
-	return len(Email) == 0, nil
-}
+// 	return len(Email) == 0, nil
+// }

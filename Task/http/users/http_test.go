@@ -30,7 +30,7 @@ func TestApiGetUserById(t *testing.T) {
 			id: "1",
 			expectErr: nil,
 			mock: 
-				mockService.EXPECT().GetUserById(1).Return(models.User{
+				mockService.EXPECT().GetUserByIdService(1).Return(models.User{
 					Id:    1,
 					Name:  "prasath",
 					Email: "prasath@gmail.com",

@@ -23,70 +23,69 @@ func New(service service.Services) UserHandler {
 	return UserHandler{s: service}
 }
 
-func (u UserHandler) AllUserDetails(writer http.ResponseWriter,req *http.Request) {
+func (u UserHandler) AllUserDetails(w http.ResponseWriter,r *http.Request) {
 
-	writer.Header().Set("content-type","application/json")
+	w.Header().Set("content-type","application/json")
 
 	data, err := u.s.GetAllUsersService()
 	if err != nil {
-		writer.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-
-	// convert user data to json object and write on the response
 	resp, _ := json.Marshal(data)
-	_, _ = writer.Write(resp)
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
 }
 
-func (u UserHandler) GetUserById(writer http.ResponseWriter, req *http.Request) {
-	writer.Header().Set("content-type", "application/json")
-	id, err := strconv.Atoi(mux.Vars(req)["id"])
+func (u UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
-		resErr, _ := writer.Write([]byte("invalid Id"))
-		writer.WriteHeader(http.StatusInternalServerError)
+		resErr, _ := w.Write([]byte("invalid Id"))
+		w.WriteHeader(http.StatusBadRequest)
 		b,_ := json.Marshal(resErr)
-		writer.Write(b)
+		w.Write(b)
 		return
 	}
 
-	res, err := u.s.GetUserById(id)
+	res, err := u.s.GetUserByIdService(id)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusInternalServerError)
 		b,_ := json.Marshal(res)
-		writer.Write(b)
+		w.Write(b)
 		return
-	}
+	} 
 
 	b, _ := json.Marshal(res)
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(b)
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
 
 }
 
-func (u UserHandler) DeleteUser(writer http.ResponseWriter, req *http.Request) {
+func (u UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	
-	writer.Header().Set("content-type", "application/json")
-	id, err := strconv.Atoi(mux.Vars(req)["id"])
+    w.Header().Set("content-type", "application/json")
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
-		resErr, _ := writer.Write([]byte("invalid Id"))
-		writer.WriteHeader(http.StatusInternalServerError)
+		resErr, _ := w.Write([]byte("invalid Id"))
+		w.WriteHeader(http.StatusBadRequest)
 		b,_ := json.Marshal(resErr)
-		writer.Write(b)
+		w.Write(b)
 		return
 	}
-	er := u.s.DeletebyId(id)
+	er := u.s.DeletebyIdService(id)
 	if er != nil {
-		writer.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error"))
 		return
 	}
-		
-	writer.WriteHeader(http.StatusOK)
-
+	w.Write([]byte("Successfully deleted"))
+	w.WriteHeader(http.StatusOK)
 }
 
-func (u UserHandler) UpdateUser(writer http.ResponseWriter, req *http.Request) {
-	var user *models.User
-	resBody, err := ioutil.ReadAll(req.Body)
+func (u UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	resBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -94,35 +93,34 @@ func (u UserHandler) UpdateUser(writer http.ResponseWriter, req *http.Request) {
 	err = json.Unmarshal(resBody, &user)
 	if err != nil {
 		fmt.Println(err)
-		_, _ = writer.Write([]byte("invalid body"))
-		writer.WriteHeader(http.StatusBadRequest)
+		resErr, _:=w.Write([]byte("invalid body"))
+		b,_ := json.Marshal(resErr)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(b)
 		return
 	}
 	if user.Id == 0 {
-		_, _ = writer.Write([]byte("Id cannot be zero"))
-		writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte("Id cannot be zero"))
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	ok, err := u.s.ValidateEmail(user.Email)
-	if err != nil {
-		fmt.Println(err)
-		_, _ = writer.Write([]byte("Error"))
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	} else if !ok {
-		_, _ = writer.Write([]byte("email already exist"))
-		writer.WriteHeader(http.StatusInternalServerError)
+	er := u.s.UpdatebyIdService(user)
+
+	if er != nil {
+		fmt.Println(er)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error"))
 		return
 	}
 
-	writer.WriteHeader(http.StatusOK)
+	w.Write([]byte("successfully updated"))
+	w.WriteHeader(http.StatusOK)
 	
-
 }
 
-func (u UserHandler) CreateUser(writer http.ResponseWriter, req *http.Request) {
-	var user *models.User
-	resBody, err := ioutil.ReadAll(req.Body)
+func (u UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	resBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -130,28 +128,20 @@ func (u UserHandler) CreateUser(writer http.ResponseWriter, req *http.Request) {
 	err = json.Unmarshal(resBody, &user)
 	if err != nil {
 		fmt.Println(err)
-		_, _ = writer.Write([]byte("invalid body"))
-		writer.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("invalid body"))
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	_, er := u.s.ValidateId(user.Id)
-	if er != nil {
-		fmt.Println(err)
-		_, _ = writer.Write([]byte("Error"))
-		writer.WriteHeader(http.StatusInternalServerError)
+
+	e := u.s.CreateUserService(user)
+
+	if e != nil {
+		fmt.Println(e)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	ok, err := u.s.ValidateEmail(user.Email)
-	if err != nil {
-		fmt.Println(err)
-		_, _ = writer.Write([]byte("Error"))
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	} else if !ok {
-		_, _ = writer.Write([]byte("email already exist"))
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	writer.WriteHeader(http.StatusOK)
+	
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Successfully created"))
 	
 }
