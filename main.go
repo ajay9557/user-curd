@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 
 	user1 "Icrud/Http/Users"
+	"Icrud/Middlewares"
 	user2 "Icrud/Services/Users"
 	user3 "Icrud/Stores/Users"
 )
@@ -36,12 +37,19 @@ func main() {
 	ht := user1.Handler{Sev: su}
 
 	r := mux.NewRouter()
-	r.HandleFunc("/api/users/{id}", ht.UserById).Methods("GET")
+	// r.HandleFunc("/api/users/{id}", Middlewares.Logger(ht.UserById)).Methods("GET")
+	r.Path("/api/users/{id}").Methods("GET").HandlerFunc(ht.UserById)
 
-	r.HandleFunc("/api/users", ht.GetUsers).Methods("GET")
-	r.HandleFunc("/api/users", ht.InsertUser).Methods("POST")
+	// r.HandleFunc("/api/users", ht.GetUsers).Methods("GET")
+	r.Path("/api/users").Methods("GET").HandlerFunc(ht.GetUsers)
+
+	// r.HandleFunc("/api/users", ht.InsertUser).Methods("POST")
+	r.Path("/api/users").Methods("POST").HandlerFunc(ht.InsertUser)
+
 	r.HandleFunc("/api/users/{id}", ht.UpdateUserById).Methods("PUT")
-	r.HandleFunc("/api/users/{id}", ht.DeleteUserById).Methods("DELETE")
+
+	// r.HandleFunc("/api/users/{id}", ht.DeleteUserById).Methods("DELETE")
+	r.HandleFunc("/api/users/{id}", Middlewares.Logger(ht.DeleteUserById)).Methods("DELETE")
 
 	http.Handle("/", r)
 

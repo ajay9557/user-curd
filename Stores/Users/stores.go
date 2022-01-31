@@ -131,7 +131,7 @@ func (s *dbStore) GetEmail(email string) (bool, error) {
 	rows := s.db.QueryRow(searchQ, email)
 
 	if rows.Err() != nil {
-		return true, errors.New("DataBase error")
+		return false, errors.New("DataBase error")
 	}
 	var eml string
 
