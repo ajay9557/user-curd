@@ -27,19 +27,19 @@ func (s *dbStore) InsertDetails(user model.User) error {
 }
 
 func (s *dbStore) GetById(Id int) (model.User, error) {
-	var us model.User
+	var user model.User
 	row := s.db.QueryRow("SELECT Id,Name,Email,Phone,Age FROM User where Id=?", Id)
 
-	err := row.Scan(&us.Id, &us.Name, &us.Email, &us.Phone, &us.Age)
+	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return us, fmt.Errorf("no records found")
+			return user, fmt.Errorf("no records found")
 		}
-		fmt.Print(us)
-		return us, fmt.Errorf("userById:%d: %v", Id, err)
+		fmt.Print(user)
+		return user, fmt.Errorf("userById:%d: %v", Id, err)
 
 	}
-	return us, nil
+	return user, nil
 }
 
 func (s *dbStore) GetAll() ([]model.User, error) {

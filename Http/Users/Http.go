@@ -13,7 +13,7 @@ import (
 )
 
 type Handler struct {
-	Sev service.Service
+	S service.Service
 }
 
 func (serv Handler) Search(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +22,7 @@ func (serv Handler) Search(w http.ResponseWriter, r *http.Request) {
 	v := params["id"]
 	id, _ := strconv.Atoi(v)
 	fmt.Println(id)
-	userdata, err := serv.Sev.SearchByUserId(id)
+	userdata, err := serv.S.SearchByUserId(id)
 	fmt.Println(userdata)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -43,7 +43,7 @@ func (serv Handler) Create(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	usr, err := serv.Sev.InsertUserDetails(users)
+	usr, err := serv.S.InsertUserDetails(users)
 	res, _ := json.Marshal(usr)
 	if err != nil {
 		_, _ = w.Write([]byte("could not create User"))
@@ -60,9 +60,9 @@ func (serv Handler) DeleteId(w http.ResponseWriter, r *http.Request) {
 	v := params["id"]
 	id, err := strconv.Atoi(v)
 	if err != nil {
-		fmt.Errorf("%v", err)
+
 	}
-	err = serv.Sev.DeleteByUserId(id)
+	err = serv.S.DeleteByUserId(id)
 	fmt.Println(err)
 	w.Write([]byte("Deleted User Successfully!!"))
 
@@ -72,14 +72,14 @@ func (serv Handler) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 	resBody, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(resBody, &user)
 	if err != nil {
-		fmt.Println(err)
+
 		_, _ = rw.Write([]byte("invalid body"))
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = serv.Sev.UpdateByUserId(user)
+	err = serv.S.UpdateByUserId(user)
 	if err != nil {
-		fmt.Println(err)
+
 		_, _ = rw.Write([]byte("Database error"))
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
@@ -90,7 +90,7 @@ func (serv Handler) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (serv Handler) GetAll(w http.ResponseWriter, r *http.Request) {
-	usr, err := serv.Sev.SearchAll()
+	usr, err := serv.S.SearchAll()
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Retrieving Failed."))

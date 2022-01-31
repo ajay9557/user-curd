@@ -47,13 +47,13 @@ func TestHandler_Search(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	serv := service.NewMockService(ctrl)
-	//mock := New(serv)
+
 	h := Handler{serv}
 	for _, tc := range tcs {
 		link := "/users/%s"
 		r := httptest.NewRequest("GET", fmt.Sprintf(link, tc.Id), nil)
 		w := httptest.NewRecorder()
-		//router := mux.NewRouter()
+
 		r = mux.SetURLVars(r, map[string]string{
 			"id": tc.Id,
 		})
@@ -82,13 +82,13 @@ func TestHandler_Delete(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	serv := service.NewMockService(ctrl)
-	//mock := New(serv)
+
 	h := Handler{serv}
 	for _, tc := range tcs {
 		link := "/users/%s"
 		r := httptest.NewRequest("DELETE", fmt.Sprintf(link, tc.Id), nil)
 		w := httptest.NewRecorder()
-		//router := mux.NewRouter()
+
 		r = mux.SetURLVars(r, map[string]string{
 			"id": tc.Id,
 		})
@@ -122,13 +122,13 @@ func TestHandler_SearchingAll(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	serv := service.NewMockService(ctrl)
-	//mock := New(serv)
+
 	h := Handler{serv}
 	for _, tc := range tcs {
 		link := "/users"
 		r := httptest.NewRequest("GET", fmt.Sprintf(link), nil)
 		w := httptest.NewRecorder()
-		//router := mux.NewRouter()
+
 		r = mux.SetURLVars(r, map[string]string{
 			"id": tc.Id,
 		})

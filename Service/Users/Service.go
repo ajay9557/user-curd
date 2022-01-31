@@ -40,7 +40,7 @@ func (ud User_Details) InsertUserDetails(user model.User) (model.User, error) {
 
 func (ud User_Details) IsEmailValid(e string) bool {
 
-	ok := isEmailValid(e)
+	ok := emailvalidation(e)
 
 	if ok {
 		res, err := ud.u.GetAll()

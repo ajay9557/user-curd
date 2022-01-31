@@ -26,7 +26,7 @@ func TestEmailValid(t *testing.T) {
 	}
 	for _, ts := range testCases {
 		t.Run(ts.desc, func(t *testing.T) {
-			result := isEmailValid(ts.input)
+			result := emailvalidation(ts.input)
 			if result != ts.expecOut {
 				t.Errorf("Expected %v obtained %v", ts.expecOut, result)
 			}
