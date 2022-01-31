@@ -1,0 +1,386 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Crud operations for users",
+    "version": "1.0.0",
+    "title": "Users-API"
+  },
+  "host": "localhost:8086",
+  "tags": [
+    {
+      "name": "user",
+      "description": "Operations about user"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {
+    "/users": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Create user",
+        "description": "Creates and inserts a user.",
+        "operationId": "createUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Created user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user created",
+            "schema": {
+              "$ref": "#/definitions/Response"
+            },
+            "examples": {
+              "application/json": {
+                "Data": {
+                  "Id": 1,
+                  "Name": "Gopi",
+                  "Email": "gopi@gmail.com",
+                  "Phone": "123456789",
+                  "Age": 21
+                },
+                "Code": 200,
+                "Message": "user created"
+              }
+            }
+          },
+          "400": {
+            "description": "invalid body",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "Code": 400,
+                "Message": "invalid body"
+              }
+            }
+          },
+          "500": {
+            "description": "internal error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "Code": 500,
+                "Message": "internal error"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Fetch all users in db",
+        "description": "slice of user objects",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "all users obtained successfully",
+            "schema": {
+              "$ref": "#/definitions/Response"
+            },
+            "examples": {
+              "application/json": {
+                "Data": [
+                  {
+                    "Id": 1,
+                    "Name": "Gopi",
+                    "Email": "gopi@gmail.com",
+                    "Phone": "123456789",
+                    "Age": 21
+                  }
+                ],
+                "Code": 200,
+                "Message": "all users obtained successfully"
+              }
+            }
+          },
+          "400": {
+            "description": "internal error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "Code": 400,
+                "Message": "internal error"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Update user",
+        "description": "Update user in db",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": " user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user updated successfully",
+            "schema": {
+              "$ref": "#/definitions/Response"
+            },
+            "examples": {
+              "application/json": {
+                "Data": {
+                  "Id": 1,
+                  "Name": "Gopi",
+                  "Email": "gopi@gmail.com",
+                  "Phone": "123456789",
+                  "Age": 21
+                },
+                "Code": 200,
+                "Message": "user updated succesfully"
+              }
+            }
+          },
+          "400": {
+            "description": "invalid body",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "Code": 400,
+                "Message": "invalid body"
+              }
+            }
+          },
+          "500": {
+            "description": "internal error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "Code": 500,
+                "Message": "internal error"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Delete user by id",
+        "description": "Delete user object",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "Id",
+            "description": "Delete user specific to id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted successfully",
+            "schema": {
+              "$ref": "#/definitions/Response"
+            },
+            "examples": {
+              "application/json": {
+                "Data": null,
+                "Code": 200,
+                "Message": "deleted successfully"
+              }
+            }
+          },
+          "400": {
+            "description": "invalid parameter id",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "Code": 400,
+                "Message": "invalid parameter id"
+              }
+            }
+          },
+          "500": {
+            "description": "internal error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "Code": 500,
+                "Message": "internal error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Fetch user by user id",
+        "description": "A user object",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "Id",
+            "description": "Fetch user specific to id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user obtained successfully",
+            "schema": {
+              "$ref": "#/definitions/Response"
+            },
+            "examples": {
+              "application/json": {
+                "Data": {
+                  "Id": 1,
+                  "Name": "Gopi",
+                  "Email": "gopi@gmail.com",
+                  "Phone": "123456789",
+                  "Age": 21
+                },
+                "Code": 200,
+                "Message": "user obtained successfully"
+              }
+            }
+          },
+          "400": {
+            "description": "invalid parameter id",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "Code": 400,
+                "Message": "invalid parameter id"
+              }
+            }
+          },
+          "500": {
+            "description": "internal error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "Code": 500,
+                "Message": "internal error"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Email": {
+          "type": "string"
+        },
+        "Phone": {
+          "type": "string"
+        },
+        "Age": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "xml": {
+        "name": "User"
+      }
+    },
+    "Response": {
+      "type": "object",
+      "properties": {
+        "Data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        },
+        "Message": {
+          "type": "string",
+          "example": "string"
+        },
+        "StatusCode": {
+          "type": "integer",
+          "format": "int64",
+          "example": "integer"
+        }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "integer",
+          "format": "int64",
+          "example": "integer"
+        },
+        "Message": {
+          "type": "string",
+          "example": "string"
+        }
+      }
+    }
+  }
+}

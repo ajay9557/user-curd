@@ -33,7 +33,7 @@ func TestInserUserDetails(t *testing.T) {
 			},
 			mock: []*gomock.Call{
 				mockStore.EXPECT().InsertUser(gomock.Any()).Return(nil),
-				mockStore.EXPECT().GetEmail(gomock.Any()).Return(true, nil),
+				mockStore.EXPECT().FetchAllUsers().Return([]models.User{}, nil),
 			},
 			expecErr: nil,
 		},
@@ -47,20 +47,6 @@ func TestInserUserDetails(t *testing.T) {
 				Age:   23,
 			},
 			expecErr: errors.New("email not valid"),
-		},
-		{
-			desc: "Failure case - 2",
-			User: models.User{
-				Id:    2,
-				Name:  "gopi",
-				Email: "gopi123@gmail.com",
-				Phone: "1234567899",
-				Age:   23,
-			},
-			mock: []*gomock.Call{
-				mockStore.EXPECT().GetEmail(gomock.Any()).Return(false, nil),
-			},
-			expecErr: errors.New("email already present"),
 		},
 		{
 			desc: "Failure case - id",
@@ -84,7 +70,7 @@ func TestInserUserDetails(t *testing.T) {
 			},
 			mock: []*gomock.Call{
 				mockStore.EXPECT().InsertUser(gomock.Any()).Return(errors.New("error generated")),
-				mockStore.EXPECT().GetEmail(gomock.Any()).Return(true, nil),
+				mockStore.EXPECT().FetchAllUsers().Return([]models.User{}, nil),
 			},
 			expecErr: errors.New("error generated"),
 		},
@@ -261,7 +247,7 @@ func TestUpdateUserDetails(t *testing.T) {
 			},
 			mock: []*gomock.Call{
 				mockStore.EXPECT().UpdateUser(gomock.Any()).Return(nil),
-				mockStore.EXPECT().GetEmail(gomock.Any()).Return(true, nil),
+				mockStore.EXPECT().FetchAllUsers().Return([]models.User{}, nil),
 			},
 			expecErr: nil,
 		},
@@ -288,20 +274,6 @@ func TestUpdateUserDetails(t *testing.T) {
 			expecErr: errors.New("email not valid"),
 		},
 		{
-			desc: "Failure case - 2",
-			User: models.User{
-				Id:    2,
-				Name:  "gopi",
-				Email: "gopi123@gmail.com",
-				Phone: "1234567899",
-				Age:   23,
-			},
-			mock: []*gomock.Call{
-				mockStore.EXPECT().GetEmail(gomock.Any()).Return(false, nil),
-			},
-			expecErr: errors.New("email already present"),
-		},
-		{
 			desc: "Failure case - 3",
 			User: models.User{
 				Id:    2,
@@ -312,7 +284,7 @@ func TestUpdateUserDetails(t *testing.T) {
 			},
 			mock: []*gomock.Call{
 				mockStore.EXPECT().UpdateUser(gomock.Any()).Return(errors.New("error generated")),
-				mockStore.EXPECT().GetEmail(gomock.Any()).Return(true, nil),
+				mockStore.EXPECT().FetchAllUsers().Return([]models.User{}, nil),
 			},
 			expecErr: errors.New("error generated"),
 		},

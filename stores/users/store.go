@@ -3,7 +3,6 @@ package users
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"strings"
 	"user-curd/models"
 	"user-curd/stores"
@@ -13,7 +12,7 @@ type UserStorer struct {
 	db *sql.DB
 }
 
-func New(db *sql.DB) stores.Store {
+func New(db *sql.DB) stores	.Store {
 	return &UserStorer{db: db}
 }
 
@@ -25,7 +24,6 @@ func (u UserStorer) InsertUser(user models.User) error {
 	}
 	_, err := u.db.Exec(insertQ, user.Id, user.Name, user.Email, user.Phone, user.Age)
 	if err != nil {
-		fmt.Println(err)
 		return errors.New("database error")
 	}
 	return nil
@@ -101,19 +99,4 @@ func (u UserStorer) DeleteUserById(id int) error {
 		return errors.New("database error")
 	}
 	return nil
-}
-
-func (u UserStorer) GetEmail(email string) (bool, error) {
-	Emails := []string{}
-	searchQ := "select Email from user where email=?;"
-	rows, err := u.db.Query(searchQ, email)
-	if err != nil {
-		return false, errors.New("database error")
-	}
-	defer rows.Close()
-	for rows.Next() {
-		_ = rows.Scan(&email)
-		Emails = append(Emails, email)
-	}
-	return len(Emails) == 0, nil
 }

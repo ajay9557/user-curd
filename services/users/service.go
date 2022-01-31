@@ -17,6 +17,7 @@ func New(store stores.Store) services.Services {
 
 func (u UserServiceHandler) InsertUserDetails(user models.User) error {
 	checkId := idCheck(user.Id)
+	checkEmail := true
 	if !checkId {
 		return errors.New("id should not be zero")
 	}
@@ -24,7 +25,13 @@ func (u UserServiceHandler) InsertUserDetails(user models.User) error {
 	if !ok {
 		return errors.New("email not valid")
 	}
-	checkEmail, _ := u.stores.GetEmail(user.Email)
+	userDetails, _ := u.stores.FetchAllUsers()
+	for _, v := range userDetails {
+		if v.Email == user.Email {
+			checkEmail = false
+			break
+		}
+	}
 	if !checkEmail {
 		return errors.New("email already present")
 	}
@@ -58,6 +65,7 @@ func (u UserServiceHandler) FetchUserDetailsById(id int) (models.User, error) {
 
 func (u UserServiceHandler) UpdateUserDetails(user models.User) error {
 	checkId := idCheck(user.Id)
+	checkEmail := true
 	if !checkId {
 		return errors.New("id should not be zero")
 	}
@@ -65,7 +73,13 @@ func (u UserServiceHandler) UpdateUserDetails(user models.User) error {
 	if !ok {
 		return errors.New("email not valid")
 	}
-	checkEmail, _ := u.stores.GetEmail(user.Email)
+	userDetails, _ := u.stores.FetchAllUsers()
+	for _, v := range userDetails {
+		if v.Email == user.Email {
+			checkEmail = false
+			break
+		}
+	}
 	if !checkEmail {
 		return errors.New("email already present")
 	}

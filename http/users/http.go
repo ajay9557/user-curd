@@ -2,7 +2,6 @@ package users
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -21,52 +20,83 @@ func New(service services.Services) UserHandler {
 func (u UserHandler) PostUser(rw http.ResponseWriter, r *http.Request) {
 	var user models.User
 	rw.Header().Set("Content-Type", "application/json")
+	var res models.Response
+	var errRes models.ErrorResponse
+
 	resBody, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(resBody, &user)
 	if err != nil {
+		errRes.Code = 400
+		errRes.Message = "invalid body"
+		b, _ := json.Marshal(errRes)
 		rw.WriteHeader(http.StatusBadRequest)
-		_, _ = rw.Write([]byte("invalid body"))
+		_, _ = rw.Write(b)
 		return
 	}
 	err = u.serv.InsertUserDetails(user)
 	if err != nil {
+		errRes.Code = 500
+		errRes.Message = "internal error"
+		b, _ := json.Marshal(errRes)
 		rw.WriteHeader(http.StatusInternalServerError)
-		_, _ = rw.Write([]byte("internal error"))
+		_, _ = rw.Write([]byte(b))
 		return
 	}
+	res.Data = user
+	res.Message = "user created"
+	res.StatusCode = 200
 	rw.WriteHeader(http.StatusOK)
-	rw.Write([]byte("User created"))
+	b, _ := json.Marshal(res)
+	rw.Write([]byte(b))
 }
 
 func (u UserHandler) GetUsers(rw http.ResponseWriter, r *http.Request) {
+	var res models.Response
+	var errRes models.ErrorResponse
 	allUsers, err := u.serv.FetchAllUserDetails()
 	if err != nil {
-		fmt.Println(err)
+		errRes.Code = 400
+		errRes.Message = "internal error"
+		b, _ := json.Marshal(errRes)
 		rw.WriteHeader(http.StatusBadRequest)
-		rw.Write([]byte("error generated"))
+		rw.Write([]byte(b))
 	} else {
-		b, _ := json.Marshal(allUsers)
+		res.Data = allUsers
+		res.Message = "all users obtained successfully"
+		res.StatusCode = 200
+		b, _ := json.Marshal(res)
 		rw.WriteHeader(http.StatusOK)
 		_, _ = rw.Write(b)
 	}
 }
 
 func (u UserHandler) GetUserById(rw http.ResponseWriter, r *http.Request) {
+	var res models.Response
+	var errRes models.ErrorResponse
 	q := r.URL.Query()
 	id := q.Get("id")
-	int_id, err := strconv.Atoi(id)
+	userId, err := strconv.Atoi(id)
 	if err != nil {
+		errRes.Code = 400
+		errRes.Message = "invalid parameter id"
+		b, _ := json.Marshal(errRes)
 		rw.WriteHeader(http.StatusBadRequest)
-		_, _ = rw.Write([]byte("invalid parameter id"))
+		_, _ = rw.Write(b)
 		return
 	}
-	user, err := u.serv.FetchUserDetailsById(int_id)
+	user, err := u.serv.FetchUserDetailsById(userId)
 	if err != nil {
+		errRes.Code = 500
+		errRes.Message = "internal error"
+		b, _ := json.Marshal(errRes)
 		rw.WriteHeader(http.StatusInternalServerError)
-		rw.Write([]byte("internal error"))
+		rw.Write(b)
 		return
 	} else {
-		b, _ := json.Marshal(user)
+		res.Data = user
+		res.Message = "user obtained successfully"
+		res.StatusCode = 200
+		b, _ := json.Marshal(res)
 		rw.WriteHeader(http.StatusOK)
 		_, _ = rw.Write(b)
 	}
@@ -75,42 +105,56 @@ func (u UserHandler) GetUserById(rw http.ResponseWriter, r *http.Request) {
 
 func (u UserHandler) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 	var user models.User
+	var res models.Response
+	var errRes models.ErrorResponse
 	rw.Header().Set("Content-Type", "application/json")
 	resBody, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(resBody, &user)
 	if err != nil {
+		errRes.Code = 400
+		errRes.Message = "invalid body"
+		b, _ := json.Marshal(errRes)
 		rw.WriteHeader(http.StatusBadRequest)
-		_, _ = rw.Write([]byte("invalid body"))
+		_, _ = rw.Write(b)
 		return
 	}
 	err = u.serv.UpdateUserDetails(user)
 	if err != nil {
+		errRes.Code = 500
+		errRes.Message = "internal error"
+		b, _ := json.Marshal(errRes)
 		rw.WriteHeader(http.StatusInternalServerError)
-		_, _ = rw.Write([]byte("internal error"))
+		_, _ = rw.Write(b)
 		return
 	}
+	res.Data = user
+	res.Message = "user updated successfully"
+	res.StatusCode = 200
+	b, _ := json.Marshal(res)
 	rw.WriteHeader(http.StatusOK)
-	rw.Write([]byte("User updated"))
+	rw.Write(b)
 }
 
 func (u UserHandler) DeleteUser(rw http.ResponseWriter, r *http.Request) {
+	var res models.Response
+	var errRes models.ErrorResponse
 	q := r.URL.Query()
 	id := q.Get("id")
-	int_id, _ := strconv.Atoi(id)
-	if int_id == 0 {
-		_, _ = rw.Write([]byte("Id shouldn't be zero"))
-		rw.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	err := u.serv.DeleteUserDetailsById(int_id)
+	userId, _ := strconv.Atoi(id)
+	err := u.serv.DeleteUserDetailsById(userId)
 	if err != nil {
-		fmt.Println(err)
-		rw.WriteHeader(http.StatusBadRequest)
-		rw.Write([]byte("error generated"))
+		rw.WriteHeader(http.StatusInternalServerError)
+		errRes.Code = 500
+		errRes.Message = "internal error"
+		b, _ := json.Marshal(errRes)
+		rw.Write(b)
 		return
 	} else {
+		res.Message = "deleted successfully"
+		res.StatusCode = 200
+		b, _ := json.Marshal(res)
 		rw.WriteHeader(http.StatusOK)
-		_, _ = rw.Write([]byte("User deleted successfully"))
+		_, _ = rw.Write(b)
 	}
 
 }

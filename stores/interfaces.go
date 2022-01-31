@@ -10,5 +10,4 @@ type Store interface {
 	FetchUserById(id int) (models.User, error)
 	UpdateUser(models.User) error
 	DeleteUserById(id int) error
-	GetEmail(email string) (bool, error)
 }

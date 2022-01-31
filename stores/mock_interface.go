@@ -78,21 +78,6 @@ func (mr *MockStoreMockRecorder) FetchUserById(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchUserById", reflect.TypeOf((*MockStore)(nil).FetchUserById), id)
 }
 
-// GetEmail mocks base method.
-func (m *MockStore) GetEmail(email string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEmail", email)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetEmail indicates an expected call of GetEmail.
-func (mr *MockStoreMockRecorder) GetEmail(email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEmail", reflect.TypeOf((*MockStore)(nil).GetEmail), email)
-}
-
 // InsertUser mocks base method.
 func (m *MockStore) InsertUser(arg0 models.User) error {
 	m.ctrl.T.Helper()

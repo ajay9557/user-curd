@@ -8,7 +8,13 @@ type User struct {
 	Age   int
 }
 
-type AuthUser struct {
-	UserName string
-	Password string
+type Response struct {
+	Data          interface{} `json:"data"`
+	Message       string      `json:"message"`
+	StatusCode int         `json:"statusCode"`
+}
+
+type ErrorResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }

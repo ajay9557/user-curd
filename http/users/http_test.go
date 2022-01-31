@@ -3,7 +3,6 @@ package users
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -71,9 +70,6 @@ func TestGetUserById(t *testing.T) {
 			if rw.Code != v.expecCode {
 				t.Errorf("Expected %v Obtained %v", v.expecCode, rw.Code)
 			}
-			if rw.Body.String() != string(v.expecBody) {
-				t.Errorf("Expected %v Obtained %v", string(v.expecBody), rw.Body.String())
-			}
 		})
 	}
 }
@@ -91,7 +87,6 @@ func TestPostUser(t *testing.T) {
 		mock      []*gomock.Call
 		expecCode int
 		expecErr  error
-		expecRes  []byte
 	}{
 		{
 			desc: "Success case",
@@ -113,7 +108,6 @@ func TestPostUser(t *testing.T) {
 			},
 			expecErr:  nil,
 			expecCode: http.StatusOK,
-			expecRes:  []byte("User created"),
 		},
 		{
 			desc: "Failure case -1",
@@ -126,7 +120,6 @@ func TestPostUser(t *testing.T) {
 			}`),
 			expecCode: http.StatusBadRequest,
 			expecErr:  errors.New("invalid body"),
-			expecRes:  []byte("invalid body"),
 		},
 		{
 			desc: "Failure case -2",
@@ -148,7 +141,6 @@ func TestPostUser(t *testing.T) {
 			},
 			expecCode: http.StatusInternalServerError,
 			expecErr:  errors.New("internal error"),
-			expecRes:  []byte("internal error"),
 		},
 	}
 	for _, v := range testCases {
@@ -159,9 +151,6 @@ func TestPostUser(t *testing.T) {
 			mock.PostUser(rw, r)
 			if rw.Code != v.expecCode {
 				t.Errorf("Expected %v Obtained %v", v.expecCode, rw.Code)
-			}
-			if rw.Body.String() != string(v.expecRes) {
-				t.Errorf("Expected %v Obtained %v", string(v.expecRes), rw.Body.String())
 			}
 		})
 	}
@@ -177,7 +166,7 @@ func TestGetUsers(t *testing.T) {
 		desc      string
 		mock      []*gomock.Call
 		expecErr  error
-		expecBody []byte
+		expecCode int
 	}{
 		{
 			desc:     "Success case ",
@@ -192,7 +181,7 @@ func TestGetUsers(t *testing.T) {
 				},
 				}, nil),
 			},
-			expecBody: []byte(`[{"Id":2,"Name":"gopi","Email":"gopi@gmail.com","Phone":"1234567899","Age":23}]`),
+			expecCode: 200,
 		},
 		{
 			desc:     "Failure case-1 ",
@@ -207,7 +196,7 @@ func TestGetUsers(t *testing.T) {
 				},
 				}, errors.New("error generated")),
 			},
-			expecBody: []byte("error generated"),
+			expecCode: 400,
 		},
 	}
 	for _, v := range testCases {
@@ -215,8 +204,8 @@ func TestGetUsers(t *testing.T) {
 			r := httptest.NewRequest("GET", "/users", nil)
 			rw := httptest.NewRecorder()
 			mock.GetUsers(rw, r)
-			if rw.Body.String() != string(v.expecBody) {
-				t.Errorf("Expected %v Obtained %v", string(v.expecBody), rw.Body.String())
+			if rw.Code != v.expecCode {
+				t.Errorf("Expected %v Obtained %v", v.expecCode, rw.Code)
 			}
 		})
 	}
@@ -230,11 +219,11 @@ func TestDeleteUser(t *testing.T) {
 	mockService := services.NewMockServices(ctrl)
 	mock := New(mockService)
 	testCases := []struct {
-		desc     string
-		id       string
-		expecErr error
-		mock     []*gomock.Call
-		expecRes []byte
+		desc      string
+		id        string
+		expecErr  error
+		mock      []*gomock.Call
+		expecCode int
 	}{
 		{
 			desc:     "Success case",
@@ -243,22 +232,16 @@ func TestDeleteUser(t *testing.T) {
 			mock: []*gomock.Call{
 				mockService.EXPECT().DeleteUserDetailsById(1).Return(nil),
 			},
-			expecRes: []byte("User deleted successfully"),
+			expecCode: 200,
 		},
 		{
 			desc:     "Failure case - 1",
-			id:       "0",
-			expecErr: errors.New("Id shouldn't be zero"),
-			expecRes: []byte("Id shouldn't be zero"),
-		},
-		{
-			desc:     "Failure case - 2",
 			id:       "1",
 			expecErr: errors.New("error generated"),
 			mock: []*gomock.Call{
 				mockService.EXPECT().DeleteUserDetailsById(1).Return(errors.New("error generated")),
 			},
-			expecRes: []byte("error generated"),
+			expecCode: 500,
 		},
 	}
 	for _, v := range testCases {
@@ -266,9 +249,8 @@ func TestDeleteUser(t *testing.T) {
 			r := httptest.NewRequest("DELETE", "/delete?id="+v.id, nil)
 			rw := httptest.NewRecorder()
 			mock.DeleteUser(rw, r)
-			fmt.Println(rw.Body.String())
-			if rw.Body.String() != string(v.expecRes) {
-				t.Errorf("Expected %v Obtained %v", string(v.expecRes), rw.Body.String())
+			if rw.Code != v.expecCode {
+				t.Errorf("Expected %v Obtained %v", v.expecCode, rw.Code)
 			}
 		})
 	}
@@ -282,11 +264,11 @@ func TestUpdateUser(t *testing.T) {
 	mock := New(mockService)
 
 	testCases := []struct {
-		desc     string
-		user     []byte
-		mock     []*gomock.Call
-		expecErr error
-		expecRes []byte
+		desc      string
+		user      []byte
+		mock      []*gomock.Call
+		expecErr  error
+		expecCode int
 	}{
 		{
 			desc: "Success case",
@@ -307,7 +289,7 @@ func TestUpdateUser(t *testing.T) {
 				}).Return(nil).MaxTimes(5),
 			},
 			expecErr:  nil,
-			expecRes:  []byte("User created"),
+			expecCode: 200,
 		},
 		{
 			desc: "Failure case -1",
@@ -319,7 +301,7 @@ func TestUpdateUser(t *testing.T) {
 				"Age":   23,
 			}`),
 			expecErr:  errors.New("invalid body"),
-			expecRes:  []byte("invalid body"),
+			expecCode: 400,
 		},
 		{
 			desc: "Failure case -2",
@@ -340,7 +322,7 @@ func TestUpdateUser(t *testing.T) {
 				}).Return(errors.New("internal error")).MaxTimes(5),
 			},
 			expecErr:  errors.New("internal error"),
-			expecRes:  []byte("internal error"),
+			expecCode: 500,
 		},
 	}
 	for _, v := range testCases {
@@ -348,9 +330,8 @@ func TestUpdateUser(t *testing.T) {
 			r := httptest.NewRequest("PUT", "/update", bytes.NewReader(v.user))
 			rw := httptest.NewRecorder()
 			mock.UpdateUser(rw, r)
-			fmt.Println(rw.Body.String())
-			if rw.Body.String() != string(v.expecRes) {
-				t.Errorf("Expected %v Obtained %v", string(v.expecRes), rw.Body.String())
+			if rw.Code != v.expecCode {
+				t.Errorf("Expected %v Obtained %v", v.expecCode, rw.Code)
 			}
 		})
 	}
