@@ -11,6 +11,9 @@ func Filter(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		ide := r.URL.Query().Get("id")
 		isValid := user.IsValidId(ide)
+		if ide == "" {
+			handler.ServeHTTP(rw, r)
+		}
 		if !isValid {
 			responseMsg := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "INVALID ID"}
 			jsonResp, _ := json.Marshal(responseMsg)

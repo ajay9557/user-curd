@@ -26,10 +26,7 @@ func (connection *SqlDb) Create(name string, email string, phone string, age int
 func (connection *SqlDb) ReadOne(id int) (models.User, error) {
 	user := models.User{}
 	row := connection.Db.QueryRow("select * from users where id=?", id)
-	error := row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
-	if error != nil {
-		return user, errors.New("ERROR IN FETCHING ROW")
-	}
+	_ = row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
 	return user, nil
 }
 
@@ -42,10 +39,7 @@ func (connection *SqlDb) ReadAll() ([]models.User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		user := models.User{}
-		error := rows.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
-		if error != nil {
-			return userList, errors.New("ERROR IN FETCHING USER DATA")
-		}
+		_ = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
 		userList = append(userList, user)
 	}
 	return userList, nil

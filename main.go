@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 )
 
 func Connect() *sql.DB {
@@ -37,10 +38,13 @@ func main() {
 
 	httpService := httpuser.HttpService{HttpServ: services}
 
+	router := mux.NewRouter()
+	router.HandleFunc("/id", httpService.Handler)
 	http.Handle("/id", AddMiddle(http.HandlerFunc(httpService.Handler), middleware.Filter))
+
+	router.HandleFunc("/", httpService.Handler)
 	http.Handle("/", AddMiddle(http.HandlerFunc(httpService.Handler), middleware.Filter))
-	//http.HandleFunc("/id", httpService.Handler)
-	// http.HandleFunc("/", httpService.Handler)
+
 	fmt.Println("Listning on port: 5454")
 	http.ListenAndServe(":5454", nil)
 }
