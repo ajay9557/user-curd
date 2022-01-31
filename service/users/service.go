@@ -17,7 +17,6 @@ func New(store datastore.UserStore) *UserService {
 }
 
 func (us *UserService) GetUserByIdService(id int) (*entities.User, error) {
-
 	// check if id is valid
 	if validateId(id) {
 		resp, err := us.usrStoreHandler.GetUserById(id)
@@ -30,12 +29,10 @@ func (us *UserService) GetUserByIdService(id int) (*entities.User, error) {
 }
 
 func (us *UserService) GetAllUsersService() ([]*entities.User, error) {
-
 	return us.usrStoreHandler.GetAllUsers()
 }
 
 func (us *UserService) CreateUserService(user entities.User) error {
-
 	// validate id, email and phone
 	if !validateId(user.Id) {
 		return errors.New("error invalid id")
@@ -50,7 +47,6 @@ func (us *UserService) CreateUserService(user entities.User) error {
 }
 
 func (us *UserService) UpdateUserService(user entities.User) error {
-
 	// Validate id, email and phone only if they are to be updated
 	if !validateId(user.Id) {
 		return errors.New("error invalid id")
@@ -65,7 +61,6 @@ func (us *UserService) UpdateUserService(user entities.User) error {
 }
 
 func (us *UserService) DeleteUserService(id int) error {
-
 	// validation of id
 	if !validateId(id) {
 		return errors.New("error invalid id")

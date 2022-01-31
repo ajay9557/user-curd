@@ -1,8 +1,8 @@
 package entities
 
 type HttpErrs struct {
-	ErrCode int    `json:"err-code"`
-	ErrMsg  string `json:"error-msg"`
+	ErrCode int    `json:"errCode"`
+	ErrMsg  string `json:"errorMsg"`
 }
 
 type HttpResponse struct {

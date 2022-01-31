@@ -16,7 +16,6 @@ import (
 )
 
 func TestUserApi_GetUserByIdHandler(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	mockUserService := service.NewMockUserService(ctrl)
 	userApi := New(mockUserService)
@@ -86,7 +85,6 @@ func TestUserApi_GetUserByIdHandler(t *testing.T) {
 }
 
 func TestUserApi_GetAllUserHandler(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	mockUserService := service.NewMockUserService(ctrl)
 	userApi := New(mockUserService)
@@ -149,7 +147,6 @@ func TestUserApi_GetAllUserHandler(t *testing.T) {
 }
 
 func TestUserApi_CreateUserHandler(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	mockUserService := service.NewMockUserService(ctrl)
 	userApi := New(mockUserService)
@@ -261,7 +258,6 @@ func TestUserApi_CreateUserHandler(t *testing.T) {
 }
 
 func TestUserApi_UpdateUserHandler(t *testing.T) {
-
 	// mock for service layer
 	ctrl := gomock.NewController(t)
 	mockUserService := service.NewMockUserService(ctrl)
@@ -398,7 +394,6 @@ func TestUserApi_UpdateUserHandler(t *testing.T) {
 }
 
 func TestUserApi_DeleteUserHandler(t *testing.T) {
-
 	// mock for service layer
 	ctrl := gomock.NewController(t)
 	mockUserService := service.NewMockUserService(ctrl)

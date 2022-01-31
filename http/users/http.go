@@ -19,7 +19,6 @@ func New(userService service.UserService) *userApi {
 }
 
 func (ua *userApi) GetUserByIdHandler(wr http.ResponseWriter, req *http.Request) {
-
 	// set content-type to json
 	wr.Header().Set("content-type", "application/json")
 
@@ -55,7 +54,6 @@ func (ua *userApi) GetUserByIdHandler(wr http.ResponseWriter, req *http.Request)
 }
 
 func (ua *userApi) GetAllUserHandler(wr http.ResponseWriter, req *http.Request) {
-
 	// set content-type to json
 	wr.Header().Set("content-type", "application/json")
 
@@ -80,7 +78,6 @@ func (ua *userApi) GetAllUserHandler(wr http.ResponseWriter, req *http.Request) 
 }
 
 func (ua *userApi) CreateUserHandler(wr http.ResponseWriter, req *http.Request) {
-
 	// set content-type to json
 	wr.Header().Set("content-type", "application/json")
 	body := req.Body
@@ -114,7 +111,6 @@ func (ua *userApi) CreateUserHandler(wr http.ResponseWriter, req *http.Request) 
 }
 
 func (ua *userApi) UpdateUserHandler(wr http.ResponseWriter, req *http.Request) {
-
 	// set content-type to json
 	wr.Header().Set("content-type", "application/json")
 	body := req.Body
@@ -127,12 +123,7 @@ func (ua *userApi) UpdateUserHandler(wr http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	var userData struct {
-		Name  string
-		Email string
-		Phone string
-		Age   int
-	}
+	var userData entities.User
 
 	err = json.NewDecoder(body).Decode(&userData)
 	if err != nil {
@@ -143,15 +134,9 @@ func (ua *userApi) UpdateUserHandler(wr http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	inp := entities.User{
-		Id:    id,
-		Name:  userData.Name,
-		Email: userData.Email,
-		Phone: userData.Phone,
-		Age:   userData.Age,
-	}
+	userData.Id = id
 	// call to service layer
-	err = ua.userService.UpdateUserService(inp)
+	err = ua.userService.UpdateUserService(userData)
 	if err != nil {
 		respErr := entities.HttpErrs{ErrCode: http.StatusBadRequest, ErrMsg: "bad request"}
 		res, _ := json.Marshal(respErr)
@@ -163,7 +148,7 @@ func (ua *userApi) UpdateUserHandler(wr http.ResponseWriter, req *http.Request) 
 	// give status OK (200) if everything goes OK
 	wr.WriteHeader(http.StatusOK)
 	response := entities.HttpResponse{
-		Data:       inp,
+		Data:       userData,
 		Message:    "Data updated",
 		StatusCode: http.StatusOK,
 	}
@@ -172,7 +157,6 @@ func (ua *userApi) UpdateUserHandler(wr http.ResponseWriter, req *http.Request) 
 }
 
 func (ua *userApi) DeleteUserHandler(wr http.ResponseWriter, req *http.Request) {
-
 	// set content-type to json
 	wr.Header().Set("content-type", "application/json")
 	id, err := strconv.Atoi(mux.Vars(req)["id"])

@@ -14,7 +14,6 @@ import (
 )
 
 func main() {
-
 	// define the mysql configuration
 	sqlConf := driver.MySQLConfig{
 		Driver:   "mysql",
@@ -44,11 +43,11 @@ func main() {
 
 	// define mux and routes with their handlers
 	r := mux.NewRouter()
-	r.Handle("/user", middleware.Authentication(http.HandlerFunc(usrHandler.GetAllUserHandler))).Methods(http.MethodGet)
-	r.Handle("/user/{id}", middleware.Authentication(http.HandlerFunc(usrHandler.GetUserByIdHandler))).Methods(http.MethodGet)
-	r.Handle("/user", middleware.Authentication(http.HandlerFunc(usrHandler.CreateUserHandler))).Methods(http.MethodPost)
-	r.Handle("/user/{id}", middleware.Authentication(http.HandlerFunc(usrHandler.UpdateUserHandler))).Methods(http.MethodPut)
-	r.Handle("/user/{id}", middleware.Authentication(http.HandlerFunc(usrHandler.DeleteUserHandler))).Methods(http.MethodDelete)
+	r.Handle("/users", middleware.Authentication(http.HandlerFunc(usrHandler.GetAllUserHandler))).Methods(http.MethodGet)
+	r.Handle("/users/{id}", middleware.Authentication(http.HandlerFunc(usrHandler.GetUserByIdHandler))).Methods(http.MethodGet)
+	r.Handle("/users", middleware.Authentication(http.HandlerFunc(usrHandler.CreateUserHandler))).Methods(http.MethodPost)
+	r.Handle("/users/{id}", middleware.Authentication(http.HandlerFunc(usrHandler.UpdateUserHandler))).Methods(http.MethodPut)
+	r.Handle("/users/{id}", middleware.Authentication(http.HandlerFunc(usrHandler.DeleteUserHandler))).Methods(http.MethodDelete)
 
 	// Run the server
 	log.Printf("Listening on port 8000...")

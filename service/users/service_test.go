@@ -12,7 +12,6 @@ import (
 )
 
 func TestGetUserByIdService(t *testing.T) {
-
 	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
 	mockUserStore := datastore.NewMockUserStore(ctrl)
@@ -84,7 +83,6 @@ func TestGetUserByIdService(t *testing.T) {
 }
 
 func TestGetAllUsersService(t *testing.T) {
-
 	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
 	mockUserStore := datastore.NewMockUserStore(ctrl)
@@ -139,7 +137,6 @@ func TestGetAllUsersService(t *testing.T) {
 }
 
 func TestCreateUserService(t *testing.T) {
-
 	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
 	mockUserStore := datastore.NewMockUserStore(ctrl)
@@ -249,7 +246,6 @@ func TestCreateUserService(t *testing.T) {
 }
 
 func TestUpdateUserService(t *testing.T) {
-
 	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
 	mockUserStore := datastore.NewMockUserStore(ctrl)
@@ -337,7 +333,6 @@ func TestUpdateUserService(t *testing.T) {
 }
 
 func TestDeleteUserService(t *testing.T) {
-
 	// create a mock for datastore layer
 	ctrl := gomock.NewController(t)
 	mockUserStore := datastore.NewMockUserStore(ctrl)

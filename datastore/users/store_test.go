@@ -12,7 +12,6 @@ import (
 )
 
 func TestGetUserById(t *testing.T) {
-
 	// Create a mock db
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -74,7 +73,6 @@ func TestGetUserById(t *testing.T) {
 }
 
 func TestGetAllUsers(t *testing.T) {
-
 	// Create a mock db
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -144,7 +142,6 @@ func TestGetAllUsers(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-
 	// Create a mock db
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
@@ -206,7 +203,6 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-
 	// Create a mock db
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
@@ -266,7 +262,6 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-
 	// Create a mock db
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {

@@ -19,7 +19,6 @@ func New(db *sql.DB) *store {
 
 // GetUserById Retrieve a single user from database
 func (s *store) GetUserById(id int) (*entities.User, error) {
-
 	var user entities.User
 
 	//define the query
@@ -55,7 +54,6 @@ func (s *store) GetAllUsers() ([]*entities.User, error) {
 
 // CreateUser Create a new user entry
 func (s *store) CreateUser(u entities.User) error {
-
 	// define the query
 	query := "insert into user values (?,?,?,?,?)"
 
@@ -69,7 +67,6 @@ func (s *store) CreateUser(u entities.User) error {
 
 // UpdateUser Update the fields based on the input
 func (s *store) UpdateUser(u entities.User) error {
-
 	fields, values := formQuery(u)
 	// form the query with the fields
 	query := "update user set" + fields + " where id = ?"
@@ -82,7 +79,6 @@ func (s *store) UpdateUser(u entities.User) error {
 
 // DeleteUser Delete record from database based on input id
 func (s *store) DeleteUser(id int) error {
-
 	// define the delete query
 	query := "delete from user where id = ?"
 

@@ -1,16 +1,15 @@
 package middleware
 
 import (
-	"crypto/sha256"
-	"crypto/subtle"
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"user-curd/entities"
+
+	"github.com/joho/godotenv"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -29,7 +28,7 @@ func Authentication(h http.Handler) http.Handler {
 			wr.Header().Set("content-type", "application/json")
 			wr.WriteHeader(http.StatusUnauthorized)
 			respErr, _ := json.Marshal(entities.HttpErrs{ErrMsg: "Unauthorized", ErrCode: http.StatusUnauthorized})
-			wr.Write(respErr)
+			_, _ = wr.Write(respErr)
 		} else {
 			// get the jwt token if it exists
 			jwtToken := authHeader[1]
@@ -59,41 +58,16 @@ func Authentication(h http.Handler) http.Handler {
 					wr.Header().Set("content-type", "application/json")
 					wr.WriteHeader(http.StatusUnauthorized)
 					respErr, _ := json.Marshal(entities.HttpErrs{ErrMsg: "Unauthorized", ErrCode: http.StatusUnauthorized})
-					wr.Write(respErr)
+					_, _ = wr.Write(respErr)
 				}
 			} else {
 				wr.Header().Set("content-type", "application/json")
 				wr.WriteHeader(http.StatusUnauthorized)
 				respErr, _ := json.Marshal(entities.HttpErrs{ErrMsg: "Unauthorized", ErrCode: http.StatusUnauthorized})
-				wr.Write(respErr)
+				_, _ = wr.Write(respErr)
 			}
 		}
 	})
 
 	return authJ
-}
-
-func BasicAuthentication(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(wr http.ResponseWriter, req *http.Request) {
-		email, pass, ok := req.BasicAuth()
-		if ok {
-			emailHash := sha256.Sum256([]byte(email))
-			passHash := sha256.Sum256([]byte(pass))
-			expectedEmailHash := sha256.Sum256([]byte("vipul@zopsmart.com"))
-			expectedPassHash := sha256.Sum256([]byte("1234"))
-
-			emailMatch := (subtle.ConstantTimeCompare(emailHash[:], expectedEmailHash[:])) == 1
-			passMatch := (subtle.ConstantTimeCompare(passHash[:], expectedPassHash[:])) == 1
-
-			if emailMatch && passMatch {
-				h.ServeHTTP(wr, req)
-				return
-			}
-		}
-		wr.Header().Set("content-type", "application/json")
-		wr.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
-		respErr, _ := json.Marshal(entities.HttpErrs{ErrMsg: "Unauthorized access", ErrCode: http.StatusUnauthorized})
-		wr.WriteHeader(http.StatusUnauthorized)
-		wr.Write(respErr)
-	})
 }
