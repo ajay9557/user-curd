@@ -43,12 +43,6 @@ func (serv Handler) Create(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	addr := serv.Sev.IsEmailValid(users.Email)
-	if !addr {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Enter Valid Email"))
-
-	}
 	usr, err := serv.Sev.InsertUserDetails(users)
 	res, _ := json.Marshal(usr)
 	if err != nil {

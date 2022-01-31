@@ -163,21 +163,12 @@ func Test_AddUser(t *testing.T) {
 			validity: true,
 			err:      nil,
 		},
-		{
-			desc:     "Failure",
-			usr:      model.User{Id: 3, Name: "Sai", Email: "Nayani@gmail.com", Phone: "9908577405", Age: "22"},
-			output:   model.User{},
-			stcode:   http.StatusBadRequest,
-			validity: false,
-			err:      nil,
-		},
 	}
 	for _, tc := range tests {
 
 		l, _ := json.Marshal(tc.usr)
 		m := bytes.NewBuffer(l)
 		link := "/users"
-		serv.EXPECT().IsEmailValid(tc.usr.Email).Return(tc.validity)
 		r := httptest.NewRequest("POST", link, m)
 		w := httptest.NewRecorder()
 
