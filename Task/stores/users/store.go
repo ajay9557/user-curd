@@ -100,23 +100,3 @@ func (s *DbStore) Delete(id int) error {
 
 	return nil
 }
-
-// func (s *DbStore) GetMail(mail string) (bool, error) {
-// 	Email := []string{}
-// 	query := "select Email from user where Email=?;"
-
-// 	res, err := s.db.Query(query, mail)
-// 	if err != nil {
-// 		return false, errors.New("error")
-// 	}
-// 	defer res.Close()
-// 	for res.Next() {
-// 		err = res.Scan(&mail)
-// 		if err != nil {
-// 			return false, errors.New("error")
-// 		}
-// 		Email = append(Email, mail)
-// 	}
-
-// 	return len(Email) == 0, nil
-// }
