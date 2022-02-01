@@ -5,7 +5,7 @@ import "regexp"
 // validateId utility to validate the id
 func validateId(id int) bool {
 	// check if id is of type int and is a positive number
-	return id < 0
+	return id > 0
 }
 
 // validateEmail utility to validate email ids
