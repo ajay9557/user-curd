@@ -8,7 +8,13 @@ type User struct {
 	Age   int    `json: "age"`
 }
 
+type Response struct {
+	Data       interface{} `json:"data"`
+	Message    string      `json:"message"`
+	StatusCode int         `json:"statusCode"`
+}
+
 type ErrorResponse struct {
-	StatusCode   int    `json: "statuscode"`
-	ErrorMessage string `json: "error"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }

@@ -24,7 +24,7 @@ func (userservice *UserService) AddUser(usr models.User) error {
 	if !IsUniqueEmail(usr.Email) {
 		return errors.New("INVALID EMAIL")
 	}
-	result := userservice.storeInterface.Create(usr.Name, usr.Email, usr.Phone, usr.Age)
+	result := userservice.storeInterface.Create(usr)
 	if result != nil {
 		return errors.New("FAILED TO ADD USER")
 	}
@@ -52,7 +52,7 @@ func (userservice *UserService) UpdateUser(usr models.User) error {
 		return errors.New("INVALID EMAIL")
 	}
 
-	err := userservice.storeInterface.Update(usr.Id, usr.Name, usr.Email, usr.Phone, usr.Age)
+	err := userservice.storeInterface.Update(usr)
 	if err != nil {
 		return err
 	}

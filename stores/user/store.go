@@ -15,8 +15,8 @@ func New(db *sql.DB) stores.Crud {
 	return &SqlDb{Db: db}
 }
 
-func (connection *SqlDb) Create(name string, email string, phone string, age int) error {
-	_, error := connection.Db.Exec("insert into users(name, email, phone, age) values(?, ?, ?, ?)", name, email, phone, age)
+func (connection *SqlDb) Create(user models.User) error {
+	_, error := connection.Db.Exec("insert into users(name, email, phone, age) values(?, ?, ?, ?)", user.Name, user.Email, user.Phone, user.Age)
 	if error != nil {
 		return errors.New("ERROR IN INSERTING DATA")
 	}
@@ -45,9 +45,40 @@ func (connection *SqlDb) ReadAll() ([]models.User, error) {
 	return userList, nil
 }
 
-func (connection *SqlDb) Update(id int, name string, email string, phone string, age int) error {
-	_, error := connection.Db.Exec("update users set name=?, email=?, phone=?, age=? where id=?", name, email, phone, age, id)
-	if error != nil {
+func (connection *SqlDb) Update(user models.User) error {
+
+	query := "update users set"
+	var args []interface{}
+
+	if user.Name != "" {
+		query += " name=?,"
+		args = append(args, user.Name)
+	}
+
+	if user.Email != "" {
+		query += " email=?,"
+		args = append(args, user.Email)
+	}
+
+	if user.Phone != "" {
+		query += " phone=?,"
+		args = append(args, user.Phone)
+	}
+
+	if user.Age != 0 {
+		query += " age=?"
+		args = append(args, user.Age)
+	}
+
+	if user.Id > 0 {
+		query += " where id=? "
+		args = append(args, user.Id)
+	} else {
+		return errors.New("INVALID ID")
+	}
+
+	_, err := connection.Db.Exec(query, args...)
+	if err != nil {
 		return errors.New("FAILED TO UPDATE USER DATA")
 	}
 	return nil

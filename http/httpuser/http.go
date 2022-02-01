@@ -26,13 +26,14 @@ func (hs HttpService) Handler(response http.ResponseWriter, request *http.Reques
 
 			if err != nil {
 				response.WriteHeader(http.StatusBadRequest)
-				errorResponse := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "ERROR IN FETCHING DATA"}
+				errorResponse := models.ErrorResponse{Code: http.StatusBadRequest, Message: "ERROR IN FETCHING DATA"}
 				errorResp, _ := json.Marshal(errorResponse)
 				response.Write([]byte(errorResp))
 				return
 			} else {
-				userListFormat, _ := json.Marshal(userList)
-				response.Write([]byte(userListFormat))
+				responseObj := models.Response{Data: userList, Message: "DATA FETCHED", StatusCode: http.StatusOK}
+				responseObjJson, _ := json.Marshal(responseObj)
+				response.Write([]byte(responseObjJson))
 			}
 
 		} else {
@@ -41,7 +42,7 @@ func (hs HttpService) Handler(response http.ResponseWriter, request *http.Reques
 
 			if err != nil {
 				response.WriteHeader(http.StatusBadRequest)
-				errorResponse := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "INVALID ID"}
+				errorResponse := models.ErrorResponse{Code: http.StatusBadRequest, Message: "INVALID ID"}
 				errorResp, _ := json.Marshal(errorResponse)
 				response.Write([]byte(errorResp))
 				return
@@ -51,13 +52,14 @@ func (hs HttpService) Handler(response http.ResponseWriter, request *http.Reques
 
 			if err != nil {
 				response.WriteHeader(http.StatusBadRequest)
-				errorResponse := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "USER NOT AVAILABLE"}
+				errorResponse := models.ErrorResponse{Code: http.StatusBadRequest, Message: "USER NOT AVAILABLE"}
 				errorResp, _ := json.Marshal(errorResponse)
 				response.Write([]byte(errorResp))
 			}
 
-			jsonUserObject, _ := json.Marshal(user)
-			response.Write([]byte(jsonUserObject))
+			responseObj := models.Response{Data: user, Message: "DATA FETCHED", StatusCode: http.StatusOK}
+			responseObjJson, _ := json.Marshal(responseObj)
+			response.Write([]byte(responseObjJson))
 		}
 	case http.MethodPost:
 		decoder := json.NewDecoder(request.Body)
@@ -66,7 +68,7 @@ func (hs HttpService) Handler(response http.ResponseWriter, request *http.Reques
 
 		if err != nil {
 			response.WriteHeader(http.StatusBadRequest)
-			errorResponse := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "EMPTY USER"}
+			errorResponse := models.ErrorResponse{Code: http.StatusBadRequest, Message: "EMPTY USER"}
 			errorResp, _ := json.Marshal(errorResponse)
 			response.Write([]byte(errorResp))
 		}
@@ -75,14 +77,13 @@ func (hs HttpService) Handler(response http.ResponseWriter, request *http.Reques
 
 		if err != nil {
 			response.WriteHeader(http.StatusBadRequest)
-			errorResponse := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "ERROR IN ADDING USER"}
+			errorResponse := models.ErrorResponse{Code: http.StatusBadRequest, Message: "ERROR IN ADDING USER"}
 			errorResp, _ := json.Marshal(errorResponse)
 			response.Write([]byte(errorResp))
 		} else {
-			response.WriteHeader(http.StatusOK)
-			errorResponse := models.ErrorResponse{StatusCode: http.StatusOK, ErrorMessage: "USER ADDED SUCCESSFULLY"}
-			errorResp, _ := json.Marshal(errorResponse)
-			response.Write([]byte(errorResp))
+			responseObj := models.Response{Data: "", Message: "USER ADDED SUCCESSFULLY", StatusCode: http.StatusOK}
+			responseObjJson, _ := json.Marshal(responseObj)
+			response.Write([]byte(responseObjJson))
 		}
 	case http.MethodPut:
 		decoder := json.NewDecoder(request.Body)
@@ -91,7 +92,7 @@ func (hs HttpService) Handler(response http.ResponseWriter, request *http.Reques
 
 		if err != nil {
 			response.WriteHeader(http.StatusBadRequest)
-			errorResponse := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "EMPTY USER"}
+			errorResponse := models.ErrorResponse{Code: http.StatusBadRequest, Message: "EMPTY USER"}
 			errorResp, _ := json.Marshal(errorResponse)
 			response.Write([]byte(errorResp))
 		}
@@ -100,12 +101,12 @@ func (hs HttpService) Handler(response http.ResponseWriter, request *http.Reques
 
 		if err != nil {
 			response.WriteHeader(http.StatusBadRequest)
-			errorResponse := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "ERROR IN UPDATING USER"}
+			errorResponse := models.ErrorResponse{Code: http.StatusBadRequest, Message: "ERROR IN UPDATING USER"}
 			errorResp, _ := json.Marshal(errorResponse)
 			response.Write([]byte(errorResp))
 		} else {
 			response.WriteHeader(http.StatusOK)
-			errorResponse := models.ErrorResponse{StatusCode: http.StatusOK, ErrorMessage: "USER UPDATED SUCCESSFULLY"}
+			errorResponse := models.ErrorResponse{Code: http.StatusBadRequest, Message: "USER UPDATED SUCCESSFULLY"}
 			errorResp, _ := json.Marshal(errorResponse)
 			response.Write([]byte(errorResp))
 		}
@@ -118,12 +119,12 @@ func (hs HttpService) Handler(response http.ResponseWriter, request *http.Reques
 
 		if err != nil || id == 0 {
 			response.WriteHeader(http.StatusBadRequest)
-			errorResponse := models.ErrorResponse{StatusCode: http.StatusOK, ErrorMessage: "ERROR IN DELETING"}
+			errorResponse := models.ErrorResponse{Code: http.StatusBadRequest, Message: "ERROR IN DELETING"}
 			errorResp, _ := json.Marshal(errorResponse)
 			response.Write([]byte(errorResp))
 		} else {
 			response.WriteHeader(http.StatusOK)
-			errorResponse := models.ErrorResponse{StatusCode: http.StatusOK, ErrorMessage: "DELETED SUCCESSFULLY"}
+			errorResponse := models.ErrorResponse{Code: http.StatusOK, Message: "USER DELETED SUCCESSFULLY"}
 			errorResp, _ := json.Marshal(errorResponse)
 			response.Write([]byte(errorResp))
 		}

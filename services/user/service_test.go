@@ -31,7 +31,7 @@ func Test_AddUser(t *testing.T) {
 			desc:     "Test Case 1",
 			input:    models.User{Id: 10, Name: "Ram Swami", Email: "ramswami43@gmail.com", Phone: "7827878984", Age: 54},
 			expected: nil,
-			mock:     []*gomock.Call{mockUserStore.EXPECT().Create("Ram Swami", "ramswami43@gmail.com", "7827878984", 54).Return(nil)},
+			mock:     []*gomock.Call{mockUserStore.EXPECT().Create(models.User{Id: 10, Name: "Ram Swami", Email: "ramswami43@gmail.com", Phone: "7827878984", Age: 54}).Return(nil)},
 		},
 		{
 			desc:     "Test Case 2",
@@ -49,7 +49,7 @@ func Test_AddUser(t *testing.T) {
 			desc:     "Test Case 4",
 			input:    models.User{Id: 10, Name: "Ram Swami", Email: "ramswami43@gmail.com", Phone: "7827878984", Age: 54},
 			expected: errors.New("FAILED TO ADD USER"),
-			mock:     []*gomock.Call{mockUserStore.EXPECT().Create("Ram Swami", "ramswami43@gmail.com", "7827878984", 54).Return(errors.New("FAILED TO ADD USER"))},
+			mock:     []*gomock.Call{mockUserStore.EXPECT().Create(models.User{Id: 10, Name: "Ram Swami", Email: "ramswami43@gmail.com", Phone: "7827878984", Age: 54}).Return(errors.New("FAILED TO ADD USER"))},
 		},
 	}
 
@@ -151,7 +151,7 @@ func Test_UpdateUser(t *testing.T) {
 			desc:     "Test Case 1",
 			input:    models.User{Id: 10, Name: "Ram Swami", Email: "ramswami43@gmail.com", Phone: "7827878984", Age: 54},
 			expected: nil,
-			mock:     []*gomock.Call{mockUserStore.EXPECT().Update(10, "Ram Swami", "ramswami43@gmail.com", "7827878984", 54).Return(nil)},
+			mock:     []*gomock.Call{mockUserStore.EXPECT().Update(models.User{Id: 10, Name: "Ram Swami", Email: "ramswami43@gmail.com", Phone: "7827878984", Age: 54}).Return(nil)},
 		},
 		{
 			desc:     "Test Case 2",
@@ -169,7 +169,7 @@ func Test_UpdateUser(t *testing.T) {
 			desc:     "Test Case 4",
 			input:    models.User{Id: 10000, Name: "Ram Swami", Email: "ramswami43@gmail.com", Phone: "7827878984", Age: 54},
 			expected: errors.New("FAILED TO UPDATE USER DATA"),
-			mock:     []*gomock.Call{mockUserStore.EXPECT().Update(10000, "Ram Swami", "ramswami43@gmail.com", "7827878984", 54).Return(errors.New("FAILED TO UPDATE USER DATA"))},
+			mock:     []*gomock.Call{mockUserStore.EXPECT().Update(models.User{Id: 10000, Name: "Ram Swami", Email: "ramswami43@gmail.com", Phone: "7827878984", Age: 54}).Return(errors.New("FAILED TO UPDATE USER DATA"))},
 		},
 	}
 

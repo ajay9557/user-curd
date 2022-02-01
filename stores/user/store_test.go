@@ -35,15 +35,15 @@ func Test_Create(t *testing.T) {
 		{
 			desc:          "Test Case 2",
 			input:         models.User{Id: 54, Name: "Akash Gupta", Email: "akash22@gmail.com", Phone: "7827876546", Age: 23},
-			mock:          []interface{}{mock.ExpectExec(query).WithArgs(20, "Akash Gupta", "akash22@gmail.com", "7827876546", 23).WillReturnError(errors.New("ERROR IN INSERTING DATA"))},
+			mock:          []interface{}{mock.ExpectExec(query).WithArgs("Akash Gupta", "akash22@gmail.com", "7827876546", 23).WillReturnError(errors.New("ERROR IN INSERTING DATA"))},
 			expectedError: errors.New("ERROR IN INSERTING DATA"),
 		},
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.desc, func(t *testing.T) {
-			err = dbHandler.Create(testCase.input.Name, testCase.input.Email, testCase.input.Phone, testCase.input.Age)
+			err = dbHandler.Create(testCase.input)
 			if testCase.expectedError == nil && err != nil {
-				t.Errorf("Error Occoured")
+				t.Errorf("Error Occoured: %s", err)
 			}
 			if err != nil && !reflect.DeepEqual(testCase.expectedError, err) {
 				t.Errorf("Output: %v, Expected: %v", err, testCase.expectedError)
@@ -178,14 +178,30 @@ func Test_Update(t *testing.T) {
 			desc:  "Test Case 2",
 			input: models.User{Id: 10, Name: "Akash Sharma", Email: "akash22@gmail.com", Phone: "7827876546", Age: 23},
 			mock: []interface{}{
-				mock.ExpectExec(query).WithArgs("akash22@gmail.com", "7827876546", 23, 10).WillReturnError(errors.New("FAILED TO UPDATE USER DATA")),
+				mock.ExpectExec(query).WithArgs("Akash Sharma", "akash22@gmail.com", "7827876546", 23, 10).WillReturnError(errors.New("FAILED TO UPDATE USER DATA")),
+			},
+			expectedError: errors.New("FAILED TO UPDATE USER DATA"),
+		},
+		{
+			desc:  "Test Case 3",
+			input: models.User{Id: -1, Name: "Akash Sharma", Email: "akash22@gmail.com", Phone: "7827876546", Age: 23},
+			mock: []interface{}{
+				mock.ExpectExec(query).WithArgs("Akash Sharma", "akash22@gmail.com", "7827876546", 23, -1).WillReturnError(errors.New("INVALID ID")),
+			},
+			expectedError: errors.New("INVALID ID"),
+		},
+		{
+			desc:  "Test Case 4",
+			input: models.User{Id: 10, Name: "", Email: "akash22@gmail.com", Phone: "", Age: 23},
+			mock: []interface{}{
+				mock.ExpectExec("update users set email=?, age=? where id=?").WithArgs("akash22@gmail.com", 23, 10).WillReturnError(errors.New("FAILED TO UPDATE USER DATA")),
 			},
 			expectedError: errors.New("FAILED TO UPDATE USER DATA"),
 		},
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.desc, func(t *testing.T) {
-			err := dbHandler.Update(testCase.input.Id, testCase.input.Name, testCase.input.Email, testCase.input.Phone, testCase.input.Age)
+			err := dbHandler.Update(testCase.input)
 			if testCase.expectedError == nil && err != nil {
 				t.Errorf("%v %v", err, testCase.expectedError)
 			}
@@ -199,7 +215,7 @@ func Test_Update(t *testing.T) {
 func Test_Delete(t *testing.T) {
 	database, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 
-	dbHandler := SqlDb{database}
+	dbHandler := New(database)
 	if err != nil {
 		fmt.Println("ERROR IN MOCKING DB")
 	}

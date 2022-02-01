@@ -1,0 +1,24 @@
+mode: set
+go_lang/Assignment/user-curd/http/httpuser/http.go:15.84,19.24 2 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:20.22,24.19 2 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:64.23,69.17 4 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:76.3,78.17 2 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:88.22,93.17 4 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:100.3,102.17 2 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:113.25,120.28 4 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:24.19,27.18 2 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:27.18,33.5 5 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:33.10,37.5 3 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:39.9,43.18 2 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:51.4,53.18 2 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:60.4,62.43 3 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:43.18,49.5 5 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:53.18,58.5 4 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:69.17,74.4 4 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:78.17,83.4 4 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:83.9,87.4 3 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:93.17,98.4 4 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:102.17,107.4 4 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:107.9,112.4 4 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:120.28,125.4 4 1
+go_lang/Assignment/user-curd/http/httpuser/http.go:125.9,130.4 4 1
