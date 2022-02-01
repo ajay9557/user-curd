@@ -10,36 +10,6 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-func Test_CheckMail(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockSvc := store.NewMockStore(ctrl)
-	mock := New(mockSvc)
-	tests := []struct {
-		desc   string
-		usr    []model.User
-		input  string
-		output bool
-		err    error
-	}{
-		{desc: "Case-1", usr: []model.User{{1, "Mahi", "Mahi@gmail.com", "9866895296", 20}}, input: "Naira@gmail.com", output: true},
-		{desc: "Case-2", usr: []model.User{{1, "Mahi", "Mahi@gmail.com", "9866895296", 20}}, input: "Mahi@gmail.com", output: false},
-		{desc: "Case-2", usr: []model.User{{1, "Mahi", "Mahi@gmail.com", "9866895296", 20}}, input: "Mahigmail.com", output: false},
-	}
-	for _, tes := range tests {
-		mockSvc.EXPECT().GetAllUsers().Return(tes.usr, tes.err).MinTimes(0)
-		if tes.err == nil {
-			fmt.Println(tes.input)
-			op, _ := mock.CheckMail(tes.input)
-
-			if op != tes.output {
-				t.Errorf("expect %v got %v", tes.output, op)
-			}
-
-		}
-	}
-}
-
 func Test_GetById(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -103,35 +73,65 @@ func Test_PostUser(t *testing.T) {
 	mockSvc := store.NewMockStore(ctrl)
 	mock := New(mockSvc)
 	tests := []struct {
-		name  string
-		email string
-		phone string
-		age   int
-		usr   model.User
-		err   error
+		users  []model.User
+		user   model.User
+		output model.User
+		err    error
 	}{
 		{
-			name:  "Naira",
-			email: "naira@gmail.com",
-			phone: "6303844857",
-			age:   20,
-			usr:   model.User{Name: "Naira", Email: "naira@gmail.com", Phone: "6303844857", Age: 20},
-			err:   nil,
+			users: []model.User{
+				{
+					Name: "Naira", Email: "naira@gmail.com", Phone: "6303844857", Age: 20,
+				},
+			},
+			user:   model.User{Name: "Naira", Email: "naa@gmail.com", Phone: "6303844857", Age: 20},
+			output: model.User{Name: "Naira", Email: "naa@gmail.com", Phone: "6303844857", Age: 20},
+			err:    nil,
+		},
+		{
+			users: []model.User{
+				{
+					Name: "Naira", Email: "naa@gmail.com", Phone: "6303844857", Age: 20,
+				},
+			},
+			user:   model.User{Name: "Naira", Email: "naa@gmail.com", Phone: "6303844857", Age: 20},
+			output: model.User{Name: "Naira", Email: "naa@gmail.com", Phone: "6303844857", Age: 20},
+			err:    fmt.Errorf("e,ail already exists"),
+		},
+		{
+			users: []model.User{
+				{
+					Name: "Naira", Email: "naa@gmail.com", Phone: "6303844857", Age: 20,
+				},
+			},
+			user:   model.User{Name: "Naira", Email: "naagmail.com", Phone: "6303844857", Age: 20},
+			output: model.User{Name: "Naira", Email: "naagmail.com", Phone: "6303844857", Age: 20},
+			err:    fmt.Errorf("enter valid email"),
 		},
 	}
 	for _, tes := range tests {
-		mockSvc.EXPECT().AddUser(tes.usr).Return(tes.usr.Id, tes.err)
-		if tes.err == nil {
+		isValid, err := CheckMail(tes.user.Email)
+		if isValid {
+			call := mockSvc.EXPECT().GetAllUsers().Return(tes.users, tes.err).MinTimes(0)
+			mockSvc.EXPECT().AddUser(tes.user).Return(tes.user.Id, tes.err).After(call).MinTimes(0)
+			if tes.err == nil {
 
-			op, err := mock.PostUser(tes.name, tes.email, tes.phone, tes.age)
+				op, err := mock.PostUser(tes.user)
 
-			if !reflect.DeepEqual(op, tes.usr) {
-				t.Errorf("expect %v got %v", tes.usr, op)
+				if !reflect.DeepEqual(op, tes.output) {
+					t.Errorf("expected %v got %v", tes.output, op)
+				}
+				if !reflect.DeepEqual(err, tes.err) {
+					t.Errorf("expected %s got %s", tes.err, err)
+				}
 			}
+		} else {
 			if !reflect.DeepEqual(err, tes.err) {
-				t.Errorf("expect %s got %s", tes.err, err)
+				t.Errorf("expected %s got %s", tes.err, err)
 			}
+
 		}
+
 	}
 
 }
@@ -142,33 +142,54 @@ func Test_Update(t *testing.T) {
 	mockSvc := store.NewMockStore(ctrl)
 	mock := New(mockSvc)
 	tests := []struct {
-		u   model.User
-		usr model.User
-		us  []model.User
-		op  model.User
-		err error
+		id     int
+		user   model.User
+		output model.User
+		users  []model.User
+		err    error
 	}{
 		{
-			u:   model.User{Id: 1, Name: "Nair", Email: "naira@gmail.com", Phone: "6303844857", Age: 20},
-			usr: model.User{Id: 1, Name: "Naira", Email: "naira@gmail.com", Phone: "6303844857", Age: 20},
-			op:  model.User{Id: 1, Name: "Naira", Email: "naira@gmail.com", Phone: "6303844857", Age: 20},
-			us:  []model.User{{Id: 1, Name: "Naira", Email: "naira@gmail.com", Phone: "6303844857", Age: 20}, {Id: 2, Name: "Naira", Email: "Naira@gmail.com", Phone: "6303844857", Age: 20}},
-			err: nil,
+			id: 2,
+			users: []model.User{
+				{
+					Id: 2, Name: "Naira", Email: "naa@gmail.com", Phone: "6303844857", Age: 20,
+				},
+			},
+			user:   model.User{Id: 2, Name: "Naira", Email: "naira@gmail.com", Phone: "6303844857", Age: 20},
+			output: model.User{Id: 2, Name: "Naira", Email: "naira@gmail.com", Phone: "6303844857", Age: 20},
+			err:    nil,
+		},
+		{
+			id: 0,
+			users: []model.User{
+				{
+					Id: 2, Name: "Naira", Email: "naa@gmail.com", Phone: "6303844857", Age: 20,
+				},
+			},
+			user:   model.User{},
+			output: model.User{},
+			err:    fmt.Errorf("id doesnt exist"),
 		},
 	}
 	for _, tes := range tests {
-		call := mockSvc.EXPECT().UpdateUser(tes.usr).Return(tes.err)
-		mockSvc.EXPECT().GetAllUsers().Return(tes.us, tes.err).After(call)
+		call := mockSvc.EXPECT().GetAllUsers().Return(tes.users, tes.err).MinTimes(0)
+		mockSvc.EXPECT().GetUserById(tes.id).Return(tes.user, tes.err).After(call).MinTimes(0)
+		isValid, _ := CheckMail(tes.user.Email)
+		if isValid {
+			thirdcall := mockSvc.EXPECT().GetAllUsers().Return(tes.users, tes.err).MinTimes(0)
+			mockSvc.EXPECT().UpdateUser(tes.user).Return(tes.err).After(thirdcall).MinTimes(0)
 
-		if tes.err == nil {
+			if tes.err == nil {
 
-			op, err := mock.Update(tes.u, tes.usr)
+				op, err := mock.Update(tes.id, tes.user)
 
-			if !reflect.DeepEqual(op, tes.op) {
-				t.Errorf("expect %v got %v", tes.usr, op)
-			}
-			if !reflect.DeepEqual(err, tes.err) {
-				t.Errorf("expect %s got %s", tes.err, err)
+				if !reflect.DeepEqual(op, tes.output) {
+					t.Errorf("expect %v got %v", tes.user, op)
+				}
+
+				if !reflect.DeepEqual(err, tes.err) {
+					t.Errorf("expect %s got %s", tes.err, err)
+				}
 			}
 		}
 	}
@@ -181,18 +202,24 @@ func Test_DeleteByID(t *testing.T) {
 	mockSvc := store.NewMockStore(ctrl)
 	mock := New(mockSvc)
 	tests := []struct {
-		id  int
-		err error
+		id    int
+		users []model.User
+		err   error
 	}{
 		{
-			id:  1,
+			id: 2,
+			users: []model.User{
+				{
+					Id: 2, Name: "Naira", Email: "naa@gmail.com", Phone: "6303844857", Age: 20,
+				},
+			},
 			err: nil,
 		},
 	}
 	for _, tes := range tests {
-		mockSvc.EXPECT().DeleteUser(tes.id).Return(tes.err)
+		call := mockSvc.EXPECT().GetAllUsers().Return(tes.users, tes.err)
+		mockSvc.EXPECT().DeleteUser(tes.id).Return(tes.err).After(call).MinTimes(0)
 		if tes.err == nil {
-
 			err := mock.DeleteByID(tes.id)
 			if !reflect.DeepEqual(err, tes.err) {
 				t.Errorf("expect %s got %s", tes.err, err)

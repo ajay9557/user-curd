@@ -16,9 +16,6 @@ func New(db *sql.DB) DbStore {
 
 func (s *DbStore) GetUserById(id int) (model.User, error) {
 	var u model.User
-	if id < 1 {
-		return u, fmt.Errorf("not a valid Id")
-	}
 	dis := s.db.QueryRow("SELECT * FROM User WHERE id = ?", id)
 	dis.Scan(&u.Id, &u.Name, &u.Email, &u.Phone, &u.Age)
 	return u, nil
@@ -47,17 +44,12 @@ func (s *DbStore) AddUser(usr model.User) (int, error) {
 	if err != nil {
 		return -1, fmt.Errorf("%v", err)
 	}
-	lastId, err := res.LastInsertId()
-	if err != nil {
-		return -1, fmt.Errorf("%v", err)
-	}
+	lastId, _ := res.LastInsertId()
+
 	return int(lastId), nil
 }
 
 func (s *DbStore) UpdateUser(ur model.User) error {
-	if ur.Id < 1 {
-		return fmt.Errorf("not a valid Id")
-	}
 	_, err := s.db.Exec("Update User set name=?, email=?,phone=?,age=? Where id=?", ur.Name, ur.Email, ur.Phone, ur.Age, ur.Id)
 	if err != nil {
 		return fmt.Errorf("%s", err)
@@ -67,9 +59,7 @@ func (s *DbStore) UpdateUser(ur model.User) error {
 }
 
 func (s *DbStore) DeleteUser(id int) error {
-	if id < 1 {
-		return fmt.Errorf("not a valid Id")
-	}
+
 	_, err := s.db.Exec("Delete FROM User WHERE id = ?", id)
 	if err != nil {
 		return fmt.Errorf("%s", err)
@@ -77,3 +67,7 @@ func (s *DbStore) DeleteUser(id int) error {
 	return nil
 
 }
+
+
+
+

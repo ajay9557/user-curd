@@ -34,21 +34,6 @@ func (m *MockUser) EXPECT() *MockUserMockRecorder {
 	return m.recorder
 }
 
-// CheckMail mocks base method.
-func (m *MockUser) CheckMail(email string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckMail", email)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CheckMail indicates an expected call of CheckMail.
-func (mr *MockUserMockRecorder) CheckMail(email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckMail", reflect.TypeOf((*MockUser)(nil).CheckMail), email)
-}
-
 // DeleteByID mocks base method.
 func (m *MockUser) DeleteByID(id int) error {
 	m.ctrl.T.Helper()
@@ -94,22 +79,22 @@ func (mr *MockUserMockRecorder) GetUsers() *gomock.Call {
 }
 
 // PostUser mocks base method.
-func (m *MockUser) PostUser(name, email, phone string, age int) (model.User, error) {
+func (m *MockUser) PostUser(arg0 model.User) (model.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PostUser", name, email, phone, age)
+	ret := m.ctrl.Call(m, "PostUser", arg0)
 	ret0, _ := ret[0].(model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // PostUser indicates an expected call of PostUser.
-func (mr *MockUserMockRecorder) PostUser(name, email, phone, age interface{}) *gomock.Call {
+func (mr *MockUserMockRecorder) PostUser(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostUser", reflect.TypeOf((*MockUser)(nil).PostUser), name, email, phone, age)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostUser", reflect.TypeOf((*MockUser)(nil).PostUser), arg0)
 }
 
 // Update mocks base method.
-func (m *MockUser) Update(arg0, arg1 model.User) (model.User, error) {
+func (m *MockUser) Update(arg0 int, arg1 model.User) (model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1)
 	ret0, _ := ret[0].(model.User)

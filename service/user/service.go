@@ -2,99 +2,112 @@ package user
 
 import (
 	"fmt"
-	"net/mail"
 	"zopsmart/user-curd/model"
 	"zopsmart/user-curd/store"
 )
 
-type UserDetails struct {
-	u store.Store
+type UserStore struct {
+	store store.Store
 }
 
-func New(userStore store.Store) UserDetails {
-	return UserDetails{u: userStore}
+func New(userStore store.Store) UserStore {
+	return UserStore{store: userStore}
 }
 
-func (user UserDetails) CheckMail(email string) (bool, error) {
-	_, err := mail.ParseAddress(email)
-	if err != nil{
-		return false, err
+func (user UserStore) GetByID(id int) (model.User, error) {
+	var us model.User
+	res, err := user.store.GetUserById(id)
+	if err != nil {
+		return us, fmt.Errorf("%v", err)
 	}
-	users, err := user.u.GetAllUsers()
-	for _, usr := range users {
-		if usr.Email == email {
-			return false, err
+	return res, nil
+}
+
+func (user UserStore) GetUsers() ([]model.User, error) {
+	var us []model.User
+	res, err := user.store.GetAllUsers()
+	if err != nil {
+		return us, fmt.Errorf("%v", err)
+	}
+	return res, nil
+
+}
+func (user UserStore) PostUser(usr model.User) (model.User, error) {
+	isValid, _ := CheckMail(usr.Email)
+	if !isValid {
+		return model.User{}, fmt.Errorf("enter valid email")
+	}
+	users, err := user.store.GetAllUsers()
+	for _, u := range users {
+		if u.Email == usr.Email {
+			return model.User{}, fmt.Errorf("Email already exists")
 		}
 	}
-	return true, nil
-
-}
-
-func (user UserDetails) GetByID(id int) (model.User, error) {
-	var us model.User
-	res, err := user.u.GetUserById(id)
+	usr.Id, _ = user.store.AddUser(usr)
 	if err != nil {
-		return us, fmt.Errorf("%v", err)
+		return model.User{}, err
 	}
-	us.Id = res.Id
-	us.Name = res.Name
-	us.Email = res.Email
-	us.Phone = res.Phone
-	us.Age = res.Age
-	return us, nil
+
+	return usr, err
+
 }
 
-func (user UserDetails) GetUsers() ([]model.User, error) {
-	var us []model.User
-	res, err := user.u.GetAllUsers()
-	if err != nil {
-		return us, fmt.Errorf("%v", err)
+func (user UserStore) DeleteByID(id int) error {
+	if id < 1 {
+		return fmt.Errorf("Id doesn't exist")
 	}
-	us = res
-	return us, nil
 
-}
-func (user UserDetails) PostUser(name string, email string, phone string, age int) (model.User, error) {
-	usr := model.User{0, name, email, phone, age}
-	var newusr model.User
-	var err error
-	usr.Id, _ = user.u.AddUser(usr)
-	if err != nil {
-		return newusr, err
-	}
-	newusr.Id = usr.Id
-	newusr.Name = usr.Name
-	newusr.Email = usr.Email
-	newusr.Phone = usr.Phone
-	newusr.Age = usr.Age
-	return newusr, err
-
-}
-
-func (user UserDetails) DeleteByID(id int) error {
-	err := user.u.DeleteUser(id)
-	if err != nil {
-		return fmt.Errorf("%v", err)
+	users, _ := user.store.GetAllUsers()
+	for _, usr := range users {
+		if usr.Id == id {
+			err := user.store.DeleteUser(id)
+			if err != nil {
+				return fmt.Errorf("%v", err)
+			}
+		}
 	}
 	return nil
 }
 
-func (user UserDetails) Update(userdata model.User, ur model.User) (model.User, error) {
-	err := user.u.UpdateUser(ur)
-	ur.Id = userdata.Id
-	if ur.Name != "" {
-		userdata.Name = ur.Name
+func (user UserStore) Update(id int, ur model.User) (model.User, error) {
+	if id < 1 {
+		return model.User{}, fmt.Errorf("Id doesn't exist")
 	}
-	isValid, _ := user.CheckMail(ur.Email)
-	if isValid {
-		userdata.Email = ur.Email
-	}
-	if ur.Phone != "" {
-		userdata.Phone = ur.Phone
-	}
-	if ur.Age != 0 {
-		userdata.Age = ur.Age
-	}
+	fmt.Println(ur)
+	users, _ := user.store.GetAllUsers()
+	for _, u := range users {
+		if u.Id == id {
+			userdata, err := user.store.GetUserById(id)
+			if err != nil {
+				return model.User{}, err
+			}
+			if ur.Name != "" {
+				userdata.Name = ur.Name
+			}
+			isValid, _ := CheckMail(ur.Email)
+			if ur.Email != "" {
+				if isValid {
+					users, _ := user.store.GetAllUsers()
+					for _, u := range users {
+						if u.Email == ur.Email {
+							return model.User{}, fmt.Errorf("Email already exists")
+						}
+					}
+					userdata.Email = ur.Email
+				}
+			}
 
-	return userdata, err
+			if ur.Phone != "" {
+				userdata.Phone = ur.Phone
+			}
+			if ur.Age != 0 {
+				userdata.Age = ur.Age
+			}
+
+			err = user.store.UpdateUser(userdata)
+			return userdata, err
+
+		}
+	}
+	return model.User{}, fmt.Errorf("Not a valid ID")
 }

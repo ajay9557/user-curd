@@ -34,13 +34,6 @@ func Test_GetUserById(t *testing.T) {
 				mock.ExpectQuery("SELECT * FROM User WHERE id = ?").WithArgs(1).WillReturnRows(rows),
 			},
 		},
-		{
-			desc: "case-2",
-			id:   0,
-			usr:  model.User{},
-			err:  fmt.Errorf("not a valid Id"),
-			mock: []interface{}{},
-		},
 	}
 	for _, tc := range tests {
 		usr, err := hndlr.GetUserById(tc.id)
@@ -117,11 +110,6 @@ func Test_UpdateUser(t *testing.T) {
 				mock.ExpectExec("Update User set name=?, email=?,phone=?,age=? Where id=?").WithArgs("Naira", "naira@gmail.com", "9866895296", 20, 1).WillReturnResult(sqlmock.NewResult(1, 1)),
 			},
 		},
-		{
-			id:   0,
-			err:  fmt.Errorf("not a valid Id"),
-			mock: []interface{}{},
-		},
 	}
 	for _, tc := range tests {
 		err := hndlr.UpdateUser(tc.usr)
@@ -156,12 +144,6 @@ func Test_Delete(t *testing.T) {
 			mock: []interface{}{
 				mock.ExpectExec("Delete FROM User WHERE id = ?").WithArgs(1).WillReturnResult(sqlmock.NewResult(1, 1)),
 			},
-		},
-		{
-			desc: "case-2",
-			id:   0,
-			err:  fmt.Errorf("not a valid Id"),
-			mock: []interface{}{},
 		},
 		{
 			desc: "case-3",

@@ -12,11 +12,11 @@ func Auth(inner http.HandlerFunc) http.HandlerFunc {
 		if ok {
 			userNameHash := sha256.Sum256([]byte(userName))
 			userPwdHash := sha256.Sum256([]byte(pwd))
-			expecName := sha256.Sum256([]byte("Bobby"))
-			expecPwd := sha256.Sum256([]byte("Bobby12500"))
+			expectedName := sha256.Sum256([]byte("Bobby"))
+			expectedPwd := sha256.Sum256([]byte("Bobby12500"))
 
-			userNameMatch := (subtle.ConstantTimeCompare(userNameHash[:], expecName[:]) == 1)
-			pwdMatch := (subtle.ConstantTimeCompare(userPwdHash[:], expecPwd[:]) == 1)
+			userNameMatch := (subtle.ConstantTimeCompare(userNameHash[:], expectedName[:]) == 1)
+			pwdMatch := (subtle.ConstantTimeCompare(userPwdHash[:], expectedPwd[:]) == 1)
 
 			if userNameMatch && pwdMatch {
 				inner.ServeHTTP(rw, r)

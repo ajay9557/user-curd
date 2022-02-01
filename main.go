@@ -28,14 +28,14 @@ func main() {
 		fmt.Println("Error in connection establishment!")
 		return
 	}
-	u := userStore.New(db)
-	p := userService.New(&u)
-	ht := userHandler.Handler{p}
+	store := userStore.New(db)
+	service := userService.New(&store)
+	h := userHandler.Handler{service}
 	r := mux.NewRouter().StrictSlash(true)
-	r.HandleFunc("/user/{id}", middlewares.Auth(ht.UserWithId)).Methods(http.MethodGet)
-	r.HandleFunc("/user", ht.AddUser).Methods(http.MethodPost)
-	r.HandleFunc("/user", ht.GetAllUsers).Methods(http.MethodGet)
-	r.HandleFunc("/user/delete/{id}", ht.DeleteUser).Methods(http.MethodDelete)
-	r.HandleFunc("/user/update/{id}", ht.UpdateUser).Methods(http.MethodPatch)
-	http.ListenAndServe(":8080", r)
+	r.HandleFunc("/user/{id}", middlewares.Auth(h.GetUserWithId)).Methods(http.MethodGet)
+	r.HandleFunc("/users", h.AddUser).Methods(http.MethodPost)
+	r.HandleFunc("/users", h.GetAllUsers).Methods(http.MethodGet)
+	r.HandleFunc("/users/{id}", h.DeleteUser).Methods(http.MethodDelete)
+	r.HandleFunc("/users/{id}", h.UpdateUser).Methods(http.MethodPut)
+	http.ListenAndServe(":8000", r)
 }

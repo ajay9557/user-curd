@@ -11,23 +11,36 @@ import (
 )
 
 type Handler struct {
-	Usr service.User
+	Svc service.User
 }
 
-func (us Handler) UserWithId(w http.ResponseWriter, r *http.Request) {
+func (us Handler) GetUserWithId(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	v := params["id"]
 	id, err := strconv.Atoi(v)
 
-	userdata, err := us.Usr.GetByID(id)
+	userdata, err := us.Svc.GetByID(id)
 	if err != nil {
+		errobj := model.ErrorResponse{http.StatusBadRequest, "Id not found"}
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Enter Valid Id"))
+		res, er := json.Marshal(errobj)
+		if er == nil {
+			w.Write([]byte(res))
+		}
 		return
 	}
-
-	res, err := json.Marshal(userdata)
+	if userdata.Id == 0 {
+		errobj := model.ErrorResponse{http.StatusBadRequest, "Id not found"}
+		w.WriteHeader(http.StatusBadRequest)
+		res, er := json.Marshal(errobj)
+		if er == nil {
+			w.Write([]byte(res))
+		}
+		return
+	}
+	response := model.Response{Data: userdata, Message: "user successfully retrieved", StatusCode: http.StatusOK}
+	res, err := json.Marshal(response)
 	if err == nil {
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)
@@ -37,12 +50,22 @@ func (us Handler) UserWithId(w http.ResponseWriter, r *http.Request) {
 
 func (us Handler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	userdata, _ := us.Usr.GetUsers()
+	userdata, err := us.Svc.GetUsers()
+	if err != nil {
+		errobj := model.ErrorResponse{http.StatusInternalServerError, "Failed to retrieve users"}
+		w.WriteHeader(http.StatusInternalServerError)
+		res, er := json.Marshal(errobj)
+		if er == nil {
+			w.Write([]byte(res))
+		}
+		return
+	}
+	response := model.Response{Data: userdata, Message: "users successfully retrieved", StatusCode: http.StatusOK}
 
-	res, err := json.MarshalIndent(userdata, "", "")
+	res, err := json.MarshalIndent(response, "", "")
 	if err == nil {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(res))
+		w.Write(res)
 	}
 
 }
@@ -53,19 +76,23 @@ func (us Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	body := r.Body
 	json.NewDecoder(body).Decode(&ur)
 
-	isValid, _ := us.Usr.CheckMail(ur.Email)
-	if !isValid {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Enter Valid email address"))
-
+	u, err := us.Svc.PostUser(ur)
+	if err != nil {
+		errobj := model.ErrorResponse{http.StatusInternalServerError, "Failed to add user"}
+		w.WriteHeader(http.StatusInternalServerError)
+		res, er := json.Marshal(errobj)
+		if er == nil {
+			w.Write([]byte(res))
+		}
 		return
-	}
 
-	u, _ := us.Usr.PostUser(ur.Name, ur.Email, ur.Phone, ur.Age)
-	res, err := json.Marshal(u)
-	if err == nil {
-		w.WriteHeader(http.StatusCreated)
-		w.Write(res)
+	} else {
+		response := model.Response{Data: u, Message: "users successfully added", StatusCode: http.StatusOK}
+		res, err := json.Marshal(response)
+		if err == nil {
+			w.WriteHeader(http.StatusCreated)
+			w.Write(res)
+		}
 	}
 
 }
@@ -78,17 +105,18 @@ func (us Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	v := params["id"]
 	id, _ := strconv.Atoi(v)
-
-	userdata, err := us.Usr.GetByID(id)
+	updatedUser, err := us.Svc.Update(id, ur)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		errobj := model.ErrorResponse{http.StatusInternalServerError, "Failed to update user"}
+		w.WriteHeader(http.StatusInternalServerError)
+		res, er := json.Marshal(errobj)
+		if er == nil {
+			w.Write([]byte(res))
+		}
 		return
 	}
-
-	userdt, _ := us.Usr.Update(userdata, ur)
-	users, _ := us.Usr.GetUsers()
-	users = append(users, userdt)
-	res, _ := json.Marshal(userdt)
+	response := model.Response{Data: updatedUser, Message: "users successfully updated", StatusCode: http.StatusOK}
+	res, _ := json.Marshal(response)
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
@@ -102,14 +130,18 @@ func (us Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	v := params["id"]
 	id, err := strconv.Atoi(v)
 
-	err = us.Usr.DeleteByID(id)
+	err = us.Svc.DeleteByID(id)
 	if err != nil {
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("User Deletion Failed"))
+		errobj := model.ErrorResponse{http.StatusInternalServerError, "Failed to delete user"}
+		w.WriteHeader(http.StatusInternalServerError)
+		res, er := json.Marshal(errobj)
+		if er == nil {
+			w.Write([]byte(res))
+		}
 		return
 	}
-	w.WriteHeader(http.StatusAccepted)
-	w.Write([]byte("User Deleted"))
-
+	response := model.Response{Data: "", Message: "users successfully added", StatusCode: http.StatusOK}
+	res, _ := json.Marshal(response)
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
 }
