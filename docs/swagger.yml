@@ -9,6 +9,9 @@
     - name: user
       description: Operations about user
 
+  security:
+    - bearerAuh: []
+
   paths:
     /user:
       get:
@@ -42,14 +45,12 @@
         tags:
           - user
         summary: Create a user
-        operationId: createUser
-        parameters:
-          - name: data
-            in: header
-            description: values that need to be put
-            required: true
-            schema:
-              $ref: '#/components/schemas/User'
+        operationId: createUser          
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         responses:
           '201':
             description: Created
@@ -233,6 +234,11 @@
                 schema:
                   $ref: '#/components/schemas/400BadRequest'
   components:
+    securitySchemes:
+      bearerAuh:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT 
     schemas:
       User:
         type: object
