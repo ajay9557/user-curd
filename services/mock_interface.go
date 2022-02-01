@@ -35,12 +35,11 @@ func (m *MockUser) EXPECT() *MockUserMockRecorder {
 }
 
 // CreateUser mocks base method.
-func (m *MockUser) CreateUser(user models.User) (int, error) {
+func (m *MockUser) CreateUser(user models.User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", user)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // CreateUser indicates an expected call of CreateUser.
@@ -50,12 +49,11 @@ func (mr *MockUserMockRecorder) CreateUser(user interface{}) *gomock.Call {
 }
 
 // DeleteUser mocks base method.
-func (m *MockUser) DeleteUser(id int) (int, error) {
+func (m *MockUser) DeleteUser(id int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUser", id)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // DeleteUser indicates an expected call of DeleteUser.
@@ -65,10 +63,10 @@ func (mr *MockUserMockRecorder) DeleteUser(id interface{}) *gomock.Call {
 }
 
 // GetUserById mocks base method.
-func (m *MockUser) GetUserById(id int) (models.User, error) {
+func (m *MockUser) GetUserById(id int) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserById", id)
-	ret0, _ := ret[0].(models.User)
+	ret0, _ := ret[0].(*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +78,10 @@ func (mr *MockUserMockRecorder) GetUserById(id interface{}) *gomock.Call {
 }
 
 // GetUsers mocks base method.
-func (m *MockUser) GetUsers() ([]models.User, error) {
+func (m *MockUser) GetUsers() ([]*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUsers")
-	ret0, _ := ret[0].([]models.User)
+	ret0, _ := ret[0].([]*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -95,16 +93,15 @@ func (mr *MockUserMockRecorder) GetUsers() *gomock.Call {
 }
 
 // UpdateUser mocks base method.
-func (m *MockUser) UpdateUser(id int, user models.User) (int, error) {
+func (m *MockUser) UpdateUser(user models.User) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateUser", id, user)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "UpdateUser", user)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // UpdateUser indicates an expected call of UpdateUser.
-func (mr *MockUserMockRecorder) UpdateUser(id, user interface{}) *gomock.Call {
+func (mr *MockUserMockRecorder) UpdateUser(user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockUser)(nil).UpdateUser), id, user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockUser)(nil).UpdateUser), user)
 }

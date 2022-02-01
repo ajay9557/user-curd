@@ -6,10 +6,12 @@ import (
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/gorilla/mux"
-	userHttp "github.com/tejas/user-crud/http/users"
-	userServices "github.com/tejas/user-crud/services/users"
-	userStore "github.com/tejas/user-crud/stores/users"
+	userHandler "github.com/tejas/user-crud/http/users"
+	"github.com/tejas/user-crud/middleware"
+	userService "github.com/tejas/user-crud/services/users"
+	userStore "github.com/tejas/user-crud/store/users"
 )
 
 func main() {
@@ -17,27 +19,26 @@ func main() {
 
 	if err != nil {
 		fmt.Println(err)
-		fmt.Println("Database connection Error")
 	}
 
-	st := userStore.New(db)
-	sr := userServices.New(st)
-	handler := userHttp.New(sr)
+	userStore := userStore.New(db)
+	userService := userService.New(userStore)
+	handler := userHandler.New(userService)
 
 	router := mux.NewRouter()
-	router.Path("/api/users/{id}").Methods("GET").HandlerFunc(handler.FindUserById)
-	router.Path("/api/users").Methods("GET").HandlerFunc(handler.FindAllUsers)
-	router.Path("/api/users/{id}").Methods("PUT").HandlerFunc(handler.UpdateUserById)
-	router.Path("/api/users/{id}").Methods("DELETE").HandlerFunc(handler.DeleteUserById)
-	router.Path("/api/users").Methods("POST").HandlerFunc(handler.CreateUsers)
+
+	router.Handle("/api/user/{id}", middleware.Authentication(http.HandlerFunc(handler.FindUserById))).Methods(http.MethodGet)
+	router.Handle("/api/users", middleware.Authentication(http.HandlerFunc(handler.FindUsers))).Methods(http.MethodGet)
+	router.Handle("/api/user/{id}", middleware.Authentication(http.HandlerFunc(handler.UpdateById))).Methods(http.MethodPut)
+	router.Handle("/api/user", middleware.Authentication(http.HandlerFunc(handler.CreateUser))).Methods(http.MethodPost)
+	router.Handle("/api/user/{id}", middleware.Authentication(http.HandlerFunc(handler.DeleteUser))).Methods(http.MethodDelete)
 
 	http.Handle("/", router)
 
-	fmt.Println("Listening to port 3000")
-	err = http.ListenAndServe(":3000", nil)
+	fmt.Println("Listening to port 8080...")
+	err = http.ListenAndServe(":8080", nil)
 
 	if err != nil {
 		fmt.Println(err)
 	}
-
 }
