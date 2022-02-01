@@ -1,0 +1,282 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a sample crud server. You can find out more info at [http://localhost:5454/](http://localhost:5454/)",
+    "version": "1.0.0",
+    "title": "Swagger Crud"
+  },
+  "server": {
+    "url": "http://localhost:54/users/"
+  },
+  
+  "paths": {
+    "/users/add": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Add a new user",
+        "description": "",
+        "operationId": "addUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User object that needs to be added",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User Added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/Response"
+                }
+              }
+            }
+          },
+          "400":{
+            "description": "Failed to add the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/update": {
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Update an existing user",
+        "description": "",
+        "operationId": "updateUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User object that needs to be update",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User Updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/Response"
+                }
+              }
+            }
+          },
+          "400":{
+            "description": "Failed to update the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "AllUser",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of Users",
+            "schema": {
+              "type": "user",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          },
+          "400":{
+            "description": "No user found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/id": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Finds User by id",
+        "operationId": "id",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of user that needs to be fetched",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user found",
+            "schema": {
+              "type": "user",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          },
+          "400":{
+            "description": "No user found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/delete": {
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Deletes a user",
+        "description": "",
+        "operationId": "deleteUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of user that needs to be deleted",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User Deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/Response"
+                }
+              }
+            }
+          },
+          "400":{
+            "description": "Failed to delete the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "user",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "age": {
+          "type": "integer"
+        }
+      },
+      "xml": {
+        "name": "User"
+      }
+    },
+    "Response": {
+      "type": "responseObject",
+      "properties":{
+        "data":{
+          "type": "object"
+        },
+        "message":{
+          "type": "string"
+        },
+        "statusCode":{
+          "type": "integer"
+        }
+      }
+    },
+    "ErrorResponse": {
+      "type": "errorObject",
+      "properties":{
+        "code":{
+          "type":"integer"
+        },
+        "message":{
+          "type":"string"
+        }
+      }
+    }
+  }
+}
