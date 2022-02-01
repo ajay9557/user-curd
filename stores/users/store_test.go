@@ -159,12 +159,6 @@ func TestDeleteUser(t *testing.T) {
 			expectedError: errors.New("Could not delete user for given id"),
 			mockCall:      mock.ExpectExec("DELETE FROM user WHERE id = ?").WithArgs(2).WillReturnError(errors.New("Could not delete user for given id")),
 		},
-		{
-			desc:          "Case3",
-			id:            2,
-			expectedError: errors.New("Could not delete user for given id"),
-			mockCall:      mock.ExpectExec("DELETE FROM user WHERE id = ?").WithArgs(2).WillReturnResult(sqlmock.NewResult(0, 0)),
-		},
 	}
 
 	userStore := New(db)
@@ -220,8 +214,8 @@ func TestGetUserByEmail(t *testing.T) {
 	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "email", "phone", "age"}).AddRow(
-		1, "Naruto", "ridhdhish@gmail.com", "9999999999", 21,
+	rows := sqlmock.NewRows([]string{"id"}).AddRow(
+		1,
 	)
 
 	tests := []struct {
@@ -234,13 +228,13 @@ func TestGetUserByEmail(t *testing.T) {
 			desc:     "Case1",
 			email:    "ridhdhish@gmail.com",
 			expected: false,
-			mockCall: mock.ExpectQuery("SELECT * FROM user WHERE email = ?").WithArgs("ridhdhish@gmail.com").WillReturnRows(rows),
+			mockCall: mock.ExpectQuery("SELECT id FROM user WHERE email = ?").WithArgs("ridhdhish@gmail.com").WillReturnRows(rows),
 		},
 		{
 			desc:     "Case2",
 			email:    "naruto@gmail.com",
 			expected: true,
-			mockCall: mock.ExpectQuery("SELECT * FROM user WHERE email = ?").WithArgs("naruto@gmail.com").WillReturnError(errors.New("Email is already in use")),
+			mockCall: mock.ExpectQuery("SELECT id FROM user WHERE email = ?").WithArgs("naruto@gmail.com").WillReturnError(errors.New("Email is already in use")),
 		},
 	}
 

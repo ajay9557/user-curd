@@ -14,9 +14,9 @@ func ValidateEmail(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		res.Header().Add("Content-type", "application.json")
 
-		token := strings.Split(req.Header.Get("x-authorization-token"), " ")
+		token := strings.Split(req.Header.Get("Authorization"), " ")
 
-		if len(token) <= 1 || token[1] == "" {
+		if len(token) != 2 {
 			_, _ = res.Write([]byte(`{"error": "Could not parse authentication token"}`))
 			return
 		}

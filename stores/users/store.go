@@ -85,7 +85,6 @@ func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 	return -1, errors.New("Nothing to update. Provide user data to update the user")
 }
 
-// FIXME: Check user is exist or not inside service layer
 /*
 DELETE /api/users/{id}
 Delete user for given id
@@ -93,15 +92,9 @@ Delete user for given id
 func (u *dbStore) DeleteUser(id int) error {
 	db := u.db
 
-	result, err := db.Exec("DELETE FROM user WHERE id = ?", id)
+	_, err := db.Exec("DELETE FROM user WHERE id = ?", id)
 
 	if err != nil {
-		return errors.New("Could not delete user for given id")
-	}
-
-	// FIXME: Remove me
-	rowsAffected, _ := result.RowsAffected()
-	if rowsAffected == 0 {
 		return errors.New("Could not delete user for given id")
 	}
 
@@ -114,8 +107,8 @@ func (u *dbStore) GetUserByEmail(email string) bool {
 
 	row := db.QueryRow("SELECT id FROM user WHERE email = ?", email)
 
-	var user models.User
-	err := row.Scan(&user.Id)
+	var user int
+	err := row.Scan(&user)
 
 	return err != nil
 }
