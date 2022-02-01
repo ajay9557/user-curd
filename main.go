@@ -39,12 +39,17 @@ func main() {
 	httpService := httpuser.HttpService{HttpServ: services}
 
 	router := mux.NewRouter()
-	router.HandleFunc("/id", httpService.Handler)
-	http.Handle("/id", AddMiddle(http.HandlerFunc(httpService.Handler), middleware.Filter))
+	router.Handle("/users/{id}", AddMiddle(http.HandlerFunc(httpService.GetOneUserHandler), middleware.Filter)).Methods(http.MethodGet)
 
-	router.HandleFunc("/", httpService.Handler)
-	http.Handle("/", AddMiddle(http.HandlerFunc(httpService.Handler), middleware.Filter))
+	router.Handle("/users/", AddMiddle(http.HandlerFunc(httpService.GetAllUserHandler), middleware.Filter)).Methods(http.MethodGet)
+
+	router.Handle("/users/add", AddMiddle(http.HandlerFunc(httpService.AddUserHandler), middleware.Filter)).Methods(http.MethodPost)
+
+	router.Handle("/users/update", AddMiddle(http.HandlerFunc(httpService.UpdateUserHandler), middleware.Filter)).Methods(http.MethodPut)
+
+	router.Handle("/users/delete", AddMiddle(http.HandlerFunc(httpService.DeleteUserHandler), middleware.Filter)).Methods(http.MethodDelete)
 
 	fmt.Println("Listning on port: 5454")
+	http.Handle("/", router)
 	http.ListenAndServe(":5454", nil)
 }

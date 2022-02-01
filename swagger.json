@@ -5,13 +5,12 @@
     "version": "1.0.0",
     "title": "Swagger Crud"
   },
-  "host": "localhost:5454",
-  "basePath": "/",
-  "schemes": [
-    "http"
-  ],
+  "server": {
+    "url": "http://localhost:54/users/"
+  },
+  
   "paths": {
-    "/": {
+    "/users/add": {
       "post": {
         "tags": [
           "user"
@@ -38,13 +37,29 @@
         ],
         "responses": {
           "200": {
-            "description": "successfully added"
+            "description": "User Added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/Response"
+                }
+              }
+            }
           },
-          "400": {
-            "description": "Invalid input"
+          "400":{
+            "description": "Failed to add the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
           }
         }
-      },
+      }
+    },
+    "/users/update": {
       "put": {
         "tags": [
           "user"
@@ -71,13 +86,29 @@
         ],
         "responses": {
           "200": {
-            "description": "Successfully updated"
+            "description": "User Updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/Response"
+                }
+              }
+            }
           },
-          "400": {
-            "description": "Invalid User data"
+          "400":{
+            "description": "Failed to update the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
           }
         }
-      },
+      }
+    },
+    "/users/": {
       "get": {
         "tags": [
           "user"
@@ -90,19 +121,26 @@
           "200": {
             "description": "List of Users",
             "schema": {
-              "type": "array",
+              "type": "user",
               "items": {
                 "$ref": "#/definitions/User"
               }
             }
           },
-          "400": {
-            "description": "Invalid User Id"
+          "400":{
+            "description": "No user found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/{id}": {
+    "/users/id": {
       "get": {
         "tags": [
           "user"
@@ -126,17 +164,26 @@
           "200": {
             "description": "user found",
             "schema": {
-              "type": "object",
+              "type": "user",
               "items": {
                 "$ref": "#/definitions/User"
               }
             }
           },
-          "400": {
-            "description": "Invalid User Id"
+          "400":{
+            "description": "No user found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
           }
         }
-      },
+      }
+    },
+    "/users/delete": {
       "delete": {
         "tags": [
           "user"
@@ -145,7 +192,6 @@
         "description": "",
         "operationId": "deleteUser",
         "produces": [
-          "application/xml",
           "application/json"
         ],
         "parameters": [
@@ -160,10 +206,24 @@
         ],
         "responses": {
           "200": {
-            "description": "User successfully deleted"
+            "description": "User Deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/Response"
+                }
+              }
+            }
           },
-          "400": {
-            "description": "Invalid ID"
+          "400":{
+            "description": "Failed to delete the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -171,7 +231,7 @@
   },
   "definitions": {
     "User": {
-      "type": "object",
+      "type": "user",
       "properties": {
         "id": {
           "type": "integer"
@@ -191,6 +251,31 @@
       },
       "xml": {
         "name": "User"
+      }
+    },
+    "Response": {
+      "type": "responseObject",
+      "properties":{
+        "data":{
+          "type": "object"
+        },
+        "message":{
+          "type": "string"
+        },
+        "statusCode":{
+          "type": "integer"
+        }
+      }
+    },
+    "ErrorResponse": {
+      "type": "errorObject",
+      "properties":{
+        "code":{
+          "type":"integer"
+        },
+        "message":{
+          "type":"string"
+        }
       }
     }
   }

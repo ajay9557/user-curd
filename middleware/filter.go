@@ -5,11 +5,13 @@ import (
 	"go_lang/Assignment/user-curd/models"
 	"go_lang/Assignment/user-curd/services/user"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func Filter(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		ide := r.URL.Query().Get("id")
+		ide := mux.Vars(r)["id"]
 		isValid := user.IsValidId(ide)
 		if ide == "" {
 			handler.ServeHTTP(rw, r)

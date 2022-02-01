@@ -13,41 +13,11 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-func Test_Handler(t *testing.T) {
+func Test_GetOneUserHandler(t *testing.T) {
 
 	controller := gomock.NewController(t)
 	mockUserService := services.NewMockServices(controller)
 	handler := HttpService{mockUserService}
-
-	testCaseGet := []struct {
-		desc     string
-		input    string
-		expected int
-		mock     []*gomock.Call
-	}{
-		{
-			desc:     "Test Case1",
-			input:    "GET",
-			expected: http.StatusOK,
-			mock:     []*gomock.Call{mockUserService.EXPECT().GetAllUser().Return([]models.User{{Id: 11, Name: "Ravi", Email: "ravi34@gmail.com", Phone: "9876789098", Age: 45}}, nil)},
-		},
-		{
-			desc:     "Test Case2",
-			input:    "GET",
-			expected: http.StatusBadRequest,
-			mock:     []*gomock.Call{mockUserService.EXPECT().GetAllUser().Return([]models.User{}, errors.New("ERROR IN FETCHING ROWS"))},
-		},
-	}
-	for _, tcs := range testCaseGet {
-		t.Run(tcs.desc, func(t *testing.T) {
-			req := httptest.NewRequest(tcs.input, "/", nil)
-			res := httptest.NewRecorder()
-			handler.Handler(res, req)
-			if res.Code != tcs.expected {
-				t.Errorf("Output: %v, Expected: %v", req, res)
-			}
-		})
-	}
 
 	testCaseGetById := []struct {
 		desc     string
@@ -83,12 +53,53 @@ func Test_Handler(t *testing.T) {
 			req := httptest.NewRequest(tcs.input, "/?id="+tcs.param, nil)
 			res := httptest.NewRecorder()
 
-			handler.Handler(res, req)
+			handler.GetOneUserHandler(res, req)
 			if res.Code != tcs.expected {
 				t.Errorf("Output: %v, Expected: %v", res.Code, tcs.expected)
 			}
 		})
 	}
+}
+
+func Test_GetAllUserHandler(t *testing.T) {
+	controller := gomock.NewController(t)
+	mockUserService := services.NewMockServices(controller)
+	handler := HttpService{mockUserService}
+	testCaseGet := []struct {
+		desc     string
+		input    string
+		expected int
+		mock     []*gomock.Call
+	}{
+		{
+			desc:     "Test Case1",
+			input:    "GET",
+			expected: http.StatusOK,
+			mock:     []*gomock.Call{mockUserService.EXPECT().GetAllUser().Return([]models.User{{Id: 11, Name: "Ravi", Email: "ravi34@gmail.com", Phone: "9876789098", Age: 45}}, nil)},
+		},
+		{
+			desc:     "Test Case2",
+			input:    "GET",
+			expected: http.StatusBadRequest,
+			mock:     []*gomock.Call{mockUserService.EXPECT().GetAllUser().Return([]models.User{}, errors.New("ERROR IN FETCHING ROWS"))},
+		},
+	}
+	for _, tcs := range testCaseGet {
+		t.Run(tcs.desc, func(t *testing.T) {
+			req := httptest.NewRequest(tcs.input, "/", nil)
+			res := httptest.NewRecorder()
+			handler.GetAllUserHandler(res, req)
+			if res.Code != tcs.expected {
+				t.Errorf("Output: %v, Expected: %v", req, res)
+			}
+		})
+	}
+}
+
+func Test_AddUserHandler(t *testing.T) {
+	controller := gomock.NewController(t)
+	mockUserService := services.NewMockServices(controller)
+	handler := HttpService{mockUserService}
 
 	testCasePost := []struct {
 		desc     string
@@ -125,12 +136,18 @@ func Test_Handler(t *testing.T) {
 			req := httptest.NewRequest(tcs.input, "/", bytes.NewBuffer(data))
 			res := httptest.NewRecorder()
 
-			handler.Handler(res, req)
+			handler.AddUserHandler(res, req)
 			if res.Code != tcs.expected {
 				t.Errorf("Output: %v, Expected: %v", res.Code, tcs.expected)
 			}
 		})
 	}
+}
+
+func Test_UpdateUserHandler(t *testing.T) {
+	controller := gomock.NewController(t)
+	mockUserService := services.NewMockServices(controller)
+	handler := HttpService{mockUserService}
 
 	testCasePut := []struct {
 		desc     string
@@ -167,12 +184,18 @@ func Test_Handler(t *testing.T) {
 			req := httptest.NewRequest(tcs.input, "/", bytes.NewBuffer(data))
 			res := httptest.NewRecorder()
 
-			handler.Handler(res, req)
+			handler.UpdateUserHandler(res, req)
 			if res.Code != tcs.expected {
 				t.Errorf("Output: %v, Expected: %v", res.Code, tcs.expected)
 			}
 		})
 	}
+}
+
+func Test_DeleteUserHandler(t *testing.T) {
+	controller := gomock.NewController(t)
+	mockUserService := services.NewMockServices(controller)
+	handler := HttpService{mockUserService}
 
 	testCaseDelete := []struct {
 		desc     string
@@ -201,7 +224,7 @@ func Test_Handler(t *testing.T) {
 			req := httptest.NewRequest(tcs.input, "/?id="+tcs.param, nil)
 			res := httptest.NewRecorder()
 
-			handler.Handler(res, req)
+			handler.DeleteUserHandler(res, req)
 			if res.Code != tcs.expected {
 				t.Errorf("Output: %v, Expected: %v", res.Code, tcs.expected)
 			}
