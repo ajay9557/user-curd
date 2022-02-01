@@ -6,16 +6,6 @@ import (
 	"net/http"
 )
 
-type StatusResponseWriter struct {
-	http.ResponseWriter
-	status int
-}
-
-func (w *StatusResponseWriter) WriteHeader(status int) {
-	w.status = status
-	w.ResponseWriter.WriteHeader(status)
-}
-
 func Logger(inner http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		userName, pwd, ok := r.BasicAuth()

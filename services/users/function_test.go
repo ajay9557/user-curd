@@ -6,29 +6,29 @@ func TestEmailValid(t *testing.T) {
 	testCases := []struct {
 		desc     string
 		input    string
-		expecOut bool
+		expectedOut bool
 	}{
 		{
 			desc:     "success case",
 			input:    "sudheer@gmail.com",
-			expecOut: true,
+			expectedOut: true,
 		},
 		{
 			desc:     "failure case",
 			input:    "sudheer",
-			expecOut: false,
+			expectedOut: false,
 		},
 		{
 			desc:     "failure case",
 			input:    "su",
-			expecOut: false,
+			expectedOut: false,
 		},
 	}
 	for _, ts := range testCases {
 		t.Run(ts.desc, func(t *testing.T) {
 			result := isEmailValid(ts.input)
-			if result != ts.expecOut {
-				t.Errorf("Expected %v obtained %v", ts.expecOut, result)
+			if result != ts.expectedOut {
+				t.Errorf("Expected %v obtained %v", ts.expectedOut, result)
 			}
 		})
 	}

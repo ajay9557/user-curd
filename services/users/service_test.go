@@ -1,11 +1,11 @@
 package users
 
 import (
-	"user-curd/models"
-	"user-curd/stores"
 	"errors"
 	"reflect"
 	"testing"
+	"user-curd/models"
+	"user-curd/stores"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -68,7 +68,7 @@ func TestUpdate(t *testing.T) {
 				Phone: "+919908577405",
 				Age:   12,
 			},
-			mock: []*gomock.Call{mockStore.EXPECT().UpdateById(gomock.Any()).Return(nil)},
+			mock: []*gomock.Call{mockStore.EXPECT().GetDetails().Return([]models.User{},nil),mockStore.EXPECT().UpdateById(gomock.Any()).Return(nil)},
 			err:  nil,
 		},
 		{
@@ -80,7 +80,9 @@ func TestUpdate(t *testing.T) {
 				Phone: "+919908577405",
 				Age:   12,
 			},
-			mock: []*gomock.Call{mockStore.EXPECT().UpdateById(gomock.Any()).Return(errors.New("t"))},
+			mock: []*gomock.Call{
+				mockStore.EXPECT().GetDetails().Return([]models.User{},nil),
+				mockStore.EXPECT().UpdateById(gomock.Any()).Return(errors.New("t"))},
 			err:  errors.New("t"),
 		},
 	}
@@ -94,7 +96,7 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
-func TestSearchById(t *testing.T) {
+func Test_GetByUserId(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -118,7 +120,7 @@ func TestSearchById(t *testing.T) {
 				Phone: "919908577405",
 				Age:   22,
 			},
-			mock: []*gomock.Call{mockStore.EXPECT().SearchById(gomock.Any()).Return(models.User{1, "Puppala", "puppala@gmail.com", "919908577405", 22}, nil)},
+			mock: []*gomock.Call{mockStore.EXPECT().GetById(gomock.Any()).Return(models.User{1, "Puppala", "puppala@gmail.com", "919908577405", 22}, nil)},
 			err:  nil,
 		},
 		{
@@ -131,13 +133,13 @@ func TestSearchById(t *testing.T) {
 				Phone: "919908577405",
 				Age:   22,
 			},
-			mock: []*gomock.Call{mockStore.EXPECT().SearchById(gomock.Any()).Return(models.User{1, "Puppala", "puppala@gmail.com", "919908577405", 22}, nil)},
+			mock: []*gomock.Call{mockStore.EXPECT().GetById(gomock.Any()).Return(models.User{1, "Puppala", "puppala@gmail.com", "919908577405", 22}, nil)},
 			err:  errors.New("t"),
 		},
 	}
 	for _, tc := range tcs {
 		t.Run(tc.desc, func(t *testing.T) {
-			res, err := mock.SearchByUserId(tc.Id)
+			res, err := mock.GetByUserId(tc.Id)
 			if err != nil && !reflect.DeepEqual(tc.err, err) {
 				t.Error("Expected: ", tc.err, "Obtained: ", err)
 			}
@@ -148,7 +150,7 @@ func TestSearchById(t *testing.T) {
 	}
 }
 
-func TestSearch(t *testing.T) {
+func Test_GetAll(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -171,7 +173,7 @@ func TestSearch(t *testing.T) {
 					Age:   12,
 				},
 			},
-			mock: []*gomock.Call{mockStore.EXPECT().SearchDetails().Return([]models.User{
+			mock: []*gomock.Call{mockStore.EXPECT().GetDetails().Return([]models.User{
 				{Id: 2,
 					Name:  "Zopsmart",
 					Email: "sudheerpuppala@gmail.com",
@@ -184,7 +186,7 @@ func TestSearch(t *testing.T) {
 	}
 	for _, tc := range tcs {
 		t.Run(tc.desc, func(t *testing.T) {
-			res, err := mock.SearchAll()
+			res, err := mock.GetAll()
 			if err != nil && !reflect.DeepEqual(err, tc.err) {
 				t.Error("Expected: ", tc.err, "Obtained: ", err)
 			}
@@ -195,7 +197,7 @@ func TestSearch(t *testing.T) {
 	}
 }
 
-func TestInsert(t *testing.T) {
+func Test_InsertDetails(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -225,7 +227,9 @@ func TestInsert(t *testing.T) {
 				Phone: "919908577405",
 				Age:   22,
 			},
-			mock: []*gomock.Call{mockStore.EXPECT().InsertDetails(gomock.Any()).Return(nil)},
+			mock: []*gomock.Call{
+				mockStore.EXPECT().GetDetails().Return([]models.User{},nil),
+				mockStore.EXPECT().InsertDetails(gomock.Any()).Return(nil)},
 			err:  nil,
 		},
 		{
@@ -244,7 +248,9 @@ func TestInsert(t *testing.T) {
 				Phone: "919908577405",
 				Age:   22,
 			},
-			mock: []*gomock.Call{mockStore.EXPECT().InsertDetails(gomock.Any()).Return(errors.New("t"))},
+			mock: []*gomock.Call{
+				mockStore.EXPECT().GetDetails().Return([]models.User{},nil),
+				mockStore.EXPECT().InsertDetails(gomock.Any()).Return(errors.New("t"))},
 			err:  errors.New("t"),
 		},
 	}
@@ -256,124 +262,6 @@ func TestInsert(t *testing.T) {
 			}
 			if !reflect.DeepEqual(res, tc.expected) {
 				t.Errorf("Expected : %v,Obtained : %v ", tc.expected, res)
-			}
-		})
-	}
-}
-
-func TestEmailValidation(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockStore := stores.NewMockStore(ctrl)
-	mock := New(mockStore)
-
-	tcs := []struct {
-		desc     string
-		Email    string
-		input    []models.User
-		mock     []*gomock.Call
-		expected bool
-		err      error
-	}{
-		{
-			desc:  "Success",
-			Email: "minnu01@gmail.com",
-			input: []models.User{
-				{Id: 2,
-					Name:  "Zopsmart",
-					Email: "sudheerpuppala@gmail.com",
-					Phone: "+919908577405",
-					Age:   12,
-				},
-			},
-			mock: []*gomock.Call{mockStore.EXPECT().SearchDetails().Return([]models.User{
-				{Id: 2,
-					Name:  "Zopsmart",
-					Email: "sudheerpuppala@gmail.com",
-					Phone: "+919908577405",
-					Age:   12,
-				},
-			}, nil)},
-			expected: true,
-			err:      nil,
-		},
-		{
-			desc:  "Success-3",
-			Email: "sudheerpuppala@gmail.com",
-			input: []models.User{
-				{Id: 2,
-					Name:  "Zopsmart",
-					Email: "sudheerpuppala@gmail.com",
-					Phone: "+919908577405",
-					Age:   12,
-				},
-				{
-					Id:    3,
-					Name:  "Zopsmart",
-					Email: "sudheerpuppala@gmail.com",
-					Phone: "+919908577405",
-					Age:   12,
-				},
-			},
-			mock: []*gomock.Call{mockStore.EXPECT().SearchDetails().Return([]models.User{
-				{Id: 2,
-					Name:  "Zopsmart",
-					Email: "sudheerpuppala@gmail.com",
-					Phone: "+919908577405",
-					Age:   12,
-				},
-				{Id: 3,
-					Name:  "Zopsmart",
-					Email: "sudheerpuppala@gmail.com",
-					Phone: "+919908577405",
-					Age:   12,
-				},
-			}, nil)},
-			expected: false,
-			err:      nil,
-		},
-		{
-			desc:  "Failure",
-			Email: "minnu01@gmail.com",
-			input: []models.User{
-				{Id: 2,
-					Name:  "Zopsmart",
-					Email: "sudheerpuppala@gmail.com",
-					Phone: "+919908577405",
-					Age:   12,
-				},
-			},
-			mock: []*gomock.Call{mockStore.EXPECT().SearchDetails().Return([]models.User{
-				{Id: 2,
-					Name:  "Zopsmart",
-					Email: "sudheerpuppala@gmail.com",
-					Phone: "+919908577405",
-					Age:   12,
-				},
-			}, errors.New("t"))},
-			expected: false,
-			err:      errors.New("t"),
-		},
-		{
-			desc:     "Failure=2",
-			Email:    "mi",
-			expected: false,
-			err:      errors.New("t"),
-		},
-		{
-			desc:     "Failure-3",
-			Email:    "minnugmail.com",
-			expected: false,
-			err:      errors.New("t"),
-		},
-	}
-
-	for _, tc := range tcs {
-		t.Run(tc.desc, func(t *testing.T) {
-			res := mock.IsEmailValid(tc.Email)
-			if !reflect.DeepEqual(res, tc.expected) {
-				t.Error("Expected: ", tc.expected, "Obtained: ", res)
 			}
 		})
 	}

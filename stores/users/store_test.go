@@ -1,18 +1,15 @@
 package users
 
 import (
-	"user-curd/models"
 	"errors"
-
-	//"fmt"
-
 	"reflect"
 	"testing"
+	"user-curd/models"
 
 	"github.com/DATA-DOG/go-sqlmock"
 )
 
-func Test_Insert(t *testing.T) {
+func Test_InsertDetails(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("database error :%s", err)
@@ -63,7 +60,7 @@ func Test_Insert(t *testing.T) {
 		})
 	}
 }
-func Test_Update(t *testing.T) {
+func Test_UpdateById(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("database error :%s", err)
@@ -114,7 +111,7 @@ func Test_Update(t *testing.T) {
 	}
 }
 
-func Test_Delete(t *testing.T) {
+func Test_DeleteById(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("database error :%s", err)
@@ -169,7 +166,7 @@ func Test_Delete(t *testing.T) {
 	}
 }
 
-func Test_Search(t *testing.T) {
+func Test_GetById(t *testing.T) {
 	query := "SELECT Id,Name,Email,Phone,Age FROM Userwhere Id=?"
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -212,7 +209,7 @@ func Test_Search(t *testing.T) {
 	handler := New(db)
 	for _, tc := range tcsSearch {
 		t.Run(tc.desc, func(t *testing.T) {
-			res, err := handler.SearchById(tc.Id)
+			res, err := handler.GetById(tc.Id)
 			if err != nil {
 				return
 			}
@@ -223,7 +220,7 @@ func Test_Search(t *testing.T) {
 	}
 }
 
-func Test_SearchAll(t *testing.T) {
+func Test_GetAll(t *testing.T) {
 	query := "SELECT Id,Name,Email,Phone,Age FROM User"
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -282,7 +279,7 @@ func Test_SearchAll(t *testing.T) {
 	handler := New(db)
 	for _, tc := range tcsSearch {
 		t.Run(tc.desc, func(t *testing.T) {
-			res, err := handler.SearchDetails()
+			res, err := handler.GetDetails()
 			if err != nil {
 				return
 			}

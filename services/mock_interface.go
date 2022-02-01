@@ -48,6 +48,36 @@ func (mr *MockServiceMockRecorder) DeleteByUserId(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteByUserId", reflect.TypeOf((*MockService)(nil).DeleteByUserId), id)
 }
 
+// GetAll mocks base method.
+func (m *MockService) GetAll() ([]models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll")
+	ret0, _ := ret[0].([]models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAll indicates an expected call of GetAll.
+func (mr *MockServiceMockRecorder) GetAll() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockService)(nil).GetAll))
+}
+
+// GetByUserId mocks base method.
+func (m *MockService) GetByUserId(id int) (models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByUserId", id)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByUserId indicates an expected call of GetByUserId.
+func (mr *MockServiceMockRecorder) GetByUserId(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUserId", reflect.TypeOf((*MockService)(nil).GetByUserId), id)
+}
+
 // InsertUserDetails mocks base method.
 func (m *MockService) InsertUserDetails(arg0 models.User) (models.User, error) {
 	m.ctrl.T.Helper()
@@ -61,50 +91,6 @@ func (m *MockService) InsertUserDetails(arg0 models.User) (models.User, error) {
 func (mr *MockServiceMockRecorder) InsertUserDetails(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUserDetails", reflect.TypeOf((*MockService)(nil).InsertUserDetails), arg0)
-}
-
-// IsEmailValid mocks base method.
-func (m *MockService) IsEmailValid(email string) bool {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsEmailValid", email)
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// IsEmailValid indicates an expected call of IsEmailValid.
-func (mr *MockServiceMockRecorder) IsEmailValid(email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsEmailValid", reflect.TypeOf((*MockService)(nil).IsEmailValid), email)
-}
-
-// SearchAll mocks base method.
-func (m *MockService) SearchAll() ([]models.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SearchAll")
-	ret0, _ := ret[0].([]models.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SearchAll indicates an expected call of SearchAll.
-func (mr *MockServiceMockRecorder) SearchAll() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchAll", reflect.TypeOf((*MockService)(nil).SearchAll))
-}
-
-// SearchByUserId mocks base method.
-func (m *MockService) SearchByUserId(id int) (models.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SearchByUserId", id)
-	ret0, _ := ret[0].(models.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SearchByUserId indicates an expected call of SearchByUserId.
-func (mr *MockServiceMockRecorder) SearchByUserId(id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchByUserId", reflect.TypeOf((*MockService)(nil).SearchByUserId), id)
 }
 
 // UpdateByUserId mocks base method.

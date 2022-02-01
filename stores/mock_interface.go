@@ -48,6 +48,36 @@ func (mr *MockStoreMockRecorder) DeleteById(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteById", reflect.TypeOf((*MockStore)(nil).DeleteById), id)
 }
 
+// GetById mocks base method.
+func (m *MockStore) GetById(id int) (models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetById", id)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetById indicates an expected call of GetById.
+func (mr *MockStoreMockRecorder) GetById(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetById", reflect.TypeOf((*MockStore)(nil).GetById), id)
+}
+
+// GetDetails mocks base method.
+func (m *MockStore) GetDetails() ([]models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDetails")
+	ret0, _ := ret[0].([]models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDetails indicates an expected call of GetDetails.
+func (mr *MockStoreMockRecorder) GetDetails() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDetails", reflect.TypeOf((*MockStore)(nil).GetDetails))
+}
+
 // InsertDetails mocks base method.
 func (m *MockStore) InsertDetails(arg0 models.User) error {
 	m.ctrl.T.Helper()
@@ -60,36 +90,6 @@ func (m *MockStore) InsertDetails(arg0 models.User) error {
 func (mr *MockStoreMockRecorder) InsertDetails(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertDetails", reflect.TypeOf((*MockStore)(nil).InsertDetails), arg0)
-}
-
-// SearchById mocks base method.
-func (m *MockStore) SearchById(id int) (models.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SearchById", id)
-	ret0, _ := ret[0].(models.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SearchById indicates an expected call of SearchById.
-func (mr *MockStoreMockRecorder) SearchById(id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchById", reflect.TypeOf((*MockStore)(nil).SearchById), id)
-}
-
-// SearchDetails mocks base method.
-func (m *MockStore) SearchDetails() ([]models.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SearchDetails")
-	ret0, _ := ret[0].([]models.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SearchDetails indicates an expected call of SearchDetails.
-func (mr *MockStoreMockRecorder) SearchDetails() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchDetails", reflect.TypeOf((*MockStore)(nil).SearchDetails))
 }
 
 // UpdateById mocks base method.

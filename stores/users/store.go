@@ -1,11 +1,11 @@
 package users
 
 import (
-	"user-curd/models"
-	"user-curd/stores"
 	"database/sql"
 	"errors"
 	"fmt"
+	"user-curd/models"
+	"user-curd/stores"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -19,21 +19,15 @@ func New(db *sql.DB) stores.Store {
 }
 
 func (u *UserStorer) InsertDetails(user models.User) error {
-	fmt.Println(user.Email)
-	res, err := u.db.Exec("INSERT INTO User VALUES (?,?,?,?,?)", user.Id, user.Name, user.Email, user.Phone, user.Age)
+	_, err := u.db.Exec("INSERT INTO User VALUES (?,?,?,?,?)", user.Id, user.Name, user.Email, user.Phone, user.Age)
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
-	fmt.Println(res)
-	//lastId, err := res.LastInsertId()
-	//fmt.Println(lastId)
-
 	return nil
 }
 
 func (u *UserStorer) UpdateById(user models.User) (err error) {
 	if _, err = u.db.Exec("update User set Name=?, Email=?, Phone=?, Age=? where Id = ?", user.Name, user.Email, user.Phone, user.Age, user.Id); err != nil {
-		fmt.Println(err)
 		return errors.New("t")
 	}
 	return nil
@@ -45,7 +39,7 @@ func (u *UserStorer) DeleteById(id int) (err error) {
 	return nil
 }
 
-func (u *UserStorer) SearchById(id int) (models.User, error) {
+func (u *UserStorer) GetById(id int) (models.User, error) {
 	var user models.User
 	row := u.db.QueryRow("SELECT Id,Name,Email,Phone,Age FROM User where Id=?", id)
 
@@ -61,7 +55,7 @@ func (u *UserStorer) SearchById(id int) (models.User, error) {
 	return user, nil
 }
 
-func (u *UserStorer) SearchDetails() ([]models.User, error) {
+func (u *UserStorer) GetDetails() ([]models.User, error) {
 	var users []models.User
 	results, err := u.db.Query("SELECT Id,Name,Email,Phone,Age FROM User ")
 	if err != nil {

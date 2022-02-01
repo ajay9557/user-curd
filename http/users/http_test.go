@@ -1,8 +1,6 @@
 package users
 
 import (
-	"user-curd/models"
-	"user-curd/services"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -11,6 +9,8 @@ import (
 	"net/http/httptest"
 	"strconv"
 	"testing"
+	"user-curd/models"
+	"user-curd/services"
 
 	gomock "github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
@@ -47,22 +47,17 @@ func TestHandler_Search(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	serv := services.NewMockService(ctrl)
-	//mock := New(serv)
 	h := Handler{serv}
 	for _, tc := range tcs {
 		link := "/users/%s"
-		//req, _ := http.NewRequest("GET", fmt.Sprintf(link, tc.Id), nil)
-		//var ww http.ResponseWriter
-		//h.Search(ww, req)
 		r := httptest.NewRequest("GET", fmt.Sprintf(link, tc.Id), nil)
 		w := httptest.NewRecorder()
-		//router := mux.NewRouter()
 		r = mux.SetURLVars(r, map[string]string{
 			"id": tc.Id,
 		})
 		id, err := strconv.Atoi(tc.Id)
 		if err == nil {
-			serv.EXPECT().SearchByUserId(id).Return(tc.expected, tc.err)
+			serv.EXPECT().GetByUserId(id).Return(tc.expected, tc.err)
 		}
 		h.Search(w, r)
 		if w.Code != tc.stCode {
@@ -85,13 +80,11 @@ func TestHandler_Delete(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	serv := services.NewMockService(ctrl)
-	//mock := New(serv)
 	h := Handler{serv}
 	for _, tc := range tcs {
 		link := "/users/%s"
 		r := httptest.NewRequest("DELETE", fmt.Sprintf(link, tc.Id), nil)
 		w := httptest.NewRecorder()
-		//router := mux.NewRouter()
 		r = mux.SetURLVars(r, map[string]string{
 			"id": tc.Id,
 		})
@@ -106,7 +99,7 @@ func TestHandler_Delete(t *testing.T) {
 	}
 }
 
-func TestHandler_SearchingAll(t *testing.T) {
+func TestHandler_GettingAll(t *testing.T) {
 	tcs := []struct {
 		Id       string
 		expected []models.User
@@ -125,23 +118,21 @@ func TestHandler_SearchingAll(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	serv := services.NewMockService(ctrl)
-	//mock := New(serv)
 	h := Handler{serv}
 	for _, tc := range tcs {
 		link := "/users"
 		r := httptest.NewRequest("GET", fmt.Sprintf(link), nil)
 		w := httptest.NewRecorder()
-		//router := mux.NewRouter()
 		r = mux.SetURLVars(r, map[string]string{
 			"id": tc.Id,
 		})
 		_, err := strconv.Atoi(tc.Id)
 		if err == nil {
-			serv.EXPECT().SearchAll().Return(tc.expected, tc.err)
+			serv.EXPECT().GetAll().Return(tc.expected, tc.err)
 		}
 		h.GetAll(w, r)
 		if w.Code != tc.stCode {
-			t.Fatalf("SearchAll() = %v , want %v", w.Code, tc.stCode)
+			t.Fatalf("GetAll() = %v , want %v", w.Code, tc.stCode)
 		}
 	}
 }
