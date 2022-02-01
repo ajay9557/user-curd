@@ -53,10 +53,26 @@ func TestGetUserById(t *testing.T) {
 		},
 
 		{
+<<<<<<< HEAD
 			desc:           "Case 3: Bad request error",
 			input:          "-1",
 			expectedStatus: http.StatusBadRequest,
 			expectedErr:    errors.New("error invalid id type"),
+=======
+			desc:     "Case 3: Failure case - 2",
+			id:       "100000000",
+			expecErr: nil,
+			mock: []*gomock.Call{
+				mockService.EXPECT().GetUserById(100000000).Return(models.User{
+					Id:    0,
+					Name:  "",
+					Email: "",
+					Phone: "",
+					Age:   0,
+				}, errors.New("User id not found")),
+			},
+			expecBody: []byte("User id not found"),
+>>>>>>> b94105d1370d19fb3bbe8480b1e7c7e621e90c32
 		},
 	}
 
