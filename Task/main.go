@@ -29,12 +29,12 @@ func main() {
 r := mux.NewRouter()
 
 r.Handle("/user", middleware.Authentication(http.HandlerFunc(userHandler.CreateUser))).Methods("POST")
-r.Handle("/user", middleware.Authentication(http.HandlerFunc(userHandler.GetUserById))).Methods("GET")
-r.Handle("/user", middleware.Authentication(http.HandlerFunc(userHandler.DeleteUser))).Methods("DELETE")
-r.Handle("/user", middleware.Authentication(http.HandlerFunc(userHandler.UpdateUser))).Methods("PUT")
-r.Handle("/user", middleware.Authentication(http.HandlerFunc(userHandler.AllUserDetails))).Methods("GET")
-
-err = http.ListenAndServe(":3000", nil)
+r.Handle("/user/{id}", middleware.Authentication(http.HandlerFunc(userHandler.GetUserById))).Methods("GET")
+r.Handle("/user/{id}", middleware.Authentication(http.HandlerFunc(userHandler.DeleteUser))).Methods("DELETE")
+r.Handle("/user/{id}", middleware.Authentication(http.HandlerFunc(userHandler.UpdateUser))).Methods("PUT")
+r.Handle("/user/alluser", middleware.Authentication(http.HandlerFunc(userHandler.AllUserDetails))).Methods("GET")
+fmt.Println("Listening at port 3000")
+err = http.ListenAndServe(":8001", r)
 
 	if err != nil {
 		fmt.Println(err)
