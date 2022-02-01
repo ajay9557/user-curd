@@ -102,13 +102,13 @@ func (st *User) CreateUser(user models.User) (*models.User, error) {
 		return nil, errors.New("Email id is already exist")
 	}
 
-	lastInsertedId, err := st.u.CreateUser(user)
+	id, err := st.u.CreateUser(user)
 
 	if err != nil {
 		return nil, err
 	}
 
-	updatedUser, _ := st.GetUserById(lastInsertedId)
+	updatedUser, _ := st.GetUserById(id)
 
 	return &updatedUser, nil
 }

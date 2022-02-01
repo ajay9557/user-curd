@@ -4,7 +4,7 @@ import (
 	"layer/user/models"
 )
 
-func formUpdateQuery(id int, u models.User) (fields string, args []interface{}) {
+func formUpdateQuery(u models.User) (fields string, args []interface{}) {
 	if u.Name != "" {
 		fields += " name = ?,"
 		args = append(args, u.Name)
@@ -21,12 +21,8 @@ func formUpdateQuery(id int, u models.User) (fields string, args []interface{}) 
 	}
 
 	if u.Age > 0 {
-		fields += " age = ?"
+		fields += " age = ?,"
 		args = append(args, u.Age)
-	}
-
-	if id > 0 {
-		args = append(args, id)
 	}
 
 	return

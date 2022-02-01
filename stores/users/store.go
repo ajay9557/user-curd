@@ -69,10 +69,13 @@ func (u *dbStore) UpdateUser(id int, user models.User) error {
 
 	queryString := "UPDATE user"
 
-	fields, args := formUpdateQuery(id, user)
+	fields, args := formUpdateQuery(user)
+	args = append(args, id)
+
+	subQuery := fields[:len(fields)-1]
 
 	if fields != "" {
-		queryString += " SET" + fields + " WHERE id = ?"
+		queryString += " SET" + subQuery + " WHERE id = ?"
 		_, err := db.Exec(queryString, args...)
 
 		if err != nil {

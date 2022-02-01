@@ -45,7 +45,7 @@ func TestValidateEmail(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			fields, args := formUpdateQuery(test.id, test.user)
+			fields, args := formUpdateQuery(test.user)
 
 			fmt.Println(reflect.DeepEqual(args, test.expectedArgs))
 
