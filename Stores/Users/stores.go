@@ -112,22 +112,29 @@ func (s *dbStore) UpdateUserById(u TModels.User, id int) (int, error) {
 		return iid, errors.New("negative Id")
 	}
 
-	sq := "Update HUser set  name = ?,email = ?,phone = ?,age = ? where id =?"
-	res, err := s.db.Exec(sq, u.Name, u.Email, u.Phone, u.Age, id)
-	if err != nil {
-		return -1, err
-	}
-	re, err := res.RowsAffected()
-	if err != nil {
-		return -1, errors.New("error during Updating the id")
-	}
+	// sq := "Update HUser set  name = ?,email = ?,phone = ?,age = ? where id =?"
+	sq := "Update HUser "
+	fields, args := formUpdateQuery(id, u)
+	if fields != "" {
+		sq += "set " + fields + "where id = ?"
+		// res, err := s.db.Exec(sq, u.Name, u.Email, u.Phone, u.Age, id)
+		res, err := s.db.Exec(sq, args...)
+		if err != nil {
+			return -1, err
+		}
+		re, err := res.RowsAffected()
+		if err != nil {
+			return -1, errors.New("error during Updating the id")
+		}
 
-	return int(re), nil
+		return int(re), nil
+	}
+	return -1, errors.New("Nothing to update")
 }
 
 func (s *dbStore) GetEmail(email string) (bool, error) {
 	// Emails := []string{}
-	searchQ := "Select email from HUser where email=?"
+	searchQ := "Select * from HUser where email=?"
 	rows := s.db.QueryRow(searchQ, email)
 
 	if rows.Err() != nil {
