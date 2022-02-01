@@ -56,14 +56,14 @@ func TestGetUsers(t *testing.T) {
 	mockUserStore := stores.NewMockUser(ctrl)
 	testUserService := New(mockUserStore)
 
-	data1 := []models.User{
+	data1 := []*models.User{
 		{Id: 1, Name: "Naruto", Email: "naruto@gmail.com", Phone: "9999999999", Age: 18},
 		{Id: 2, Name: "Itachi", Email: "itachi@gmail.com", Phone: "8320578360", Age: 24},
 	}
 
 	tests := []struct {
 		desc     string
-		expected []models.User
+		expected []*models.User
 		mockCall *gomock.Call
 	}{
 		{
@@ -73,8 +73,8 @@ func TestGetUsers(t *testing.T) {
 		},
 		{
 			desc:     "Case2",
-			expected: []models.User{},
-			mockCall: mockUserStore.EXPECT().GetUsers().Return([]models.User{}, errors.New("Cannot fetch users")),
+			expected: nil,
+			mockCall: mockUserStore.EXPECT().GetUsers().Return(nil, errors.New("Cannot fetch users")),
 		},
 	}
 
@@ -126,7 +126,7 @@ func TestUpdateUser(t *testing.T) {
 			expectedError: nil,
 			mockCall: []*gomock.Call{
 				mockUserStore.EXPECT().GetUserById(1).Return(&expectedUser, nil),
-				mockUserStore.EXPECT().UpdateUser(1, testUser).Return(1, nil),
+				mockUserStore.EXPECT().UpdateUser(1, testUser).Return(nil),
 				mockUserStore.EXPECT().GetUserById(1).Return(&updatedUser, nil),
 			},
 		},
@@ -153,7 +153,7 @@ func TestUpdateUser(t *testing.T) {
 			expectedError: errors.New("Connection lost"),
 			mockCall: []*gomock.Call{
 				mockUserStore.EXPECT().GetUserById(1).Return(&expectedUser, nil),
-				mockUserStore.EXPECT().UpdateUser(1, testUser).Return(-1, errors.New("Connection lost")),
+				mockUserStore.EXPECT().UpdateUser(1, testUser).Return(errors.New("Connection lost")),
 			},
 		},
 	}

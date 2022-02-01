@@ -46,7 +46,7 @@ func (srv Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request
 	user, err := srv.hndlr.GetUserById(id)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
-		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. User id not found"}
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: err.Error()}
 		jsonData, _ := json.Marshal(newError)
 		_, _ = res.Write(jsonData)
 		return
@@ -73,7 +73,7 @@ func (srv Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 	users, err := srv.hndlr.GetUsers()
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
-		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Could not fetch users"}
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: err.Error()}
 		jsonData, _ := json.Marshal(newError)
 		_, _ = res.Write(jsonData)
 
@@ -82,7 +82,7 @@ func (srv Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 
 	responseData := models.Response{
 		Data: struct {
-			Users []models.User `json:"users"`
+			Users []*models.User `json:"users"`
 		}{
 			Users: users,
 		},
@@ -186,7 +186,7 @@ func (srv Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request)
 
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
-		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Something went wrong"}
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: err.Error()}
 		jsonData, _ := json.Marshal(newError)
 		_, _ = res.Write(jsonData)
 

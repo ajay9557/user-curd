@@ -38,23 +38,23 @@ func (u *dbStore) GetUserById(id int) (*models.User, error) {
 GET /api/users
 Fetch all users
 */
-func (u *dbStore) GetUsers() ([]models.User, error) {
+func (u *dbStore) GetUsers() ([]*models.User, error) {
 	db := u.db
 
 	rows, err := db.Query("SELECT * FROM user")
 
 	if err != nil {
-		return []models.User{}, errors.New("Cannot fetch users")
+		return nil, errors.New("Cannot fetch users")
 	}
 
-	var users []models.User
+	var users []*models.User
 
 	for rows.Next() {
 		var u models.User
 
 		_ = rows.Scan(&u.Id, &u.Name, &u.Email, &u.Phone, &u.Age)
 
-		users = append(users, u)
+		users = append(users, &u)
 	}
 
 	return users, nil
@@ -64,7 +64,7 @@ func (u *dbStore) GetUsers() ([]models.User, error) {
 PUT /api/users/{id}
 Update user for given id
 */
-func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
+func (u *dbStore) UpdateUser(id int, user models.User) error {
 	db := u.db
 
 	queryString := "UPDATE user"
@@ -76,13 +76,13 @@ func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 		_, err := db.Exec(queryString, args...)
 
 		if err != nil {
-			return -1, errors.New("Internal server error")
+			return errors.New("Internal server error")
 		}
 
-		return id, nil
+		return nil
 	}
 
-	return -1, errors.New("Nothing to update. Provide user data to update the user")
+	return errors.New("Nothing to update. Provide user data to update the user")
 }
 
 /*

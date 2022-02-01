@@ -92,10 +92,10 @@ func (mr *MockUserMockRecorder) GetUserById(arg0 interface{}) *gomock.Call {
 }
 
 // GetUsers mocks base method
-func (m *MockUser) GetUsers() ([]models.User, error) {
+func (m *MockUser) GetUsers() ([]*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUsers")
-	ret0, _ := ret[0].([]models.User)
+	ret0, _ := ret[0].([]*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -107,12 +107,11 @@ func (mr *MockUserMockRecorder) GetUsers() *gomock.Call {
 }
 
 // UpdateUser mocks base method
-func (m *MockUser) UpdateUser(arg0 int, arg1 models.User) (int, error) {
+func (m *MockUser) UpdateUser(arg0 int, arg1 models.User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUser", arg0, arg1)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // UpdateUser indicates an expected call of UpdateUser

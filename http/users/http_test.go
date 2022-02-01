@@ -79,7 +79,7 @@ func TestGetUsersHandler(t *testing.T) {
 	mockUserService := services.NewMockUser(ctrl)
 	h := New(mockUserService)
 
-	data1 := []models.User{
+	data1 := []*models.User{
 		{Id: 1, Name: "Naruto", Email: "naruto@gmail.com", Phone: "9999999999", Age: 18},
 		{Id: 2, Name: "Itachi", Email: "itachi@gmail.com", Phone: "8320578360", Age: 24},
 	}
@@ -97,7 +97,7 @@ func TestGetUsersHandler(t *testing.T) {
 		{
 			desc:               "Case2",
 			expectedStatusCode: http.StatusBadRequest,
-			mockCall:           mockUserService.EXPECT().GetUsers().Return([]models.User{}, errors.New("Invalid Id")),
+			mockCall:           mockUserService.EXPECT().GetUsers().Return(nil, errors.New("Invalid Id")),
 		},
 	}
 

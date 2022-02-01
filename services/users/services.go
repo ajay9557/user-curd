@@ -20,17 +20,17 @@ func (st *User) GetUserById(id int) (models.User, error) {
 	user, err := st.u.GetUserById(id)
 
 	if err != nil {
-		return models.User{}, errors.New("Cannot fetch user for given id")
+		return models.User{}, err
 	}
 
 	return *user, nil
 }
 
-func (st *User) GetUsers() ([]models.User, error) {
+func (st *User) GetUsers() ([]*models.User, error) {
 	users, err := st.u.GetUsers()
 
 	if err != nil {
-		return []models.User{}, errors.New("Cannot fetch users")
+		return nil, err
 	}
 
 	return users, nil
@@ -49,7 +49,7 @@ func (st *User) UpdateUser(id int, user models.User) (*models.User, error) {
 		return nil, err
 	}
 
-	_, err = st.u.UpdateUser(id, user)
+	err = st.u.UpdateUser(id, user)
 
 	if err != nil {
 		return nil, err
@@ -99,13 +99,13 @@ func (st *User) CreateUser(user models.User) (*models.User, error) {
 	isValid := st.u.GetUserByEmail(user.Email)
 
 	if !isValid {
-		return nil, errors.New("Email id is already in exist")
+		return nil, errors.New("Email id is already exist")
 	}
 
 	lastInsertedId, err := st.u.CreateUser(user)
 
 	if err != nil {
-		return nil, errors.New("Could not able to create new user")
+		return nil, err
 	}
 
 	updatedUser, _ := st.GetUserById(lastInsertedId)

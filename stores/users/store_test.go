@@ -90,11 +90,11 @@ func TestUpdateUser(t *testing.T) {
 	defer db.Close()
 
 	tests := []struct {
-		desc       string
-		id         int
-		user       models.User
-		expectedId int
-		mockCall   []*sqlmock.ExpectedExec
+		desc          string
+		id            int
+		user          models.User
+		expectedError error
+		mockCall      []*sqlmock.ExpectedExec
 	}{
 		{
 			desc: "Case1",
@@ -105,7 +105,7 @@ func TestUpdateUser(t *testing.T) {
 				Phone: "8320578360",
 				Age:   21,
 			},
-			expectedId: 1,
+			expectedError: nil,
 			mockCall: []*sqlmock.ExpectedExec{
 				mock.ExpectExec("UPDATE user SET name = ?, email = ?, phone = ?, age = ? WHERE id = ?").WithArgs("Ridhdhish", "rid@gmail.com", "8320578360", 21, 1).WillReturnResult(sqlmock.NewResult(1, 1)),
 			},
@@ -116,9 +116,9 @@ func TestUpdateUser(t *testing.T) {
 			user: models.User{
 				Name: "Ridhdhish",
 			},
-			expectedId: -1,
+			expectedError: errors.New("Internal server error"),
 			mockCall: []*sqlmock.ExpectedExec{
-				mock.ExpectExec("UPDATE user SET name = ?, WHERE id = ?").WithArgs("Ridhdhish", 1).WillReturnError(errors.New("Connection lost")),
+				mock.ExpectExec("UPDATE user SET name = ?, WHERE id = ?").WithArgs("Ridhdhish", 1).WillReturnError(errors.New("Internal server error")),
 			},
 		},
 	}
@@ -127,10 +127,10 @@ func TestUpdateUser(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
 			// mock.ExpectBegin()
-			updatedUserId, _ := userStore.UpdateUser(test.id, test.user)
+			err := userStore.UpdateUser(test.id, test.user)
 
-			if updatedUserId != test.expectedId {
-				t.Errorf("Expected: %d, Got: %d", test.expectedId, updatedUserId)
+			if test.expectedError != nil && errors.Is(err, test.expectedError) {
+				t.Errorf("Expected: %d, Got: %d", test.expectedError, err)
 			}
 			// mock.ExpectCommit()
 		})
