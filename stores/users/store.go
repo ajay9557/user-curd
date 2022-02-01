@@ -15,26 +15,22 @@ func New(db *sql.DB) stores.User {
 	return &userStore{db}
 }
 
-func (u *userStore) Insert(usr models.User) (models.User, error) {
-	query := "insert into user1 values(?,?,?,?,?)"
-	stmt, err := u.db.Prepare(query)
-	defer func() {
-		if err == nil {
-			stmt.Close()
-		}
-	}()
+func (u *userStore) Insert(usr *models.User) (*models.User, error) {
+	query := "insert into user1(name,email,phone,age) values(?,?,?,?)"
+	res, err := u.db.Exec(query, usr.Name, usr.Email, usr.Phone, usr.Age)
 	if err != nil {
-		return models.User{}, err
+		return &models.User{}, errors.New("error in executing insert")
 	}
-	_, err = stmt.Exec(usr.Id, usr.Name, usr.Email, usr.Phone, usr.Age)
+	id, err := res.LastInsertId()
 	if err != nil {
-		return models.User{}, err
+		return &models.User{}, errors.New("could not get last inserted id")
 	}
+	usr.Id = int(id)
 	return usr, nil
 }
 
-func (u *userStore) GetAll() ([]models.User, error) {
-	var users []models.User
+func (u *userStore) GetAll() ([]*models.User, error) {
+	var users []*models.User
 	query := "select * from user1"
 	rows, err := u.db.Query(query)
 	defer func() {
@@ -44,36 +40,39 @@ func (u *userStore) GetAll() ([]models.User, error) {
 	}()
 
 	if err != nil {
-		return []models.User{}, err
+		return []*models.User{}, err
 	}
 	for rows.Next() {
 		usr := models.User{}
 		rows.Scan(&usr.Id, &usr.Name, &usr.Email, &usr.Phone, &usr.Age)
-		users = append(users, usr)
+		users = append(users, &usr)
 	}
 	println(users)
 	return users, nil
 }
 
-func (u *userStore) GetById(id int) (models.User, error) {
+func (u *userStore) GetById(id int) (*models.User, error) {
 	var usr models.User
 	query := "select * from user1 where id = ?"
-	rows := u.db.QueryRow(query, id)
-	err := rows.Scan(&usr.Id, &usr.Name, &usr.Email, &usr.Phone, &usr.Age)
-	return usr, err
+	row := u.db.QueryRow(query, id)
+	err := row.Scan(&usr.Id, &usr.Name, &usr.Email, &usr.Phone, &usr.Age)
+	if err == sql.ErrNoRows {
+		return &models.User{}, errors.New("no id found")
+	}
+	//err := rows.Scan(usr.Id, usr.Name, usr.Email, usr.Phone, usr.Age)
+	return &usr, err
 }
 
-func (u *userStore) Update(id int, name string) error {
-	query := "update user1 set name = ? where id = ?"
-	stmt, err := u.db.Prepare(query)
+func (u *userStore) Update(user *models.User) (*models.User, error) {
+	feilds, values := stores.BuildQuery(*user)
+	query := "update user1 set " + feilds + "where id = ?"
+	_, err := u.db.Exec(query, values...)
 	if err != nil {
-		return err
+		return &models.User{}, errors.New("error in updating user name")
 	}
-	_, err = stmt.Exec(name, id)
-	if err != nil {
-		return errors.New("error in updating user name")
-	}
-	return nil
+	// fetch the updated details
+	usr, err := u.GetById(user.Id)
+	return usr, nil
 }
 
 func (u *userStore) Delete(id int) error {

@@ -35,12 +35,11 @@ func (m *MockUser) EXPECT() *MockUserMockRecorder {
 }
 
 // Delete mocks base method.
-func (m *MockUser) Delete(id int) (models.User, error) {
+func (m *MockUser) Delete(id int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
-	ret0, _ := ret[0].(models.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Delete indicates an expected call of Delete.
@@ -50,10 +49,10 @@ func (mr *MockUserMockRecorder) Delete(id interface{}) *gomock.Call {
 }
 
 // GetAll mocks base method.
-func (m *MockUser) GetAll() ([]models.User, error) {
+func (m *MockUser) GetAll() ([]*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll")
-	ret0, _ := ret[0].([]models.User)
+	ret0, _ := ret[0].([]*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,10 +64,10 @@ func (mr *MockUserMockRecorder) GetAll() *gomock.Call {
 }
 
 // GetById mocks base method.
-func (m *MockUser) GetById(id int) (models.User, error) {
+func (m *MockUser) GetById(id int) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetById", id)
-	ret0, _ := ret[0].(models.User)
+	ret0, _ := ret[0].(*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +79,10 @@ func (mr *MockUserMockRecorder) GetById(id interface{}) *gomock.Call {
 }
 
 // Insert mocks base method.
-func (m *MockUser) Insert(usr models.User) (models.User, error) {
+func (m *MockUser) Insert(usr *models.User) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Insert", usr)
-	ret0, _ := ret[0].(models.User)
+	ret0, _ := ret[0].(*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -95,15 +94,16 @@ func (mr *MockUserMockRecorder) Insert(usr interface{}) *gomock.Call {
 }
 
 // Update mocks base method.
-func (m *MockUser) Update(id int, name string) error {
+func (m *MockUser) Update(user *models.User) (*models.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", id, name)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "Update", user)
+	ret0, _ := ret[0].(*models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockUserMockRecorder) Update(id, name interface{}) *gomock.Call {
+func (mr *MockUserMockRecorder) Update(user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUser)(nil).Update), id, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUser)(nil).Update), user)
 }

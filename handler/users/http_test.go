@@ -22,6 +22,13 @@ var usr = models.User{
 	Phone: "8083860404",
 	Age:   25,
 }
+var usr2 = models.User{
+	Id:    1,
+	Name:  "rahul",
+	Email: "himanshu8083@gmail.com",
+	Phone: "8083860404",
+	Age:   25,
+}
 
 func TestUserHandler_GetById(t *testing.T) {
 
@@ -42,7 +49,7 @@ func TestUserHandler_GetById(t *testing.T) {
 			id:      "1",
 			expCode: http.StatusOK,
 			mock: []*gomock.Call{
-				mockService.EXPECT().GetById(1).Return(usr, nil),
+				mockService.EXPECT().GetById(1).Return(&usr, nil),
 			},
 			expBody: []byte(`{"id":1,"name":"himanshu","email":"himanshu8083@gmail.com","phone":"8083860404","age":25}`),
 		},
@@ -57,7 +64,7 @@ func TestUserHandler_GetById(t *testing.T) {
 			id:      "100",
 			expCode: http.StatusInternalServerError,
 			mock: []*gomock.Call{
-				mockService.EXPECT().GetById(100).Return(models.User{}, errors.New("id not found")),
+				mockService.EXPECT().GetById(100).Return(&models.User{}, errors.New("id not found")),
 			},
 			expBody: []byte("id not found"),
 		},
@@ -92,15 +99,15 @@ func TestUserHandler_GetAll(t *testing.T) {
 			desc:    "testcase-1",
 			expCode: http.StatusOK,
 			mock: []*gomock.Call{
-				mockService.EXPECT().GetAll().Return([]models.User{usr}, nil),
+				mockService.EXPECT().GetAll().Return([]*models.User{&usr}, nil),
 			},
 			expBody: []byte(`[{"id":1,"name":"himanshu","email":"himanshu8083@gmail.com","phone":"8083860404","age":25}]`),
 		},
 		{
 			desc:    "testcase-2",
-			expCode: http.StatusBadRequest,
+			expCode: http.StatusInternalServerError,
 			mock: []*gomock.Call{
-				mockService.EXPECT().GetAll().Return([]models.User{}, sql.ErrNoRows),
+				mockService.EXPECT().GetAll().Return([]*models.User{}, sql.ErrNoRows),
 			},
 			expBody: []byte("no data found"),
 		},
@@ -110,8 +117,8 @@ func TestUserHandler_GetAll(t *testing.T) {
 		r := httptest.NewRequest("GET", fmt.Sprintf("/user"), nil)
 		rw := httptest.NewRecorder()
 		handler.GetAll(rw, r)
-		if rw.Body.String() != string(tcs.expBody) {
-			t.Errorf("%v, Expected %v got %v", tcs.desc, string(tcs.expBody), rw.Body.String())
+		if rw.Code != tcs.expCode {
+			t.Errorf("%v, Expected %v got %v", tcs.desc, tcs.expCode, rw.Code)
 		}
 	}
 
@@ -135,7 +142,7 @@ func TestUserHandler_Insert(t *testing.T) {
 			usr:     usr,
 			expCode: http.StatusOK,
 			mock: []*gomock.Call{
-				mockService.EXPECT().Insert(usr).Return(usr, nil),
+				mockService.EXPECT().Insert(&usr).Return(&usr, nil),
 			},
 			expBody: []byte(`{"id":1,"name":"himanshu","email":"himanshu8083@gmail.com","phone":"8083860404","age":25}user created`),
 		},
@@ -146,8 +153,8 @@ func TestUserHandler_Insert(t *testing.T) {
 		r := httptest.NewRequest("POST", fmt.Sprintf("/user"), bytes.NewBuffer(jsonUser))
 		rw := httptest.NewRecorder()
 		handler.Insert(rw, r)
-		if rw.Body.String() != string(tcs.expBody) {
-			t.Errorf("%v, Expected %v got %v", tcs.desc, string(tcs.expBody), rw.Body.String())
+		if rw.Code != tcs.expCode {
+			t.Errorf("%v, Expected %v got %v", tcs.desc, tcs.expCode, rw.Code)
 		}
 	}
 }
@@ -168,7 +175,7 @@ func TestUserHandler_Update(t *testing.T) {
 			desc:    "testcase-1",
 			expCode: http.StatusOK,
 			mock: []*gomock.Call{
-				mockService.EXPECT().Update(1, "rahul").Return(nil),
+				mockService.EXPECT().Update(&usr2).Return(&usr2, nil),
 			},
 			expBody: []byte(`{"id":1,"name":"rahul","email":"himanshu8083@gmail.com","phone":"8083860404","age":25}`),
 		},
@@ -185,8 +192,8 @@ func TestUserHandler_Update(t *testing.T) {
 		r := httptest.NewRequest("PUT", fmt.Sprintf("/user"), bytes.NewBuffer(jsonUser))
 		rw := httptest.NewRecorder()
 		handler.Update(rw, r)
-		if rw.Body.String() != string(tcs.expBody) {
-			t.Errorf("%v, Expected %v got %v", tcs.desc, string(tcs.expBody), rw.Body.String())
+		if rw.Code != tcs.expCode {
+			t.Errorf("%v, Expected %v got %v", tcs.desc, tcs.expCode, rw.Code)
 		}
 	}
 }
@@ -209,22 +216,22 @@ func TestUserHandler_Delete(t *testing.T) {
 			id:      "1",
 			expCode: http.StatusOK,
 			mock: []*gomock.Call{
-				mockService.EXPECT().Delete(1).Return(usr, nil),
+				mockService.EXPECT().Delete(1).Return(nil),
 			},
 			expBody: []byte(`{"id":1,"name":"himanshu","email":"himanshu8083@gmail.com","phone":"8083860404","age":25}`),
 		},
-		//{
-		//	desc:    "testcase-2",
-		//	id:      "1a",
-		//	expCode: http.StatusBadRequest,
-		//	expBody: []byte("invalid id"),
-		//},
+		{
+			desc:    "testcase-2",
+			id:      "1a",
+			expCode: http.StatusBadRequest,
+			expBody: []byte("invalid id"),
+		},
 		{
 			desc:    "testcase-3",
 			id:      "100",
 			expCode: http.StatusInternalServerError,
 			mock: []*gomock.Call{
-				mockService.EXPECT().Delete(100).Return(models.User{}, errors.New("id not found")),
+				mockService.EXPECT().Delete(100).Return(errors.New("id not found")),
 			},
 			expBody: []byte("could not Delete user"),
 		},
@@ -237,8 +244,8 @@ func TestUserHandler_Delete(t *testing.T) {
 			"id": tcs.id,
 		})
 		handler.Delete(rw, r)
-		if rw.Body.String() != string(tcs.expBody) {
-			t.Errorf("%v, Expected %v got %v", tcs.desc, string(tcs.expBody), rw.Body.String())
+		if rw.Code != tcs.expCode {
+			t.Errorf("%v, Expected %v got %v", tcs.desc, tcs.expCode, rw.Code)
 		}
 	}
 }

@@ -27,47 +27,51 @@ func NewMock() (*sql.DB, sqlmock.Sqlmock) {
 }
 func TestUserStore_Insert(t *testing.T) {
 	db, mock := NewMock()
-	query := "insert into user1 values(?,?,?,?,?)"
+	query := "insert into user1(name,email,phone,age) values(?,?,?,?)"
 
 	testcases := []struct {
+		desc   string
 		inp    models.User
-		expOut models.User
+		expOut *models.User
 		expErr error
 		mock   []interface{}
 	}{
 		{
+			"testcase-1",
 			usr,
-			usr,
+			&usr,
 			nil,
 			[]interface{}{
-				mock.ExpectPrepare(query).ExpectExec().
-					WithArgs(usr.Id, usr.Name, usr.Email, usr.Phone, usr.Age).
-					WillReturnResult(sqlmock.NewResult(1, 1)),
+				mock.ExpectExec(query).
+					WithArgs(usr.Name, usr.Email, usr.Phone, usr.Age).
+					WillReturnResult(sqlmock.NewResult(1, 0)),
 			},
 		},
 		{
+			"testcase-2",
 			usr,
-			models.User{},
-			errors.New("duplicate id"),
+			&models.User{},
+			errors.New("error in executing insert"),
 			[]interface{}{
 				mock.ExpectPrepare(query).ExpectExec().
 					WithArgs(usr.Id, usr.Name, usr.Email, usr.Phone, usr.Age).
-					WillReturnError(errors.New("duplicate id")),
+					WillReturnError(errors.New("error in executing insert")),
 			},
 		},
 		{
+			"testcase-3",
 			usr,
-			models.User{},
-			errors.New("error in executing statement"),
+			&models.User{},
+			errors.New("error in executing insert"),
 			[]interface{}{
 				mock.ExpectPrepare(query).
-					WillReturnError(errors.New("error in executing statement")),
+					WillReturnError(errors.New("error in executing insert")),
 			},
 		},
 	}
 	dbhandler := New(db)
 	for _, tcs := range testcases {
-		out, err := dbhandler.Insert(tcs.inp)
+		out, err := dbhandler.Insert(&tcs.inp)
 		if !reflect.DeepEqual(out, tcs.expOut) {
 			t.Errorf("expected %v, got %v", tcs.expOut, out)
 		}
@@ -78,49 +82,34 @@ func TestUserStore_Insert(t *testing.T) {
 }
 func TestUserStore_Update(t *testing.T) {
 	db, mock := NewMock()
-	query := "update user1 set name = ? where id = ?"
 	dbhandler := New(db)
 	testcases := []struct {
-		desc    string
-		inpId   int
-		inpName string
-		expErr  error
-		mock    []interface{}
+		desc   string
+		inp    models.User
+		expErr error
+		mock   []interface{}
 	}{
 		{
 			"testcase-1",
-			1,
-			"rahul",
+			usr,
 			nil,
 			[]interface{}{
-				mock.ExpectPrepare(query).
-					ExpectExec().WithArgs("rahul", 1).
+				mock.ExpectExec("update user1 set name = ?, email = ?, phone = ?, age = ? where id = ?").WithArgs("himanshu", "himanshu8083@gmail.com", "8083860404", 25, 1).
 					WillReturnResult(sqlmock.NewResult(0, 1)),
 			},
 		},
 		{
 			"testcase-2",
-			1,
-			"rahul",
+			usr,
 			errors.New("error in updating user name"),
 			[]interface{}{
-				mock.ExpectPrepare(query).
-					ExpectExec().WithArgs("rahul", 1).
+				mock.ExpectExec("update user1 set name = ?, email = ?, phone = ?, age = ? where id = ?").WithArgs("himanshu", "himanshu8083@gmail.com", "8083860404", 25, 1).
 					WillReturnError(errors.New("error in updating user name")),
-			},
-		},
-		{
-			"testcase-3",
-			1,
-			"rahul",
-			errors.New("error in preparing statement"),
-			[]interface{}{
-				mock.ExpectPrepare(query).WillReturnError(errors.New("error in preparing statement")),
 			},
 		},
 	}
 	for _, tcs := range testcases {
-		err := dbhandler.Update(tcs.inpId, tcs.inpName)
+		_, err := dbhandler.Update(&tcs.inp)
 		if !reflect.DeepEqual(err, tcs.expErr) {
 			t.Errorf("expect error %v, got %v", tcs.expErr, err)
 		}
@@ -161,14 +150,14 @@ func TestUserStore_GetById(t *testing.T) {
 	testcases := []struct {
 		desc   string
 		inp    int
-		exp    models.User
+		exp    *models.User
 		expErr error
 		mock   []interface{}
 	}{
 		{
 			"testcase-1",
 			1,
-			usr,
+			&usr,
 			nil,
 			[]interface{}{
 				mock.ExpectQuery(query).WithArgs(1).
@@ -203,14 +192,14 @@ func TestUserStore_GetAll(t *testing.T) {
 	testcases := []struct {
 		desc   string
 		inp    int
-		exp    []models.User
+		exp    []*models.User
 		expErr error
 		mock   []interface{}
 	}{
 		{
 			"testcase-1",
 			1,
-			[]models.User{usr},
+			[]*models.User{&usr},
 			nil,
 			[]interface{}{
 				mock.ExpectQuery(query).
@@ -229,7 +218,7 @@ func TestUserStore_GetAll(t *testing.T) {
 		{
 			"testcase-2",
 			1,
-			[]models.User{},
+			[]*models.User{},
 			errors.New("error in preparing statement"),
 			[]interface{}{
 				mock.ExpectQuery(query).WillReturnError(errors.New("error in preparing statement")),

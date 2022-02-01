@@ -2,7 +2,6 @@ package users
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
@@ -42,70 +41,97 @@ func (uh *UserHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
 func (uh *UserHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	var response models.Response
+	response.Data = nil
 	users, err := uh.Usev.GetAll()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("no data found"))
+		response.StatusCode = http.StatusInternalServerError
+		response.Message = "no data found"
+		b, _ := json.Marshal(response)
+		w.WriteHeader(response.StatusCode)
+		w.Write(b)
 		return
 	}
-	b, _ := json.Marshal(users)
+	response.Data = users
+	response.Message = "all users fetched"
+	response.StatusCode = http.StatusOK
+	b, _ := json.Marshal(response)
 	w.Write(b)
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(response.StatusCode)
 }
 
 func (uh *UserHandler) Insert(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	body, _ := ioutil.ReadAll(r.Body)
 	var usr models.User
+	var response models.Response
 	err := json.Unmarshal(body, &usr)
 
 	if err != nil {
-		fmt.Println(err)
-		_, _ = w.Write([]byte("invalid body"))
-		w.WriteHeader(http.StatusBadRequest)
+		response.StatusCode = http.StatusBadRequest
+		response.Message = "invalid body"
+		response.Data = nil
+		b, _ := json.Marshal(response)
+		_, _ = w.Write(b)
+		w.WriteHeader(response.StatusCode)
 		return
 	}
-	usr, err = uh.Usev.Insert(usr)
-
+	user, err := uh.Usev.Insert(&usr)
 	if err != nil {
-		_, _ = w.Write([]byte("could not create user"))
-		w.WriteHeader(http.StatusInternalServerError)
+		response.StatusCode = http.StatusInternalServerError
+		response.Message = err.Error()
+		response.Data = nil
+		b, _ := json.Marshal(response)
+		_, _ = w.Write(b)
+		w.WriteHeader(response.StatusCode)
 		return
-
 	}
-	b, _ := json.Marshal(usr)
+	response.StatusCode = http.StatusOK
+	response.Message = "user created"
+	response.Data = user
+	b, _ := json.Marshal(response)
 	w.WriteHeader(http.StatusOK)
 	w.Write(b)
-	w.Write([]byte("user created"))
 }
 
 func (uh *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	var response models.Response
 	body, _ := ioutil.ReadAll(r.Body)
 	var usr models.User
 	err := json.Unmarshal(body, &usr)
 
 	if err != nil {
-		fmt.Println(err)
-		_, _ = w.Write([]byte("invalid body"))
-		w.WriteHeader(http.StatusBadRequest)
+		response.StatusCode = http.StatusBadRequest
+		response.Message = "invalid body"
+		response.Data = nil
+		b, _ := json.Marshal(response)
+		_, _ = w.Write(b)
+		w.WriteHeader(response.StatusCode)
 		return
 	}
-	err = uh.Usev.Update(usr.Id, usr.Name)
+	user, err := uh.Usev.Update(&usr)
 
 	if err != nil {
-		_, _ = w.Write([]byte("could not update user"))
-		w.WriteHeader(http.StatusInternalServerError)
-
+		response.StatusCode = http.StatusInternalServerError
+		response.Message = "could not update user"
+		response.Data = nil
+		b, _ := json.Marshal(response)
+		_, _ = w.Write(b)
+		w.WriteHeader(response.StatusCode)
 		return
-
 	}
-	b, _ := json.Marshal(usr)
+	response.StatusCode = http.StatusOK
+	response.Message = "user updated"
+	response.Data = user
+	b, _ := json.Marshal(response)
+	w.WriteHeader(http.StatusOK)
 	w.Write(b)
 }
 
 func (uh *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	var response models.Response
 	params := mux.Vars(r)
 
 	v := params["id"]
@@ -113,17 +139,29 @@ func (uh *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(v)
 
 	if err != nil {
-		_, _ = w.Write([]byte("invalid user id"))
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
+		response.StatusCode = http.StatusBadRequest
+		response.Message = "invalid id"
+		response.Data = nil
+		b, _ := json.Marshal(response)
+		_, _ = w.Write(b)
 		return
 	}
-	usr, err := uh.Usev.Delete(id)
+	err = uh.Usev.Delete(id)
 
 	if err != nil {
-		_, _ = w.Write([]byte("could not Delete user"))
 		w.WriteHeader(http.StatusInternalServerError)
+		response.StatusCode = http.StatusInternalServerError
+		response.Message = err.Error()
+		response.Data = nil
+		b, _ := json.Marshal(response)
+		_, _ = w.Write(b)
 		return
 	}
-	b, _ := json.Marshal(usr)
-	w.Write(b)
+	response.StatusCode = http.StatusOK
+	response.Message = "user deleted"
+	response.Data = nil
+	b, _ := json.Marshal(response)
+	_, _ = w.Write(b)
+	w.WriteHeader(response.StatusCode)
 }

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	handler "user-crud/handler/users"
+	"user-crud/middlewares"
 	service "user-crud/services/users"
 	store "user-crud/stores/users"
 )
@@ -23,7 +24,7 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/user", handler.Insert).Methods(http.MethodPost)
+	r.HandleFunc("/user", middlewares.Authentication(http.HandlerFunc(handler.Insert))).Methods(http.MethodPost)
 	r.HandleFunc("/user/{id}", handler.Update).Methods(http.MethodPut)
 	r.HandleFunc("/user/{id}", handler.Delete).Methods(http.MethodDelete)
 	r.HandleFunc("/user/{id}", handler.GetById).Methods(http.MethodGet)
