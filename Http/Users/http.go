@@ -43,8 +43,8 @@ func (srvhdlr Handler) UserById(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	UserWithId, err := srvhdlr.Sev.UserById(iid)
-	if err != nil {
+	UserWithId, er := srvhdlr.Sev.UserById(iid)
+	if er != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		herr := TModels.ErrorResponse{StCode: http.StatusBadRequest, Errmessage: er.Error()}
 		res, er := json.Marshal(herr)
@@ -192,8 +192,8 @@ func (srvhdlr Handler) DeleteUserById(w http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	_, err := srvhdlr.Sev.DeleteUserById(iid)
-	if err != nil {
+	_, er = srvhdlr.Sev.DeleteUserById(iid)
+	if er != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		herr := TModels.ErrorResponse{StCode: http.StatusBadRequest, Errmessage: er.Error()}
 		res, er := json.Marshal(herr)
@@ -309,8 +309,8 @@ func (srvhdlr Handler) UpdateUserById(w http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	updatedUser, err := srvhdlr.Sev.UpdateUserById(u, iid)
-	if err != nil {
+	updatedUser, er := srvhdlr.Sev.UpdateUserById(u, iid)
+	if er != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		herr := TModels.ErrorResponse{StCode: http.StatusBadRequest, Errmessage: er.Error()}
 		res, er := json.Marshal(herr)
