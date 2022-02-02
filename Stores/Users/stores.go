@@ -115,8 +115,11 @@ func (s *dbStore) UpdateUserById(u TModels.User, id int) (int, error) {
 	// sq := "Update HUser set  name = ?,email = ?,phone = ?,age = ? where id =?"
 	sq := "Update HUser "
 	fields, args := formUpdateQuery(id, u)
+
+	subQuery := fields[:len(fields)-1]
+
 	if fields != "" {
-		sq += "set " + fields + "where id = ?"
+		sq += "set " + subQuery + " where id = ?"
 		// res, err := s.db.Exec(sq, u.Name, u.Email, u.Phone, u.Age, id)
 		res, err := s.db.Exec(sq, args...)
 		if err != nil {
