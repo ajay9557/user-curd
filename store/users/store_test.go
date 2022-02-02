@@ -43,7 +43,7 @@ func TestGetUserById(t *testing.T) {
 		{
 			desc:      "Case 2: failure case",
 			id:        4,
-			expected:  &models.User{},
+			expected:  nil,
 			mockQuery: mock.ExpectQuery(query).WithArgs(4).WillReturnError(errors.New("error fetching while get users by id, invalid id")),
 		},
 	}
@@ -103,7 +103,7 @@ func TestGetUsers(t *testing.T) {
 		},
 		{
 			desc:      "Case 2: Failure Case",
-			expected:  []models.User{},
+			expected:  nil,
 			mockQuery: mock.ExpectQuery(query).WillReturnError(errors.New("cannot fetch users")),
 		},
 	}

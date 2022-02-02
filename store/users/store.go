@@ -26,7 +26,7 @@ func (u *dbStore) GetUserById(id int) (*models.User, error) {
 	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
 
 	if err != nil {
-		return &models.User{}, errors.New("cannot fetch user details, invalid id")
+		return nil, errors.New("cannot fetch user details, invalid id")
 	}
 
 	return &user, nil

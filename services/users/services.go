@@ -2,7 +2,6 @@ package users
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/tejas/user-crud/models"
 	"github.com/tejas/user-crud/services"
@@ -36,7 +35,7 @@ func (st *User) GetUserById(id int) (*models.User, error) {
 func (st *User) GetUsers() ([]*models.User, error) {
 	users, err := st.u.GetUsers()
 	if err != nil {
-		return []*models.User{}, errors.New("cannot fetch users")
+		return nil, errors.New("cannot fetch users")
 	}
 
 	return users, nil
@@ -56,13 +55,10 @@ func (st *User) UpdateUser(user models.User) error {
 		return errors.New("invalid phone number")
 	}
 
-	// calling GetUserById function of store layer with id as parameter
-	//checking user email is empty or not before updating the user data, because email is a not null field.
-
 	u1, _ := st.u.GetUserById(user.Id)
 
-	if u1.Email != "" {
-		fmt.Println("user not exists")
+	if u1 == nil {
+		return errors.New("user not exits")
 	}
 
 	users := st.u.UpdateUser(user)
@@ -97,13 +93,11 @@ func (st *User) DeleteUser(id int) error {
 
 	var user models.User
 
-	// calling GetUserById function of store layer with id as parameter
-	//checking user email is empty or not before deleting the user, because email is a not null field.
 
 	u1, _ := st.u.GetUserById(user.Id)
 
-	if u1.Email != "" {
-		fmt.Println("user not exists")
+	if u1 == nil {
+		return errors.New("user not exits")
 	}
 
 	deleteuser := st.u.DeleteUser(id)
