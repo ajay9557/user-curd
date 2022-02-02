@@ -135,25 +135,40 @@ func TestInsertUser(t *testing.T) {
 
 	testUser := TModels.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
 
+	returnUser := TModels.User{
+		Id:    1,
+		Name:  "Ridhdhish",
+		Email: "ridhdhish@gmail.com",
+		Phone: "8320578360",
+		Age:   21,
+	}
+
 	tests := []struct {
-		desc     string
-		user     TModels.User
-		expected int
-		mockCall []*gomock.Call
+		desc string
+		user TModels.User
+		// expected int
+		expectedUser  TModels.User
+		expectedError error
+		mockCall      []*gomock.Call
 	}{
 		{
-			desc:     "Case1",
-			user:     testUser,
-			expected: 1,
+			desc: "Case1",
+			user: testUser,
+			// expected: 1,
+			expectedUser:  returnUser,
+			expectedError: nil,
 			mockCall: []*gomock.Call{
 				mockUserStore.EXPECT().InsertUser(testUser).Return(1, nil),
 				mockUserStore.EXPECT().GetEmail("ridhdhish@gmail.com").Return(false, nil),
+				mockUserStore.EXPECT().UserById(1).Return(returnUser, nil),
 			},
 		},
 		{
-			desc:     "Case2",
-			user:     testUser,
-			expected: 0,
+			desc: "Case2",
+			user: testUser,
+			// expected: 0,
+			expectedUser:  TModels.User{},
+			expectedError: errors.New("Email id is already in exist"),
 			mockCall: []*gomock.Call{
 				mockUserStore.EXPECT().GetEmail("ridhdhish@gmail.com").Return(true, nil),
 			},
@@ -168,10 +183,14 @@ func TestInsertUser(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			lastInsertedId, _ := testUserService.InsertUser(test.user)
+			// lastInsertedId, _ := testUserService.InsertUser(test.user)
+			user, err := testUserService.InsertUser(test.user)
 
-			if lastInsertedId != test.expected {
-				t.Errorf("Expected: %v, Got: %v", test.expected, lastInsertedId)
+			// if lastInsertedId != test.expected {
+			// 	t.Errorf("Expected: %v, Got: %v", test.expected, lastInsertedId)
+			// }
+			if test.expectedError != nil && errors.Is(err, test.expectedError) && !reflect.DeepEqual(user, test.expectedUser) {
+				t.Errorf("Expected: %v, Got: %v", test.expectedUser, user)
 			}
 		})
 	}
@@ -185,33 +204,61 @@ func TestUpdateUserById(t *testing.T) {
 	testUserService := New(mockUserStore)
 
 	testUser := TModels.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
+	expectedUser := TModels.User{
+		Id:    1,
+		Name:  "Ridhdhish",
+		Email: "ridhdhish@gmail.com",
+		Phone: "8320578360",
+		Age:   21,
+	}
+
+	updatedUser := TModels.User{
+		Id:    1,
+		Name:  "Ridhdhish",
+		Email: "ridhdhish@gmail.com",
+		Phone: "8320578360",
+		Age:   22,
+	}
 
 	tests := []struct {
-		desc     string
-		id       int
-		expected int
-		mockCall *gomock.Call
+		desc string
+		id   int
+		// expected int
+		expectedUser  TModels.User
+		expectedError error
+		mockCall      []*gomock.Call
 	}{
 		{
-			desc:     "Case1",
-			id:       1,
-			expected: 1,
-			mockCall: mockUserStore.EXPECT().UpdateUserById(testUser, 1).Return(1, nil),
+			desc: "Case1",
+			id:   1,
+			// expected: 1,
+			expectedUser: updatedUser,
+			mockCall: []*gomock.Call{
+				mockUserStore.EXPECT().UserById(1).Return(expectedUser, nil),
+				mockUserStore.EXPECT().UpdateUserById(testUser, 1).Return(1, nil),
+				mockUserStore.EXPECT().UserById(1).Return(updatedUser, nil),
+			},
 		},
 		{
-			desc:     "Case2",
-			id:       2,
-			expected: 0,
-			mockCall: mockUserStore.EXPECT().UpdateUserById(testUser, 2).Return(0, errors.New("Invalid id")),
+			desc: "Case2",
+			id:   -1,
+			// expected: 0,
+			expectedUser:  TModels.User{},
+			expectedError: errors.New("User id should be greater than 0"),
+			mockCall:      nil,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			lastInsertedId, _ := testUserService.UpdateUserById(testUser, test.id)
+			// lastInsertedId, _ := testUserService.UpdateUserById(testUser, test.id)
 
-			if lastInsertedId != test.expected {
-				t.Errorf("Expected: %v, Got: %v", test.expected, lastInsertedId)
+			// if lastInsertedId != test.expected {
+			// 	t.Errorf("Expected: %v, Got: %v", test.expected, lastInsertedId)
+			// }
+			user, err := testUserService.UpdateUserById(testUser, test.id)
+			if err != nil && err.Error() != test.expectedError.Error() && !reflect.DeepEqual(user, test.expectedUser) {
+				t.Errorf("expectedUser: %v, Got: %v", test.expectedUser, user)
 			}
 		})
 	}

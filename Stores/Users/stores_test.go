@@ -224,7 +224,7 @@ func TestUpdateUser(t *testing.T) {
 			},
 			expectedError: nil,
 			mockCall: []*sqlmock.ExpectedExec{
-				mock.ExpectExec("Update HUser set name = ?,email = ?,phone = ?,age = ?,where id = ?").WithArgs("Ridhdhish", "rid@gmail.com", "8320578360", 21, 1).WillReturnResult(sqlmock.NewResult(1, 1)),
+				mock.ExpectExec("Update HUser set name = ?,email = ?,phone = ?,age = ? where id = ?").WithArgs("Ridhdhish", "rid@gmail.com", "8320578360", 21, 1).WillReturnResult(sqlmock.NewResult(1, 1)),
 			},
 		},
 		// {
@@ -245,7 +245,7 @@ func TestUpdateUser(t *testing.T) {
 		t.Run(test.desc, func(t *testing.T) {
 			_, err := userStore.UpdateUserById(test.user, test.id)
 
-			if test.expectedError != nil && errors.Is(err, test.expectedError) {
+			if !errors.Is(err, test.expectedError) {
 				t.Errorf("Expected: %d, Got: %d", test.expectedError, err)
 			}
 		})

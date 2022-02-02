@@ -14,7 +14,7 @@ type Response struct {
 	StatusCode int         `json:"statusCode"`
 }
 
-type RetErr struct {
+type ErrorResponse struct {
 	StCode     int    `json:"st_code"`
 	Errmessage string `json:"errmessage"`
 }

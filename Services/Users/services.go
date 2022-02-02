@@ -5,6 +5,7 @@ import (
 	"Icrud/Stores"
 	"Icrud/TModels"
 	"errors"
+	"reflect"
 
 	"fmt"
 )
@@ -42,18 +43,33 @@ func (su *ServUser) GetUsers() ([]TModels.User, error) {
 
 }
 
-func (su *ServUser) InsertUser(users TModels.User) (int, error) {
-	var iid int
+func (su *ServUser) InsertUser(users TModels.User) (TModels.User, error) {
+	// var iid int
+	var uuser TModels.User
+	if reflect.DeepEqual(users, TModels.User{}) {
+		return uuser, errors.New("Need an non-empty user data")
+	}
+	validEmail := validateEmail(users.Email)
+	if !validEmail {
+		return uuser, errors.New("Invalid EMail")
+	}
+
+	validPhone := validatePhone(users.Phone)
+	if !validPhone {
+		return uuser, errors.New("Invalid Phone")
+	}
 	isEmailExist, _ := su.isu.GetEmail(users.Email)
 	if isEmailExist {
-		return iid, errors.New("email id is already in use")
+		return uuser, errors.New("email id is already in use")
 	}
-	res, err := su.isu.InsertUser(users)
+	newId, err := su.isu.InsertUser(users)
 	if err != nil {
-		return iid, err
+		return uuser, err
 	}
-	iid = res
-	return iid, nil
+	// iid = res
+	// return iid, nil
+	updatedUser, _ := su.isu.UserById(newId)
+	return updatedUser, nil
 }
 
 func (su *ServUser) DeleteUserById(id int) (int, error) {
@@ -66,16 +82,27 @@ func (su *ServUser) DeleteUserById(id int) (int, error) {
 	return iid, nil
 }
 
-func (su *ServUser) UpdateUserById(u TModels.User, id int) (int, error) {
-	// var u TModels.User
-	var iid int
-	res, err := su.isu.UpdateUserById(u, id)
-	if err != nil {
-		fmt.Println(err)
-		return iid, err
+func (su *ServUser) UpdateUserById(u TModels.User, id int) (TModels.User, error) {
+	var uu TModels.User
+	// var iid int
+
+	if id < 0 {
+		return uu, errors.New("User id should be greater than 0")
 	}
-	iid = res
-	return iid, nil
+	_, err := su.isu.UserById(id)
+	if err != nil {
+		return uu, err
+	}
+	_, err = su.isu.UpdateUserById(u, id)
+	if err != nil {
+		// fmt.Println(err)
+		return uu, err
+	}
+	// iid = res
+	// return iid, nil
+	updatedUser, _ := su.isu.UserById(id)
+	return updatedUser, nil
+
 }
 
 // func (su *ServUser) EmailValidation(email string) (bool, error) {
