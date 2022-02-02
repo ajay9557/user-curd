@@ -35,6 +35,32 @@ func (ud User_Details) InsertUserDetails(user model.User) (model.User, error) {
 	newUser.Age = user.Age
 	newUser.Name = user.Name
 
+	checkEmail := true
+	Idcheck := CheckId(user.Id)
+	if Idcheck {
+		ok := emailvalidation(user.Email)
+		if ok {
+			res, err := ud.u.GetAll()
+			if err != nil {
+				checkEmail = false
+			}
+			for _, k := range res {
+				if k.Email == user.Email {
+					checkEmail = false
+				}
+			}
+			if checkEmail {
+				err := ud.u.InsertDetails(user)
+				if err != nil {
+					return newUser, errors.New("t")
+				}
+			}
+		} else {
+			return newUser, errors.New("invalid email")
+		}
+	} else {
+		return newUser, errors.New("invalid id")
+	}
 	return newUser, nil
 }
 
@@ -59,18 +85,44 @@ func (ud User_Details) IsEmailValid(e string) bool {
 }
 
 func (ud User_Details) DeleteByUserId(i int) error {
-	err := ud.u.DeleteById(i)
-	if err != nil {
-		return err
+	idcheck := CheckId(i)
+	if idcheck {
+		err := ud.u.DeleteById(i)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
-	return nil
+	return errors.New("Id is not valid")
 }
 
 func (ud User_Details) UpdateByUserId(user model.User) error {
-	err := ud.u.UpdateById(user)
-	if err != nil {
-		fmt.Println(err)
-		return errors.New("t")
+	checkEmail := true
+	Idcheck := CheckId(user.Id)
+	if Idcheck {
+		ok := emailvalidation(user.Email)
+		if ok {
+			res, err := ud.u.GetAll()
+			if err != nil {
+				checkEmail = false
+			}
+			for _, k := range res {
+				if k.Email == user.Email {
+					checkEmail = false
+				}
+			}
+			if checkEmail {
+				err := ud.u.UpdateById(user)
+				if err != nil {
+					fmt.Println(err)
+					return errors.New("t")
+				}
+			}
+		} else {
+			return errors.New("invalid email")
+		}
+	} else {
+		return errors.New("invalid id")
 	}
 	return nil
 }

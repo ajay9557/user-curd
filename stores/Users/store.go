@@ -17,11 +17,10 @@ func New(db *sql.DB) *dbStore {
 
 func (s *dbStore) InsertDetails(user model.User) error {
 	fmt.Println(user.Email)
-	res, err := s.db.Exec("INSERT INTO User VALUES (?,?,?,?,?)", user.Id, user.Name, user.Email, user.Phone, user.Age)
+	_, err := s.db.Exec("INSERT INTO User VALUES (?,?,?,?)", user.Name, user.Email, user.Phone, user.Age)
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
-	fmt.Println(res)
 
 	return nil
 }
@@ -35,7 +34,7 @@ func (s *dbStore) GetById(Id int) (model.User, error) {
 		if err == sql.ErrNoRows {
 			return user, fmt.Errorf("no records found")
 		}
-		fmt.Print(user)
+
 		return user, fmt.Errorf("userById:%d: %v", Id, err)
 
 	}
@@ -54,7 +53,7 @@ func (s *dbStore) GetAll() ([]model.User, error) {
 		var user model.User
 		err = results.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
 		if err != nil {
-			return []model.User{}, errors.New("t")
+			return []model.User{}, errors.New("user details not found")
 		}
 		users = append(users, user)
 	}

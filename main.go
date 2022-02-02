@@ -6,8 +6,8 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	hl "user-curd/Http/Users"
-	sl "user-curd/Service/Users"
+	httplayer "user-curd/Http/Users"
+	servicelayer "user-curd/Service/Users"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -21,9 +21,9 @@ func main() {
 		return
 	}
 	defer db.Close()
-	st := Users.New(db)
-	s := sl.New(st)
-	ht := hl.Handler{s}
+	store:= Users.New(db)
+	service := servicelayer.New(store)
+	ht := httplayer.Handler{service}
 
 	fmt.Print("Server Starting....")
 	m := mux.NewRouter().StrictSlash(true)

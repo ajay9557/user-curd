@@ -11,3 +11,9 @@ func emailvalidation(e string) bool {
 	return emailRegex.MatchString(e)
 
 }
+func CheckId(id int) bool {
+	if id <= 0 {
+		return false
+	}
+	return true
+}
