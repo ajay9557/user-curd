@@ -1,6 +1,9 @@
 package users
 
-import "regexp"
+import (
+	"regexp"
+
+)
 
 func ValidId(id int) bool {
 	if id < 0 {
@@ -20,3 +23,4 @@ func ValidPhone(phone string) bool {
 
 	return phoneRegex.MatchString(phone) && len(phone) == 10
 }
+

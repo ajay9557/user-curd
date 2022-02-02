@@ -2,13 +2,13 @@ package users
 
 import "github.com/tejas/user-crud/models"
 
-func preCheck(user models.User) (string, []interface{}){
+func preCheck(user models.User) (string, []interface{}) {
 
 	var query string
 	var values []interface{}
 
 	if user.Id < 0 {
-		return "",nil
+		return "", nil
 	}
 
 	if user.Name != "" {
@@ -26,7 +26,7 @@ func preCheck(user models.User) (string, []interface{}){
 		values = append(values, user.Phone)
 	}
 
-	if  user.Age != 0 {
+	if user.Age != 0 {
 		query += " age = ?,"
 		values = append(values, user.Age)
 	}

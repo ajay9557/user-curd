@@ -233,7 +233,7 @@ func TestUpdateUser(t *testing.T) {
 			}
 			err := store.UpdateUser(tc.input)
 			if !reflect.DeepEqual(err, tc.expectedErr) {
-				t.Errorf("Expected: %v, Got: %v, ",tc.expectedErr, err)
+				t.Errorf("Expected: %v, Got: %v, ", tc.expectedErr, err)
 			}
 		})
 	}
@@ -276,7 +276,7 @@ func TestDeleteUser(t *testing.T) {
 		t.Run("testing "+tc.desc, func(t *testing.T) {
 			err := store.DeleteUser(tc.id)
 			if !reflect.DeepEqual(err, tc.expectedErr) {
-				t.Errorf("Expected: %v, Got: %v, ",tc.expectedErr, err)
+				t.Errorf("Expected: %v, Got: %v, ", tc.expectedErr, err)
 			}
 		})
 	}

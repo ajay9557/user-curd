@@ -44,7 +44,11 @@ func (u *dbStore) GetUsers() ([]*models.User, error) {
 
 	for rows.Next() {
 		var u models.User
-		_ = rows.Scan(&u.Id, &u.Name, &u.Email, &u.Phone, &u.Age)
+		err = rows.Scan(&u.Id, &u.Name, &u.Email, &u.Phone, &u.Age)
+
+		if err != nil {
+			return nil, errors.New("error")
+		}
 
 		users = append(users, &u)
 	}
