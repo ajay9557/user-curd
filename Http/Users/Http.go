@@ -2,36 +2,42 @@ package Users
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	service "user-curd/Service"
 	"user-curd/model"
+	service "user-curd/services"
 
 	"github.com/gorilla/mux"
 )
 
 type Handler struct {
-	S service.Service
+	S service.User
 }
 
 func (serv Handler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	v := params["id"]
-	id, _ := strconv.Atoi(v)
-	fmt.Println(id)
-	userdata, err := serv.S.SearchByUserId(id)
-	fmt.Println(userdata)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-	}
-	res, err := json.Marshal(userdata)
-	if err == nil {
-		w.Write(res)
-	}
 
+	v := params["id"]
+
+	id, err := strconv.Atoi(v)
+
+	if err != nil {
+		w.Write([]byte("invalid id"))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	usr, err := serv.S.SearchByUserId(id)
+
+	if err != nil {
+		w.Write([]byte("id not found"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	b, _ := json.Marshal(usr)
+	w.Write(b)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (serv Handler) Create(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +49,7 @@ func (serv Handler) Create(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	usr, err := serv.S.InsertUserDetails(users)
+	usr, err := serv.S.InsertUserDetails(&users)
 	res, _ := json.Marshal(usr)
 	if err != nil {
 		_, _ = w.Write([]byte("could not create User"))
@@ -56,37 +62,74 @@ func (serv Handler) Create(w http.ResponseWriter, r *http.Request) {
 
 func (serv Handler) DeleteId(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	var response model.Response
 	params := mux.Vars(r)
-	v := params["id"]
-	id, err := strconv.Atoi(v)
-	if err != nil {
 
+	v := params["id"]
+
+	id, err := strconv.Atoi(v)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		response.StatusCode = http.StatusBadRequest
+		response.Message = "invalid id"
+		response.Data = nil
+		b, _ := json.Marshal(response)
+		_, _ = w.Write(b)
+		return
 	}
 	err = serv.S.DeleteByUserId(id)
-	fmt.Println(err)
-	w.Write([]byte("Deleted User Successfully!!"))
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response.StatusCode = http.StatusInternalServerError
+		response.Message = err.Error()
+		response.Data = nil
+		b, _ := json.Marshal(response)
+		_, _ = w.Write(b)
+		return
+	}
+	response.StatusCode = http.StatusOK
+	response.Message = "user deleted"
+	response.Data = nil
+	b, _ := json.Marshal(response)
+	_, _ = w.Write(b)
+	w.WriteHeader(response.StatusCode)
 
 }
 func (serv Handler) UpdateUser(rw http.ResponseWriter, r *http.Request) {
-	var user model.User
-	resBody, _ := ioutil.ReadAll(r.Body)
-	err := json.Unmarshal(resBody, &user)
-	if err != nil {
+	rw.Header().Set("Content-Type", "application/json")
+	var response model.Response
+	body, _ := ioutil.ReadAll(r.Body)
+	var usr model.User
+	err := json.Unmarshal(body, &usr)
 
-		_, _ = rw.Write([]byte("invalid body"))
-		rw.WriteHeader(http.StatusBadRequest)
+	if err != nil {
+		response.StatusCode = http.StatusBadRequest
+		response.Message = "invalid body"
+		response.Data = nil
+		b, _ := json.Marshal(response)
+		_, _ = rw.Write(b)
+		rw.WriteHeader(response.StatusCode)
 		return
 	}
-	err = serv.S.UpdateByUserId(user)
-	if err != nil {
+	user, err := serv.S.UpdateByUserId(&usr)
 
-		_, _ = rw.Write([]byte("Database error"))
-		rw.WriteHeader(http.StatusInternalServerError)
+	if err != nil {
+		response.StatusCode = http.StatusInternalServerError
+		response.Message = "could not update user"
+		response.Data = nil
+		b, _ := json.Marshal(response)
+		_, _ = rw.Write(b)
+		rw.WriteHeader(response.StatusCode)
 		return
 	}
-	fmt.Println(user)
+	response.StatusCode = http.StatusOK
+	response.Message = "user updated"
+	response.Data = user
+	b, _ := json.Marshal(response)
 	rw.WriteHeader(http.StatusOK)
-	rw.Write([]byte("User updated"))
+	rw.Write(b)
 }
 
 func (serv Handler) GetAll(w http.ResponseWriter, r *http.Request) {

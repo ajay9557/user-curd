@@ -7,236 +7,229 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
-	service "user-curd/Service"
 	"user-curd/model"
+	"user-curd/services"
 
 	gomock "github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 )
 
-var user = []model.User{
-	{
-		Id:    1,
-		Name:  "Nayani",
-		Email: "Sai@gmail.com",
-		Phone: "9908577405",
-		Age:   "22",
-	},
-	{
-		Id:    2,
-		Name:  "Sai",
-		Email: "Nayani@gmail.com",
-		Phone: "9908577405",
-		Age:   "24",
-	},
+var user = model.User{
+	Id:    1,
+	Name:  "sai",
+	Email: "Nayani@gmail.com",
+	Phone: "6303880131",
+	Age:   "25",
 }
 
 func TestHandler_Search(t *testing.T) {
-	tcs := []struct {
-		Id       string
-		expected model.User
-		stCode   int
-		err      error
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockService := services.NewMockUser(ctrl)
+	handler := Handler{mockService}
+
+	testCases := []struct {
+		desc    string
+		id      string
+		mock    []*gomock.Call
+		expCode int
+		expBody []byte
 	}{
-		{"1", user[0], http.StatusOK, nil},
-		{"2", user[1], http.StatusOK, nil},
+		{
+			desc:    "testcase-1",
+			id:      "1",
+			expCode: http.StatusOK,
+			mock: []*gomock.Call{
+				mockService.EXPECT().SearchByUserId(1).Return(&user, nil),
+			},
+			expBody: []byte(`{"id":1,"name":"sai","email":"Nayani@gmail.com","phone":"6303880131","age":"25"}`),
+		},
+		{
+			desc:    "testcase-2",
+			id:      "1a",
+			expCode: http.StatusBadRequest,
+			expBody: []byte("invalid id"),
+		},
+		{
+			desc:    "testcase-3",
+			id:      "100",
+			expCode: http.StatusInternalServerError,
+			mock: []*gomock.Call{
+				mockService.EXPECT().SearchByUserId(100).Return(&model.User{}, errors.New("id not found")),
+			},
+			expBody: []byte("id not found"),
+		},
 	}
 
-	ctrl := gomock.NewController(t)
-
-	serv := service.NewMockService(ctrl)
-
-	h := Handler{serv}
-	for _, tc := range tcs {
-		link := "/users/%s"
-		r := httptest.NewRequest("GET", fmt.Sprintf(link, tc.Id), nil)
-		w := httptest.NewRecorder()
-
+	for _, tcs := range testCases {
+		r := httptest.NewRequest("GET", fmt.Sprintf("/user/%s", tcs.id), nil)
+		rw := httptest.NewRecorder()
 		r = mux.SetURLVars(r, map[string]string{
-			"id": tc.Id,
+			"id": tcs.id,
 		})
-		id, err := strconv.Atoi(tc.Id)
-		if err == nil {
-			serv.EXPECT().SearchByUserId(id).Return(tc.expected, tc.err)
-		}
-		h.Search(w, r)
-		if w.Code != tc.stCode {
-			t.Fatalf("SearchId() = %v , want %v", w.Code, tc.stCode)
+		handler.Search(rw, r)
+		if rw.Body.String() != string(tcs.expBody) {
+			t.Errorf("%v, Expected %v got %v", tcs.desc, string(tcs.expBody), rw.Body.String())
 		}
 	}
 }
 
 func TestHandler_Delete(t *testing.T) {
-	tcs := []struct {
-		Id       string
-		expected model.User
-		stCode   int
-		err      error
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockService := services.NewMockUser(ctrl)
+	handler := Handler{mockService}
+
+	testCases := []struct {
+		desc    string
+		id      string
+		mock    []*gomock.Call
+		expCode int
+		expBody []byte
 	}{
-		{"1", user[0], http.StatusOK, nil},
-		{"2", user[1], http.StatusOK, nil},
+		{
+			desc:    "testcase-1",
+			id:      "1",
+			expCode: http.StatusOK,
+			mock: []*gomock.Call{
+				mockService.EXPECT().DeleteByUserId(1).Return(nil),
+			},
+			expBody: []byte(`{"id":1,"name":"ai","email":"Nayani@gmail.com","phone":"6303880131","age":"25"}`),
+		},
+		{
+			desc:    "testcase-2",
+			id:      "1a",
+			expCode: http.StatusBadRequest,
+			expBody: []byte("invalid id"),
+		},
+		{
+			desc:    "testcase-3",
+			id:      "100",
+			expCode: http.StatusInternalServerError,
+			mock: []*gomock.Call{
+				mockService.EXPECT().DeleteByUserId(100).Return(errors.New("id not found")),
+			},
+			expBody: []byte("could not Delete user"),
+		},
 	}
 
-	ctrl := gomock.NewController(t)
-
-	serv := service.NewMockService(ctrl)
-
-	h := Handler{serv}
-	for _, tc := range tcs {
-		link := "/users/%s"
-		r := httptest.NewRequest("DELETE", fmt.Sprintf(link, tc.Id), nil)
-		w := httptest.NewRecorder()
-
+	for _, tcs := range testCases {
+		r := httptest.NewRequest("GET", fmt.Sprintf("/user/%s", tcs.id), nil)
+		rw := httptest.NewRecorder()
 		r = mux.SetURLVars(r, map[string]string{
-			"id": tc.Id,
+			"id": tcs.id,
 		})
-		id, err := strconv.Atoi(tc.Id)
-		if err == nil {
-			serv.EXPECT().DeleteByUserId(id).Return(tc.err)
-		}
-		h.DeleteId(w, r)
-		if w.Code != tc.stCode {
-			t.Fatalf("DeleteId() = %v , want %v", w.Code, tc.stCode)
+		handler.DeleteId(rw, r)
+		if rw.Code != tcs.expCode {
+			t.Errorf("%v, Expected %v got %v", tcs.desc, tcs.expCode, rw.Code)
 		}
 	}
 }
 
 func TestHandler_SearchingAll(t *testing.T) {
-	tcs := []struct {
-		Id       string
-		expected []model.User
-		stCode   int
-		err      error
-	}{
-		{"1", []model.User{
-			{Id: 2,
-				Name:  "Nayani",
-				Email: "sai@gmail.com",
-				Phone: "9908577405",
-				Age:   "12",
-			}}, http.StatusOK, nil},
-	}
-
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockService := services.NewMockUser(ctrl)
+	handler := Handler{mockService}
 
-	serv := service.NewMockService(ctrl)
+	testCases := []struct {
+		desc    string
+		mock    []*gomock.Call
+		expCode int
+		expBody []byte
+	}{
+		{
+			desc:    "testcase-1",
+			expCode: http.StatusOK,
+			mock: []*gomock.Call{
+				mockService.EXPECT().SearchAll().Return([]*model.User{&user}, nil),
+			},
+			expBody: []byte(`[{"id":1,"name":"sai","email":"Nayani@gmail.com","phone":"6303880131","age":"25"}]`),
+		},
+	}
 
-	h := Handler{serv}
-	for _, tc := range tcs {
-		link := "/users"
-		r := httptest.NewRequest("GET", fmt.Sprintf(link), nil)
-		w := httptest.NewRecorder()
-
-		r = mux.SetURLVars(r, map[string]string{
-			"id": tc.Id,
-		})
-		_, err := strconv.Atoi(tc.Id)
-		if err == nil {
-			serv.EXPECT().SearchAll().Return(tc.expected, tc.err)
-		}
-		h.GetAll(w, r)
-		if w.Code != tc.stCode {
-			t.Fatalf("SearchAll() = %v , want %v", w.Code, tc.stCode)
+	for _, tcs := range testCases {
+		r := httptest.NewRequest("GET", fmt.Sprintf("/user"), nil)
+		rw := httptest.NewRecorder()
+		handler.GetAll(rw, r)
+		if rw.Code != tcs.expCode {
+			t.Errorf("%v, Expected %v got %v", tcs.desc, tcs.expCode, rw.Code)
 		}
 	}
+
 }
+
 func Test_AddUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	serv := service.NewMockService(ctrl)
-	h := Handler{serv}
-	tests := []struct {
-		desc     string
-		usr      model.User
-		output   model.User
-		stcode   int
-		validity bool
-		err      error
+	mockService := services.NewMockUser(ctrl)
+	handler := Handler{mockService}
+
+	testCases := []struct {
+		desc    string
+		usr     model.User
+		mock    []*gomock.Call
+		expCode int
+		expBody []byte
 	}{
 		{
-			desc:     "Success",
-			usr:      model.User{Id: 1, Name: "Sai", Email: "Nayani@gmail.com", Phone: "9908577405", Age: "22"},
-			output:   model.User{Id: 1, Name: "Sai", Email: "Nayani@gmail.com", Phone: "9908577405", Age: "22"},
-			stcode:   http.StatusOK,
-			validity: true,
-			err:      nil,
+			desc:    "testcase-1",
+			usr:     user,
+			expCode: http.StatusOK,
+			mock: []*gomock.Call{
+				mockService.EXPECT().InsertUserDetails(&user).Return(&user, nil),
+			},
+			expBody: []byte(`{"id":1,"name":"sai","email":"Nayani@gmail.com","phone":"6303880131","age":"25"}user created`),
 		},
 	}
-	for _, tc := range tests {
 
-		l, _ := json.Marshal(tc.usr)
-		m := bytes.NewBuffer(l)
-		link := "/users"
-		r := httptest.NewRequest("POST", link, m)
-		w := httptest.NewRecorder()
-
-		serv.EXPECT().InsertUserDetails(tc.usr).Return(tc.output, tc.err).MinTimes(0)
-		h.Create(w, r)
-		if w.Code != tc.stcode {
-			t.Fatalf("InsertUser()=%v,want %v", w.Code, tc.stcode)
+	for _, tcs := range testCases {
+		jsonUser, _ := json.Marshal(tcs.usr)
+		r := httptest.NewRequest("POST", fmt.Sprintf("/user"), bytes.NewBuffer(jsonUser))
+		rw := httptest.NewRecorder()
+		handler.Create(rw, r)
+		if rw.Code != tcs.expCode {
+			t.Errorf("%v, Expected %v got %v", tcs.desc, tcs.expCode, rw.Code)
 		}
 	}
-
 }
 
 func TestUpdateUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	serv := service.NewMockService(ctrl)
-	h := Handler{serv}
+	mockService := services.NewMockUser(ctrl)
+	handler := Handler{mockService}
+
 	testCases := []struct {
-		desc     string
-		user     []byte
-		mock     []*gomock.Call
-		expecErr error
-		expecRes []byte
+		desc    string
+		mock    []*gomock.Call
+		expCode int
+		expBody []byte
 	}{
 		{
-			desc: "Success case",
-			user: []byte(`{
-				"Id":    1,
-				"Name":  "Sai",
-				"Email": "Nayani@gmail.com",
-				"Phone": "9908577405",
-				"Age":   "23"
-			}`),
+			desc:    "testcase-1",
+			expCode: http.StatusOK,
 			mock: []*gomock.Call{
-				serv.EXPECT().IsEmailValid("Nayani@gmail.com").Return(true).MaxTimes(5),
-				serv.EXPECT().UpdateByUserId(model.User{
-					Id:    1,
-					Name:  "Sai",
-					Email: "Nayani@gmail.com",
-					Phone: "9908577405",
-					Age:   "23",
-				}).Return(nil).MaxTimes(5),
+				mockService.EXPECT().UpdateByUserId(&user).Return(&user, nil),
 			},
-			expecErr: nil,
-			expecRes: []byte("User updated"),
-		},
-		{
-			desc: "Failure case -1",
-			user: []byte(`{
-				"Id":    1,
-				"Name":  "Sai",
-				"Email": "Nayani@gmail.com",
-				"Phone": "9908577405",
-				"Age":   "23",
-			}`),
-			expecErr: errors.New("invalid body"),
-			expecRes: []byte("invalid body"),
+			expBody: []byte(`{"id":1,"name":"sai","email":"Nayani@gmail.com","phone":"6303880131","age":"25"}`),
 		},
 	}
-	for _, v := range testCases {
-		t.Run(v.desc, func(t *testing.T) {
-			r := httptest.NewRequest("PUT", "/update", bytes.NewReader(v.user))
-			rw := httptest.NewRecorder()
-			h.UpdateUser(rw, r)
-			fmt.Println(rw.Body.String())
-			if rw.Body.String() != string(v.expecRes) {
-				t.Errorf("Expected %v Obtained %v", string(v.expecRes), rw.Body.String())
-			}
+
+	for _, tcs := range testCases {
+		jsonUser, _ := json.Marshal(model.User{
+			Id:    1,
+			Name:  "sai",
+			Email: "Nayani@gmail.com",
+			Phone: "6303880131",
+			Age:   "25",
 		})
+		r := httptest.NewRequest("PUT", fmt.Sprintf("/user"), bytes.NewBuffer(jsonUser))
+		rw := httptest.NewRecorder()
+		handler.UpdateUser(rw, r)
+		if rw.Code != tcs.expCode {
+			t.Errorf("%v, Expected %v got %v", tcs.desc, tcs.expCode, rw.Code)
+		}
 	}
 }

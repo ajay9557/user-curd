@@ -1,4 +1,4 @@
-package Users
+package validations
 
 import "testing"
 
@@ -26,7 +26,7 @@ func TestEmailValid(t *testing.T) {
 	}
 	for _, ts := range testCases {
 		t.Run(ts.desc, func(t *testing.T) {
-			result := emailvalidation(ts.input)
+			result := ValidateEmail(ts.input)
 			if result != ts.expectedOutput {
 				t.Errorf("Expected %v obtained %v", ts.expectedOutput, result)
 			}

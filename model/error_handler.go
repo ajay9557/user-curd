@@ -1,15 +1,6 @@
 package model
 
-import "fmt"
-
-const (
-	ErrPro = "Id should not be nill"
-)
-
-type Err struct {
-	Id int
-}
-
-func (er Err) Error() string {
-	return fmt.Sprint(ErrPro, er.Id)
+type ErrorResponse struct {
+	Code    string `"json:"code"`
+	Message string `json:"message"`
 }

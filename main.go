@@ -1,13 +1,13 @@
 package main
 
 import (
-	"user-curd/stores/Users"
+	stores "user-curd/stores/Users"
 
 	"database/sql"
 	"fmt"
 	"net/http"
 	httplayer "user-curd/Http/Users"
-	servicelayer "user-curd/Service/Users"
+	servicelayer "user-curd/services/Users"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -21,7 +21,7 @@ func main() {
 		return
 	}
 	defer db.Close()
-	store:= Users.New(db)
+	store := stores.New(db)
 	service := servicelayer.New(store)
 	ht := httplayer.Handler{service}
 
