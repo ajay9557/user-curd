@@ -2,7 +2,7 @@ package Users
 
 import "Icrud/TModels"
 
-func formUpdateQuery(id int, u TModels.User) (string, []interface{}) {
+func formUpdateQuery(u TModels.User) (string, []interface{}) {
 	var where string = ""
 	var value []interface{}
 	if u.Name != "" {
@@ -20,10 +20,6 @@ func formUpdateQuery(id int, u TModels.User) (string, []interface{}) {
 	if u.Age != 0 {
 		where = where + "age = ?,"
 		value = append(value, u.Age)
-	}
-
-	if id > 0 {
-		value = append(value, id)
 	}
 
 	return where, value

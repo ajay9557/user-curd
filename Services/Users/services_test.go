@@ -55,14 +55,14 @@ func TestGetUsers(t *testing.T) {
 	mockUserStore := Stores.NewMockIStore(ctrl)
 	testUserService := New(mockUserStore)
 
-	data1 := []TModels.User{
-		{Id: 1, Name: "Naruto", Email: "naruto@gmail.com", Phone: "9999999999", Age: 18},
-		{Id: 2, Name: "Itachi", Email: "itachi@gmail.com", Phone: "8320578360", Age: 24},
+	data1 := []*TModels.User{
+		&TModels.User{Id: 1, Name: "Naruto", Email: "naruto@gmail.com", Phone: "9999999999", Age: 18},
+		&TModels.User{Id: 2, Name: "Itachi", Email: "itachi@gmail.com", Phone: "8320578360", Age: 24},
 	}
 
 	tests := []struct {
 		desc     string
-		expected []TModels.User
+		expected []*TModels.User
 		mockCall *gomock.Call
 	}{
 		{
@@ -72,8 +72,8 @@ func TestGetUsers(t *testing.T) {
 		},
 		{
 			desc:     "Case2",
-			expected: []TModels.User{},
-			mockCall: mockUserStore.EXPECT().GetUsers().Return([]TModels.User{}, errors.New("Cannot fetch users")),
+			expected: nil,
+			mockCall: mockUserStore.EXPECT().GetUsers().Return([]*TModels.User{}, errors.New("Cannot fetch users")),
 		},
 	}
 
@@ -98,29 +98,29 @@ func TestDeleteUserById(t *testing.T) {
 	tests := []struct {
 		desc     string
 		id       int
-		expected int
+		expected error
 		mockCall *gomock.Call
 	}{
 		{
 			desc:     "Case1",
 			id:       1,
-			expected: 1,
-			mockCall: mockUserStore.EXPECT().DeleteUserById(1).Return(1, nil),
+			expected: nil,
+			mockCall: mockUserStore.EXPECT().DeleteUserById(1).Return(nil),
 		},
 		{
 			desc:     "Case2",
 			id:       2,
-			expected: 0,
-			mockCall: mockUserStore.EXPECT().DeleteUserById(2).Return(0, errors.New("Invalid id")),
+			expected: errors.New("Invalid id"),
+			mockCall: mockUserStore.EXPECT().DeleteUserById(2).Return(errors.New("Invalid id")),
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			rowsAffected, _ := testUserService.DeleteUserById(test.id)
+			err := testUserService.DeleteUserById(test.id)
 
-			if rowsAffected != test.expected {
-				t.Errorf("Expected: %v, Got: %v", test.expected, rowsAffected)
+			if !reflect.DeepEqual(err, test.expected) {
+				t.Errorf("Expected: %v, Got: %v", test.expected, err)
 			}
 		})
 	}
@@ -173,12 +173,6 @@ func TestInsertUser(t *testing.T) {
 				mockUserStore.EXPECT().GetEmail("ridhdhish@gmail.com").Return(true, nil),
 			},
 		},
-		// {
-		// 	desc:     "Case3",
-		// 	user:     TModels.User{},
-		// 	expected: 0,
-		// 	mockCall: nil,
-		// },
 	}
 
 	for _, test := range tests {
@@ -186,9 +180,6 @@ func TestInsertUser(t *testing.T) {
 			// lastInsertedId, _ := testUserService.InsertUser(test.user)
 			user, err := testUserService.InsertUser(test.user)
 
-			// if lastInsertedId != test.expected {
-			// 	t.Errorf("Expected: %v, Got: %v", test.expected, lastInsertedId)
-			// }
 			if test.expectedError != nil && errors.Is(err, test.expectedError) && !reflect.DeepEqual(user, test.expectedUser) {
 				t.Errorf("Expected: %v, Got: %v", test.expectedUser, user)
 			}
@@ -235,27 +226,22 @@ func TestUpdateUserById(t *testing.T) {
 			expectedUser: updatedUser,
 			mockCall: []*gomock.Call{
 				mockUserStore.EXPECT().UserById(1).Return(expectedUser, nil),
-				mockUserStore.EXPECT().UpdateUserById(testUser, 1).Return(1, nil),
+				mockUserStore.EXPECT().UpdateUserById(testUser, 1).Return(nil),
 				mockUserStore.EXPECT().UserById(1).Return(updatedUser, nil),
 			},
 		},
 		{
 			desc: "Case2",
-			id:   -1,
+			id:   3,
 			// expected: 0,
 			expectedUser:  TModels.User{},
 			expectedError: errors.New("User id should be greater than 0"),
-			mockCall:      nil,
-		},
+			mockCall:      []*gomock.Call{mockUserStore.EXPECT().UserById(3).Return(expectedUser, errors.New("User id should be greater than 0"))}},
 	}
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			// lastInsertedId, _ := testUserService.UpdateUserById(testUser, test.id)
 
-			// if lastInsertedId != test.expected {
-			// 	t.Errorf("Expected: %v, Got: %v", test.expected, lastInsertedId)
-			// }
 			user, err := testUserService.UpdateUserById(testUser, test.id)
 			if err != nil && err.Error() != test.expectedError.Error() && !reflect.DeepEqual(user, test.expectedUser) {
 				t.Errorf("expectedUser: %v, Got: %v", test.expectedUser, user)

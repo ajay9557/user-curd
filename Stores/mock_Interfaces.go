@@ -6,49 +6,49 @@ package Stores
 
 import (
 	TModels "Icrud/TModels"
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockIStore is a mock of IStore interface
+// MockIStore is a mock of IStore interface.
 type MockIStore struct {
 	ctrl     *gomock.Controller
 	recorder *MockIStoreMockRecorder
 }
 
-// MockIStoreMockRecorder is the mock recorder for MockIStore
+// MockIStoreMockRecorder is the mock recorder for MockIStore.
 type MockIStoreMockRecorder struct {
 	mock *MockIStore
 }
 
-// NewMockIStore creates a new mock instance
+// NewMockIStore creates a new mock instance.
 func NewMockIStore(ctrl *gomock.Controller) *MockIStore {
 	mock := &MockIStore{ctrl: ctrl}
 	mock.recorder = &MockIStoreMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockIStore) EXPECT() *MockIStoreMockRecorder {
 	return m.recorder
 }
 
-// DeleteUserById mocks base method
-func (m *MockIStore) DeleteUserById(arg0 int) (int, error) {
+// DeleteUserById mocks base method.
+func (m *MockIStore) DeleteUserById(arg0 int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUserById", arg0)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// DeleteUserById indicates an expected call of DeleteUserById
+// DeleteUserById indicates an expected call of DeleteUserById.
 func (mr *MockIStoreMockRecorder) DeleteUserById(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserById", reflect.TypeOf((*MockIStore)(nil).DeleteUserById), arg0)
 }
 
-// GetEmail mocks base method
+// GetEmail mocks base method.
 func (m *MockIStore) GetEmail(arg0 string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEmail", arg0)
@@ -57,28 +57,28 @@ func (m *MockIStore) GetEmail(arg0 string) (bool, error) {
 	return ret0, ret1
 }
 
-// GetEmail indicates an expected call of GetEmail
+// GetEmail indicates an expected call of GetEmail.
 func (mr *MockIStoreMockRecorder) GetEmail(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEmail", reflect.TypeOf((*MockIStore)(nil).GetEmail), arg0)
 }
 
-// GetUsers mocks base method
-func (m *MockIStore) GetUsers() ([]TModels.User, error) {
+// GetUsers mocks base method.
+func (m *MockIStore) GetUsers() ([]*TModels.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUsers")
-	ret0, _ := ret[0].([]TModels.User)
+	ret0, _ := ret[0].([]*TModels.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetUsers indicates an expected call of GetUsers
+// GetUsers indicates an expected call of GetUsers.
 func (mr *MockIStoreMockRecorder) GetUsers() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockIStore)(nil).GetUsers))
 }
 
-// InsertUser mocks base method
+// InsertUser mocks base method.
 func (m *MockIStore) InsertUser(arg0 TModels.User) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertUser", arg0)
@@ -87,28 +87,27 @@ func (m *MockIStore) InsertUser(arg0 TModels.User) (int, error) {
 	return ret0, ret1
 }
 
-// InsertUser indicates an expected call of InsertUser
+// InsertUser indicates an expected call of InsertUser.
 func (mr *MockIStoreMockRecorder) InsertUser(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUser", reflect.TypeOf((*MockIStore)(nil).InsertUser), arg0)
 }
 
-// UpdateUserById mocks base method
-func (m *MockIStore) UpdateUserById(arg0 TModels.User, arg1 int) (int, error) {
+// UpdateUserById mocks base method.
+func (m *MockIStore) UpdateUserById(arg0 TModels.User, arg1 int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUserById", arg0, arg1)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// UpdateUserById indicates an expected call of UpdateUserById
+// UpdateUserById indicates an expected call of UpdateUserById.
 func (mr *MockIStoreMockRecorder) UpdateUserById(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserById", reflect.TypeOf((*MockIStore)(nil).UpdateUserById), arg0, arg1)
 }
 
-// UserById mocks base method
+// UserById mocks base method.
 func (m *MockIStore) UserById(arg0 int) (TModels.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UserById", arg0)
@@ -117,7 +116,7 @@ func (m *MockIStore) UserById(arg0 int) (TModels.User, error) {
 	return ret0, ret1
 }
 
-// UserById indicates an expected call of UserById
+// UserById indicates an expected call of UserById.
 func (mr *MockIStoreMockRecorder) UserById(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserById", reflect.TypeOf((*MockIStore)(nil).UserById), arg0)

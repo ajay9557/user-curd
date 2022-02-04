@@ -85,7 +85,7 @@ func (srvhdlr Handler) GetUsers(w http.ResponseWriter, req *http.Request) {
 
 	responseData := TModels.Response{
 		Data: struct {
-			Users []TModels.User `json: "users"`
+			Users []*TModels.User `json: "users"`
 		}{
 			Users: AllUsers,
 		},
@@ -192,7 +192,7 @@ func (srvhdlr Handler) DeleteUserById(w http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	_, er = srvhdlr.Sev.DeleteUserById(iid)
+	er = srvhdlr.Sev.DeleteUserById(iid)
 	if er != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		herr := TModels.ErrorResponse{StCode: http.StatusBadRequest, Errmessage: er.Error()}

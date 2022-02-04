@@ -31,12 +31,12 @@ func (su *ServUser) UserById(id int) (TModels.User, error) {
 	return u, nil
 }
 
-func (su *ServUser) GetUsers() ([]TModels.User, error) {
-	var u []TModels.User
+func (su *ServUser) GetUsers() ([]*TModels.User, error) {
+	var u []*TModels.User
 	res, err := su.isu.GetUsers()
 	if err != nil {
 		fmt.Println(err)
-		return []TModels.User{}, err
+		return nil, err
 	}
 	u = res
 	return u, nil
@@ -72,28 +72,31 @@ func (su *ServUser) InsertUser(users TModels.User) (TModels.User, error) {
 	return updatedUser, nil
 }
 
-func (su *ServUser) DeleteUserById(id int) (int, error) {
-	var iid int
-	res, err := su.isu.DeleteUserById(id)
+func (su *ServUser) DeleteUserById(id int) error {
+	// var iid int
+	// if id < 1 {
+	// 	return errors.New("Id must be >0")
+	// }
+	err := su.isu.DeleteUserById(id)
 	if err != nil {
-		return iid, err
+		return err
 	}
-	iid = res
-	return iid, nil
+	// iid = res
+	return nil
 }
 
 func (su *ServUser) UpdateUserById(u TModels.User, id int) (TModels.User, error) {
 	var uu TModels.User
 	// var iid int
 
-	if id < 0 {
+	if id < 1 {
 		return uu, errors.New("User id should be greater than 0")
 	}
 	_, err := su.isu.UserById(id)
 	if err != nil {
 		return uu, err
 	}
-	_, err = su.isu.UpdateUserById(u, id)
+	err = su.isu.UpdateUserById(u, id)
 	if err != nil {
 		// fmt.Println(err)
 		return uu, err
@@ -101,6 +104,7 @@ func (su *ServUser) UpdateUserById(u TModels.User, id int) (TModels.User, error)
 	// iid = res
 	// return iid, nil
 	updatedUser, _ := su.isu.UserById(id)
+
 	return updatedUser, nil
 
 }

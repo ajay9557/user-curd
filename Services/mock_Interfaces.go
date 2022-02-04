@@ -35,12 +35,11 @@ func (m *MockISUser) EXPECT() *MockISUserMockRecorder {
 }
 
 // DeleteUserById mocks base method.
-func (m *MockISUser) DeleteUserById(arg0 int) (int, error) {
+func (m *MockISUser) DeleteUserById(arg0 int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUserById", arg0)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // DeleteUserById indicates an expected call of DeleteUserById.
@@ -50,10 +49,10 @@ func (mr *MockISUserMockRecorder) DeleteUserById(arg0 interface{}) *gomock.Call 
 }
 
 // GetUsers mocks base method.
-func (m *MockISUser) GetUsers() ([]TModels.User, error) {
+func (m *MockISUser) GetUsers() ([]*TModels.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUsers")
-	ret0, _ := ret[0].([]TModels.User)
+	ret0, _ := ret[0].([]*TModels.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

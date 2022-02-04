@@ -35,18 +35,18 @@ func New(db *sql.DB) Stores.IStore {
 	return &dbStore{db: db}
 }
 
-func (s *dbStore) GetUsers() ([]TModels.User, error) {
-	var users []TModels.User
+func (s *dbStore) GetUsers() ([]*TModels.User, error) {
+	var users []*TModels.User
 
 	rows, err := s.db.Query("select * from HUser")
 	if err != nil {
-		return []TModels.User{}, errors.New("cannot fetch users")
+		return nil, errors.New("cannot fetch users")
 	}
 
 	for rows.Next() {
 		var u TModels.User
 		err = rows.Scan(&u.Id, &u.Name, &u.Email, &u.Phone, &u.Age)
-		users = append(users, u)
+		users = append(users, &u)
 	}
 	return users, err
 
@@ -91,48 +91,52 @@ func (s *dbStore) UserById(id int) (TModels.User, error) {
 
 }
 
-func (s *dbStore) DeleteUserById(id int) (int, error) {
-	var iid int
+func (s *dbStore) DeleteUserById(id int) error {
+	// var iid int
 	if id < 1 {
-		return iid, errors.New("negative Id")
+		return errors.New("negative Id")
 	}
 
 	result, err := s.db.Exec("delete from HUser where id=?", id)
 	if err != nil {
-		return iid, err
+		return err
 	}
-	rr, _ := result.RowsAffected()
-	return int(rr), nil
+	_, err = result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (s *dbStore) UpdateUserById(u TModels.User, id int) (int, error) {
-	var iid int
+func (s *dbStore) UpdateUserById(u TModels.User, id int) error {
+	// var iid int
 
 	if id < 1 {
-		return iid, errors.New("negative Id")
+		return errors.New("negative Id")
 	}
 
 	// sq := "Update HUser set  name = ?,email = ?,phone = ?,age = ? where id =?"
 	sq := "Update HUser "
-	fields, args := formUpdateQuery(id, u)
+	fields, args := formUpdateQuery(u)
 
 	subQuery := fields[:len(fields)-1]
 
 	if fields != "" {
 		sq += "set " + subQuery + " where id = ?"
 		// res, err := s.db.Exec(sq, u.Name, u.Email, u.Phone, u.Age, id)
+		args = append(args, id)
 		res, err := s.db.Exec(sq, args...)
 		if err != nil {
-			return -1, err
+			return err
 		}
-		re, err := res.RowsAffected()
+		_, err = res.RowsAffected()
 		if err != nil {
-			return -1, errors.New("error during Updating the id")
+			return errors.New("error during Updating the id")
 		}
 
-		return int(re), nil
+		return nil
 	}
-	return -1, errors.New("Nothing to update")
+	return errors.New("Nothing to update")
 }
 
 func (s *dbStore) GetEmail(email string) (bool, error) {

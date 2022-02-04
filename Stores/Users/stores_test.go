@@ -60,20 +60,20 @@ func TestGetUsers(t *testing.T) {
 
 	tests := []struct {
 		desc      string
-		expected  []TModels.User
+		expected  []*TModels.User
 		mockQuery *sqlmock.ExpectedQuery
 	}{
 		{
 			desc: "Case1",
-			expected: []TModels.User{
-				{Id: 1, Name: "Naruto", Email: "naruto@gmail.com", Phone: "9999999999", Age: 18},
-				{Id: 2, Name: "Itachi", Email: "itachi@gmail.com", Phone: "8320578360", Age: 24},
+			expected: []*TModels.User{
+				&TModels.User{Id: 1, Name: "Naruto", Email: "naruto@gmail.com", Phone: "9999999999", Age: 18},
+				&TModels.User{Id: 2, Name: "Itachi", Email: "itachi@gmail.com", Phone: "8320578360", Age: 24},
 			},
 			mockQuery: mock.ExpectQuery("select * from HUser").WillReturnRows(rows),
 		},
 		{
 			desc:      "Case2",
-			expected:  []TModels.User{},
+			expected:  nil,
 			mockQuery: mock.ExpectQuery("select * from HUser").WillReturnError(errors.New("Cannot fetch users")),
 		},
 	}
@@ -84,7 +84,7 @@ func TestGetUsers(t *testing.T) {
 		t.Run(test.desc, func(t *testing.T) {
 			userList, _ := userStore.GetUsers()
 
-			if !reflect.DeepEqual(userList, test.expected) {
+			if err == nil && !reflect.DeepEqual(userList, test.expected) {
 				t.Errorf("Expected: %v, Got: %v", test.expected, userList)
 			}
 		})
@@ -101,19 +101,19 @@ func TestDeleteUserById(t *testing.T) {
 	tests := []struct {
 		desc     string
 		id       int
-		expected int
+		expected error
 		mockCall *sqlmock.ExpectedExec
 	}{
 		{
 			desc:     "Case1",
 			id:       1,
-			expected: 1,
+			expected: nil,
 			mockCall: mock.ExpectExec("delete from HUser where id=?").WithArgs(1).WillReturnResult(sqlmock.NewResult(1, 1)),
 		},
 		{
 			desc:     "Case2",
 			id:       2,
-			expected: 0,
+			expected: errors.New("Invalid Id"),
 			mockCall: mock.ExpectExec("delete from HUser where id=?").WithArgs(2).WillReturnError(errors.New("Invalid Id")),
 		},
 	}
@@ -122,10 +122,10 @@ func TestDeleteUserById(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			affectedRows, _ := userStore.DeleteUserById(test.id)
+			err := userStore.DeleteUserById(test.id)
 
-			if affectedRows != test.expected {
-				t.Errorf("Expected: %d, Got: %d", test.expected, affectedRows)
+			if !reflect.DeepEqual(err, test.expected) {
+				t.Errorf("Expected: %d, Got: %d", test.expected, err)
 			}
 		})
 	}
@@ -243,7 +243,7 @@ func TestUpdateUser(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			_, err := userStore.UpdateUserById(test.user, test.id)
+			err := userStore.UpdateUserById(test.user, test.id)
 
 			if !errors.Is(err, test.expectedError) {
 				t.Errorf("Expected: %d, Got: %d", test.expectedError, err)

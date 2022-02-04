@@ -56,3 +56,8 @@ func main() {
 	log.Println("Listening at :3000")
 	http.ListenAndServe(":3000", nil)
 }
+
+// "Name": "veda",
+// "Email": "abvedalu@gmail.com",
+// "Phone": "9381593132",
+// "Age": 211234

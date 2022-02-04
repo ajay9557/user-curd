@@ -69,7 +69,7 @@ func TestGetUsers(t *testing.T) {
 	mockUserService := Services.NewMockISUser(ctrl)
 	h := Handler{mockUserService}
 
-	data1 := []TModels.User{
+	data1 := []*TModels.User{
 		{Id: 1, Name: "Naruto", Email: "naruto@gmail.com", Phone: "9999999999", Age: 18},
 		{Id: 2, Name: "Itachi", Email: "itachi@gmail.com", Phone: "8320578360", Age: 24},
 	}
@@ -87,7 +87,7 @@ func TestGetUsers(t *testing.T) {
 		{
 			desc:               "Case2",
 			expectedStatusCode: http.StatusBadRequest,
-			mockCall:           mockUserService.EXPECT().GetUsers().Return([]TModels.User{}, errors.New("Invalid Id")),
+			mockCall:           mockUserService.EXPECT().GetUsers().Return([]*TModels.User{}, errors.New("Invalid Id")),
 		},
 	}
 
@@ -119,13 +119,13 @@ func TestDeleteUserById(t *testing.T) {
 			desc:               "Case1",
 			id:                 "1",
 			expectedStatusCode: http.StatusOK,
-			mockCall:           mockUserService.EXPECT().DeleteUserById(1).Return(1, nil),
+			mockCall:           mockUserService.EXPECT().DeleteUserById(1).Return(nil),
 		},
 		{
 			desc:               "Case2",
 			id:                 "2",
 			expectedStatusCode: http.StatusBadRequest,
-			mockCall:           mockUserService.EXPECT().DeleteUserById(2).Return(0, errors.New("Invalid Id")),
+			mockCall:           mockUserService.EXPECT().DeleteUserById(2).Return(errors.New("Invalid Id")),
 		},
 		{
 			desc:               "Case3",
